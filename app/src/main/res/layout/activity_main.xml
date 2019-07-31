@@ -60,6 +60,7 @@
                 android:id="@+id/search_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="5dp"
                 android:visibility="invisible" />
 
             <ProgressBar
@@ -67,7 +68,7 @@
                 style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|center_horizontal"
+                android:layout_gravity="center_vertical|center_horizontal"
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="@+id/search_button"
                 app:layout_constraintStart_toStartOf="@+id/search_button"
