@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(MainActivity.this, getString(R.string.error_download), Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.GONE);
+                searchButton.setClickable(true);
             }
         }
     };
