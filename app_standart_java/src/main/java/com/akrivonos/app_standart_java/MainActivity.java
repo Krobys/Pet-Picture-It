@@ -39,11 +39,12 @@ public class MainActivity extends AppCompatActivity {
     protected static final String SPAN_URL = "span_url";
     protected static final String STATUS = "STATUS";
     protected static final String SERVICE_FILTER = "com.akrivonos.app_standart_java.SERVICE";
-    int status;
+    private int status;
     private TextView searchResultTextView;
     private EditText searchRequestEditText;
     private Button searchButton;
     private ProgressBar progressBar;
+
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
     private View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    void startSettingLoadedInfo(String info) {
+    private void startSettingLoadedInfo(String info) {
         List<Photo> photos;
         try {
             photos = parseXml(info);
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    List<Photo> parseXml(String xml) throws XmlPullParserException, IOException { // Парсинг фотографий в список
+    private List<Photo> parseXml(String xml) throws XmlPullParserException, IOException { // Парсинг фотографий в список
         List<Photo> photos = new ArrayList<>();
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         return photos;
     }
 
-    void setSpanTextInView(List<Photo> photos) { //добавление активной ссылки для каждой фото
+    private void setSpanTextInView(List<Photo> photos) { //добавление активной ссылки для каждой фото
         for (Photo photo : photos) {
             final String photoUrl = getPhotoUrl(photo);
 
