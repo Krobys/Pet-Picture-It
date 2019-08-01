@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Button searchButton;
     private ProgressBar progressBar;
     protected static final String SPAN_URL = "span_url";
+
     private View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -99,4 +100,8 @@ public class MainActivity extends AppCompatActivity {
         String secret = photo.getSecret();
         return "https://farm" + farm + ".staticflickr.com/" + server + "/" + id + "_" + secret + ".jpg";
     }
+
+//     progressBar.setVisibility(View.GONE);
+//        searchResultTextView.setVisibility(View.VISIBLE);
+//        searchButton.setClickable(true);
 }
