@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     protected static final String SPAN_URL = "span_url";
     protected static final String STATUS = "STATUS";
     protected static final String SERVICE_FILTER = "com.akrivonos.app_standart_java.SERVICE";
-    private int status;
     private TextView searchResultTextView;
     private EditText searchRequestEditText;
     private Button searchButton;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            status = intent.getIntExtra(STATUS, 0);
+            int status = intent.getIntExtra(STATUS, 0);
             switch (status) {
                 case STATUS_START:
                     progressBar.setVisibility(View.VISIBLE);
