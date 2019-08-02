@@ -3,7 +3,6 @@ package com.akrivonos.app_standart_java.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.akrivonos.app_standart_java.MainActivity;
 
@@ -48,7 +47,7 @@ public class PicturesDownloadService extends Service {
         return "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText;
     }
 
-    class RunTask implements Runnable {
+    private class RunTask implements Runnable {
         int startId;
 
         RunTask(int startId) {
@@ -74,7 +73,6 @@ public class PicturesDownloadService extends Service {
             URL url;
             try {
                 url = new URL(urlDownload);
-                Log.d("test", "loadInformation: " + url.toString());
                 HttpsURLConnection c = (HttpsURLConnection) url.openConnection();
                 c.setRequestMethod("GET");
                 c.setReadTimeout(10000);

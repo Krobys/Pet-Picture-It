@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:text="@string/search"
-        app:layout_constraintEnd_toEndOf="@+id/search_request"
+        app:layout_constraintEnd_toEndOf="@id/search_request"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="@+id/search_request"
         app:layout_constraintTop_toBottomOf="@+id/search_request" />

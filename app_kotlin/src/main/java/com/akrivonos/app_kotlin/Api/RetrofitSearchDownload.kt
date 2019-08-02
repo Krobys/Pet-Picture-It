@@ -1,7 +1,6 @@
 package com.akrivonos.app_kotlin.Api
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.akrivonos.app_kotlin.Models.Rsp
 import retrofit2.Call
 import retrofit2.Callback
@@ -38,7 +37,6 @@ object RetrofitSearchDownload {
             }
 
             override fun onFailure(call: Call<Rsp>, t: Throwable) {
-                Log.d("test", "onFail: ${t.message}")
                 transData.value = null
             }
         })
