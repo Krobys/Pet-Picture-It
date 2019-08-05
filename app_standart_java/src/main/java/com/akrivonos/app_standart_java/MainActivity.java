@@ -1,10 +1,9 @@
 package com.akrivonos.app_standart_java;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -19,52 +18,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akrivonos.app_standart_java.models.Photo;
+import com.akrivonos.app_standart_java.services.PicturesDownloadService;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderListener {
 
     public static final String SEARCH_TEXT = "search_text";
     public static final String RESULT_TEXT = "result_text";
-    public static final String BROADCAST_ACTION = "com.akrivonos.broadcastrec.Broadcast";
     public static final int STATUS_START = 1;
     public static final int STATUS_STOP = 0;
     protected static final String SPAN_URL = "span_url";
-    protected static final String STATUS = "STATUS";
-    protected static final String SERVICE_FILTER = "com.akrivonos.app_standart_java.SERVICE";
+    private static final String SEARCH_FIELD_TEXT = "search_field_text";
     private TextView searchResultTextView;
     private EditText searchRequestEditText;
     private Button searchButton;
     private ProgressBar progressBar;
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int status = intent.getIntExtra(STATUS, 0);
-            switch (status) {
-                case STATUS_START:
-                    progressBar.setVisibility(View.VISIBLE);
-                    searchResultTextView.setVisibility(View.GONE);
-                    searchButton.setClickable(false);
-                    break;
-                case STATUS_STOP:
-                    progressBar.setVisibility(View.GONE);
-                    searchResultTextView.setVisibility(View.VISIBLE);
-                    searchResultTextView.setText("");
-                    setSpanTextInView(intent.<Photo>getParcelableArrayListExtra(RESULT_TEXT));
-                    searchButton.setClickable(true);
-                    stopService(new Intent(SERVICE_FILTER).setPackage(getPackageName()));
-                    break;
-            }
-        }
-    };
+    private PicturesDownloadService downloadPicturesManage;
 
     private View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             String searchText = searchRequestEditText.getText().toString();
             if (!TextUtils.isEmpty(searchText)) {
-                startService(new Intent(SERVICE_FILTER).setPackage(getPackageName()).putExtra(SEARCH_TEXT, searchText));
+                downloadPicturesManage.startLoadPictures(searchText);
             } else {
                 Toast.makeText(MainActivity.this, getString(R.string.empty_field), Toast.LENGTH_SHORT).show();
             }
@@ -83,15 +61,15 @@ public class MainActivity extends AppCompatActivity {
         searchResultTextView = findViewById(R.id.search_result);
         searchButton.setOnClickListener(startSearch);
 
+        restoreSearchField();
         searchResultTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION));
+        downloadPicturesManage = new PicturesDownloadService(this);
     }
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(SERVICE_FILTER).setPackage(getPackageName()));
-        unregisterReceiver(broadcastReceiver);
+        saveSearchField();
         super.onDestroy();
     }
 
@@ -117,5 +95,39 @@ public class MainActivity extends AppCompatActivity {
         String id = photo.getId();
         String secret = photo.getSecret();
         return "https://farm" + farm + ".staticflickr.com/" + server + "/" + id + "_" + secret + ".jpg";
+    }
+
+    void saveSearchField() { //сохранение состояния поля для ввода
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String searchFieldText = searchRequestEditText.getText().toString();
+        if (!TextUtils.isEmpty(searchFieldText)) {
+            sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, searchFieldText).apply();
+        } else {
+            sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, null).apply();
+        }
+    }
+
+    void restoreSearchField() { //востановление состояния поля для ввода
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.contains(SEARCH_FIELD_TEXT)) {
+            String searchFieldText = sharedPreferences.getString(SEARCH_FIELD_TEXT, "");
+            searchRequestEditText.setText(searchFieldText);
+        }
+    }
+
+    @Override
+    public void startLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+        searchResultTextView.setVisibility(View.GONE);
+        searchButton.setClickable(false);
+    }
+
+    @Override
+    public void finishLoading(ArrayList<Photo> photos) {
+        progressBar.setVisibility(View.GONE);
+        searchResultTextView.setVisibility(View.VISIBLE);
+        searchResultTextView.setText("");
+        setSpanTextInView(photos);
+        searchButton.setClickable(true);
     }
 }

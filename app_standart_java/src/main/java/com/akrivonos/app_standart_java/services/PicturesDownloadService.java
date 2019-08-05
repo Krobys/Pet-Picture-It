@@ -1,12 +1,10 @@
 package com.akrivonos.app_standart_java.services;
 
 import android.annotation.SuppressLint;
-import android.app.Service;
-import android.content.Intent;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.os.IBinder;
 
-import com.akrivonos.app_standart_java.MainActivity;
+import com.akrivonos.app_standart_java.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -23,27 +21,19 @@ import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import static com.akrivonos.app_standart_java.MainActivity.RESULT_TEXT;
-import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
-import static com.akrivonos.app_standart_java.MainActivity.STATUS_START;
-import static com.akrivonos.app_standart_java.MainActivity.STATUS_STOP;
+public class PicturesDownloadService {
+    private LoaderListener loaderListener;
 
-public class PicturesDownloadService extends Service {
-    public static final String STATUS = "STATUS";
+    public PicturesDownloadService(Context context) {
+        loaderListener = (LoaderListener) context;
+    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        String urlDownload = buildUrlForSearchWithSearchText(intent.getStringExtra(SEARCH_TEXT));
+    public void startLoadPictures(String searchText) {
+        String urlDownload = buildUrlForSearchWithSearchText(searchText);
         new RunLoadingPictures().execute(urlDownload);
-        return super.onStartCommand(intent, flags, startId);
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    String buildUrlForSearchWithSearchText(String searchText) { // Генерация адреса для поиска
+    private String buildUrlForSearchWithSearchText(String searchText) { // Генерация адреса для поиска
         String API_KEY = "c67772a7cb8e4c8be058a309f88f62cf";
         return "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText;
     }
@@ -53,8 +43,7 @@ public class PicturesDownloadService extends Service {
 
         @Override
         protected void onPreExecute() {
-            sendBroadcast(new Intent(MainActivity.BROADCAST_ACTION)
-                    .putExtra(STATUS, STATUS_START));
+            loaderListener.startLoading();
             super.onPreExecute();
         }
 
@@ -65,9 +54,7 @@ public class PicturesDownloadService extends Service {
 
         @Override
         protected void onPostExecute(ArrayList<Photo> photos) {
-            sendBroadcast(new Intent(MainActivity.BROADCAST_ACTION)
-                    .putExtra(STATUS, STATUS_STOP)
-                    .putExtra(RESULT_TEXT, photos));
+            loaderListener.finishLoading(photos);
             super.onPostExecute(photos);
         }
 

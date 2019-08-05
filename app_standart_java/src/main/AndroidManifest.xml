@@ -13,15 +13,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <service
-            android:name=".services.PicturesDownloadService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.akrivonos.app_standart_java.SERVICE" />
-            </intent-filter>
-        </service>
-
         <activity android:name=".LinkContentActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
