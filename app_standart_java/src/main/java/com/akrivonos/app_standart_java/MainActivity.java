@@ -20,14 +20,7 @@ import android.widget.Toast;
 
 import com.akrivonos.app_standart_java.models.Photo;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     searchResultTextView.setVisibility(View.VISIBLE);
                     searchResultTextView.setText("");
-                    startSettingLoadedInfo(intent.getStringExtra(RESULT_TEXT));
+                    setSpanTextInView(intent.<Photo>getParcelableArrayListExtra(RESULT_TEXT));
                     searchButton.setClickable(true);
                     stopService(new Intent(SERVICE_FILTER).setPackage(getPackageName()));
                     break;
@@ -102,53 +95,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void startSettingLoadedInfo(String info) {
-        List<Photo> photos;
-        try {
-            photos = parseXml(info);
-            setSpanTextInView(photos);
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<Photo> parseXml(String xml) throws XmlPullParserException, IOException { // Парсинг фотографий в список
-        List<Photo> photos = new ArrayList<>();
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        XmlPullParser xpp = factory.newPullParser();
-        xpp.setInput(new StringReader(xml));
-        while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
-            if (xpp.getEventType() == XmlPullParser.START_TAG) {
-                if (xpp.getName().equals("photo")) {
-                    Photo photo = new Photo();
-                    for (int i = 0; i < xpp.getAttributeCount(); i++) {
-                        switch (xpp.getAttributeName(i)) {
-                            case "id":
-                                photo.setId(xpp.getAttributeValue(i));
-                                break;
-                            case "secret":
-                                photo.setSecret(xpp.getAttributeValue(i));
-                                break;
-                            case "server":
-                                photo.setServer(xpp.getAttributeValue(i));
-                                break;
-                            case "farm":
-                                photo.setFarm(xpp.getAttributeValue(i));
-                                break;
-                        }
-                    }
-                    photos.add(photo);
-                }
-            }
-            xpp.next();
-        }
-        return photos;
-    }
-
-    private void setSpanTextInView(List<Photo> photos) { //добавление активной ссылки для каждой фото
+    private void setSpanTextInView(ArrayList<Photo> photos) { //добавление активной ссылки для каждой фото
         for (Photo photo : photos) {
             final String photoUrl = getPhotoUrl(photo);
 
