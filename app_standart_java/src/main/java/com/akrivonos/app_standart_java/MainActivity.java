@@ -24,10 +24,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements LoaderListener {
 
-    public static final String SEARCH_TEXT = "search_text";
-    public static final String RESULT_TEXT = "result_text";
-    public static final int STATUS_START = 1;
-    public static final int STATUS_STOP = 0;
     protected static final String SPAN_URL = "span_url";
     private static final String SEARCH_FIELD_TEXT = "search_field_text";
     private TextView searchResultTextView;
