@@ -12,4 +12,9 @@ public interface DatabaseControlListener {
     boolean checkIsFavorite(String photoUrl);
 
     ArrayList<ArrayList<PhotoInfo>> getAllFavoritesForUser(String userName);
+
+    ArrayList<ArrayList<PhotoInfo>> getHistoryConvention(String userName);
+
+    void addToHistoryConvention(PhotoInfo photoInfo);
 }
+

@@ -13,12 +13,13 @@ import java.util.ArrayList;
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
-    private String tableName = "pictureFa";
+    private String favoriteTable = "pictureFa";
     private String historyTable = "historyTable";
     private Context context;
     private SQLiteDatabase db;
     private Cursor query = null;
-    private String CREATE_TABLE_TEXT = "CREATE TABLE IF NOT EXISTS " + tableName + "(user TEXT, request TEXT, url TEXT)";
+    private String CREATE_TABLE_FAVORITE = "CREATE TABLE IF NOT EXISTS " + favoriteTable + "(user TEXT, request TEXT, url TEXT)";
+    private String CREATE_TABLE_HISTORY_CONVENTION = "CREATE TABLE IF NOT EXISTS " + historyTable + "(user TEXT, request TEXT, url TEXT)";
 
 
     public DatabaseControl(Context context) {
@@ -28,7 +29,9 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE_TEXT);
+        Log.d("test", "CREATE TABLE");
+        db.execSQL(CREATE_TABLE_FAVORITE);
+        db.execSQL(CREATE_TABLE_HISTORY_CONVENTION);
     }
 
     @Override
@@ -42,7 +45,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         cv.put(USER_NAME_FIELD, photoInfo.getUserName());
         cv.put(REQUEST_FIELD_TEXT, photoInfo.getRequestText());
         cv.put(URL_TEXT, photoInfo.getUrlText());
-        db.insert(tableName, null, cv);
+        db.insert(favoriteTable, null, cv);
         db.close();
         Log.d("test", "SET IS FAVORITE");
     }
@@ -51,7 +54,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     public void setPhotoNotFavorite(PhotoInfo photoInfo) { // убрать фото из избранных
 
         db = getWritableDatabase();
-        db.execSQL("DELETE FROM pictureFa WHERE user = '" + photoInfo.getUserName() + "' AND request = '" + photoInfo.getRequestText() + "' AND url = '" + photoInfo.getUrlText() + "';");
+        db.execSQL("DELETE FROM " + favoriteTable + " WHERE user = '" + photoInfo.getUserName() + "' AND request = '" + photoInfo.getRequestText() + "' AND url = '" + photoInfo.getUrlText() + "';");
         db.close();
         Log.d("test", "SET IS NO FAVORITE");
     }
@@ -59,7 +62,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     @Override
     public boolean checkIsFavorite(String photoUrl) {
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM pictureFa WHERE url = '" + photoUrl + "' ORDER BY request DESC;", null);
+        query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE url = '" + photoUrl + "' ORDER BY request DESC;", null);
         boolean result = query.getCount() != 0;
         db.close();
         query.close();
@@ -69,7 +72,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     @Override
     public ArrayList<ArrayList<PhotoInfo>> getAllFavoritesForUser(String userName) {//получаем список запросов с списков фотографий в каждом по запросам
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM pictureFa WHERE user = '" + userName + "' ORDER BY request DESC;", null);
+        query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
         ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
 
         while (query.moveToNext()) {
@@ -84,6 +87,50 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db.close();
         query.close();
         return sortBySections(photosForTitle);
+    }
+
+    @Override
+    public ArrayList<ArrayList<PhotoInfo>> getHistoryConvention(String userName) {
+        ArrayList<PhotoInfo> photosHistory = new ArrayList<>();
+        db = getReadableDatabase();
+        query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
+        while (query.moveToNext()) {
+            PhotoInfo photoInfo = new PhotoInfo();
+            photoInfo.setUserName(query.getString(0));
+            photoInfo.setRequestText(query.getString(1));
+            photoInfo.setUrlText(query.getString(2));
+
+            photosHistory.add(photoInfo);
+        }
+        db.close();
+        query.close();
+        return sortBySections(photosHistory);
+    }
+
+    @Override
+    public void addToHistoryConvention(PhotoInfo photoInfo) {
+        db = getWritableDatabase();
+        String USER_NAME_FIELD = "user";
+        String REQUEST_FIELD_TEXT = "request";
+        String URL_TEXT = "url";
+
+        db = getWritableDatabase();
+        query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = '" + photoInfo.getUserName() + "' ORDER BY request DESC;", null);
+        if (query.getCount() >= 20) {
+            query.moveToLast();
+            PhotoInfo photoInfoForDelete = new PhotoInfo();
+            photoInfoForDelete.setUserName(query.getString(0));
+            photoInfoForDelete.setRequestText(query.getString(1));
+            photoInfoForDelete.setUrlText(query.getString(2));
+            db.execSQL("DELETE FROM " + historyTable + " WHERE user = '" + photoInfoForDelete.getUserName() + "' AND request = '" + photoInfoForDelete.getRequestText() + "' AND url = '" + photoInfoForDelete.getUrlText() + "';");
+        }
+
+        ContentValues cv = new ContentValues();
+        cv.put(USER_NAME_FIELD, photoInfo.getUserName());
+        cv.put(REQUEST_FIELD_TEXT, photoInfo.getRequestText());
+        cv.put(URL_TEXT, photoInfo.getUrlText());
+        db.insert(historyTable, null, cv);
+        db.close();
     }
 
     private ArrayList<ArrayList<PhotoInfo>> sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям
