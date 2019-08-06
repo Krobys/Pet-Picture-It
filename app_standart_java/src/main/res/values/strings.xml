@@ -4,4 +4,6 @@
     <string name="search" tools:ignore="ExtraTranslation">search</string>
     <string name="error_download" tools:ignore="ExtraTranslation">Error downloading</string>
     <string name="empty_field" tools:ignore="ExtraTranslation">Request field is empty</string>
+    <string name="auth_field_empty_error">"The Auth Field is Empty"</string>
+    <string name="user_name">user_name</string>
 </resources>

@@ -1,0 +1,118 @@
+package com.akrivonos.app_standart_java.database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.akrivonos.app_standart_java.models.PhotoInfo;
+
+import java.util.ArrayList;
+
+public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
+
+    private String tableName = "pictureFa";
+    private String historyTable = "historyTable";
+    private Context context;
+    private SQLiteDatabase db;
+    private Cursor query = null;
+    private String CREATE_TABLE_TEXT = "CREATE TABLE IF NOT EXISTS " + tableName + "(user TEXT, request TEXT, url TEXT)";
+
+
+    public DatabaseControl(Context context) {
+        super(context, "app.database", null, 1);
+        this.context = context;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE_TEXT);
+    }
+
+    @Override
+    public void setPhotoFavorite(PhotoInfo photoInfo) { // установить фото в избранные
+        String USER_NAME_FIELD = "user";
+        String REQUEST_FIELD_TEXT = "request";
+        String URL_TEXT = "url";
+
+        db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(USER_NAME_FIELD, photoInfo.getUserName());
+        cv.put(REQUEST_FIELD_TEXT, photoInfo.getRequestText());
+        cv.put(URL_TEXT, photoInfo.getUrlText());
+        db.insert(tableName, null, cv);
+        db.close();
+        Log.d("test", "SET IS FAVORITE");
+    }
+
+    @Override
+    public void setPhotoNotFavorite(PhotoInfo photoInfo) { // убрать фото из избранных
+
+        db = getWritableDatabase();
+        db.execSQL("DELETE FROM pictureFa WHERE user = '" + photoInfo.getUserName() + "' AND request = '" + photoInfo.getRequestText() + "' AND url = '" + photoInfo.getUrlText() + "';");
+        db.close();
+        Log.d("test", "SET IS NO FAVORITE");
+    }
+
+    @Override
+    public boolean checkIsFavorite(String photoUrl) {
+        db = getReadableDatabase();
+        query = db.rawQuery("SELECT * FROM pictureFa WHERE url = '" + photoUrl + "' ORDER BY request DESC;", null);
+        boolean result = query.getCount() != 0;
+        db.close();
+        query.close();
+        return result;
+    }
+
+    @Override
+    public ArrayList<ArrayList<PhotoInfo>> getAllFavoritesForUser(String userName) {//получаем список запросов с списков фотографий в каждом по запросам
+        db = getReadableDatabase();
+        query = db.rawQuery("SELECT * FROM pictureFa WHERE user = '" + userName + "' ORDER BY request DESC;", null);
+        ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
+
+        while (query.moveToNext()) {
+            PhotoInfo photoInfo = new PhotoInfo();
+            photoInfo.setUserName(query.getString(0));
+            photoInfo.setRequestText(query.getString(1));
+            photoInfo.setUrlText(query.getString(2));
+
+            photosForTitle.add(photoInfo);
+        }
+
+        db.close();
+        query.close();
+        return sortBySections(photosForTitle);
+    }
+
+    private ArrayList<ArrayList<PhotoInfo>> sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям
+        PhotoInfo previousPhotoFromSection = null;
+        ArrayList<ArrayList<PhotoInfo>> favoritePhotosList = new ArrayList<>();
+        ArrayList<PhotoInfo> sectionPhotos = new ArrayList<>();
+        for (PhotoInfo photo : photos) {
+            if (previousPhotoFromSection == null) {
+                previousPhotoFromSection = photo;
+                sectionPhotos.add(photo);
+            } else {
+                if (photo.getRequestText().equals(previousPhotoFromSection.getRequestText())) {
+                    sectionPhotos.add(photo);
+                } else {
+                    favoritePhotosList.add(sectionPhotos);
+                    previousPhotoFromSection = photo;
+                    sectionPhotos = new ArrayList<>();
+                    sectionPhotos.add(photo);
+                }
+            }
+        }
+        if (sectionPhotos.size() != 0) {
+            favoritePhotosList.add(sectionPhotos);
+        }
+        return favoritePhotosList;
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+}

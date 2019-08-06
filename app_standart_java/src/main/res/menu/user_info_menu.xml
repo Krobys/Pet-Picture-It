@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/history"
+        android:icon="@drawable/ic_archive_black_24dp"
+        android:title="@string/user_name"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/favorire_pick"
+        android:icon="@drawable/ic_favorite_border_black_unactive"
+        android:title="@string/user_name"
+        app:showAsAction="ifRoom" />
+</menu>
