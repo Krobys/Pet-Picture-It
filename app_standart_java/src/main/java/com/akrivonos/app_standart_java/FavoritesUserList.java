@@ -7,7 +7,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -38,29 +37,29 @@ public class FavoritesUserList extends AppCompatActivity {
         textFavoritesResult.setMovementMethod(LinkMovementMethod.getInstance());
         databaseControlListener = new DatabaseControl(getApplicationContext());
 
+
     }
 
-    void getListUserFavorites() {
+    private void getListUserFavorites() {
         getUserName();
         favoritePhotos = databaseControlListener.getAllFavoritesForUser(userName);
     }
 
-    void getUserName() {
+    private void getUserName() {
         Intent intent = getIntent();
         if (intent.hasExtra(USER_NAME)) {
             userName = intent.getStringExtra(USER_NAME);
         }
     }
 
-    void fillFavoritesToTextView() {
+    private void fillFavoritesToTextView() {
         if (favoritePhotos.size() != 0) {
             textFavoritesResult.setText("");
         } else {
-            textFavoritesResult.setText("Нет информации");
+            textFavoritesResult.setText(getString(R.string.no_info));
         }
 
         for (ArrayList<PhotoInfo> photoListByTitle : favoritePhotos) {
-            Log.d("test", "section: " + photoListByTitle.get(0).getRequestText());
             textFavoritesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
             for (PhotoInfo photo : photoListByTitle) {
                 photo.showPhotoInfos();
@@ -86,9 +85,9 @@ public class FavoritesUserList extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.d("test", "refresh text view");
         getListUserFavorites();
         fillFavoritesToTextView();
         super.onResume();
     }
+
 }

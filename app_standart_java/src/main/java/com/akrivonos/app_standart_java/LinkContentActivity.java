@@ -32,7 +32,7 @@ public class LinkContentActivity extends AppCompatActivity {
 
         databaseControlListener = new DatabaseControl(getApplicationContext());
         setPhotoInfo();
-
+        databaseControlListener.addToHistoryConvention(photoInfo);
         WebView webView = findViewById(R.id.web_view);
 
         webView.loadUrl(photoInfo.getUrlText());
@@ -71,7 +71,7 @@ public class LinkContentActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    void setPhotoInfo() {
+    private void setPhotoInfo() {
         Intent intent = getIntent();
         String userName = intent.getStringExtra(USER_NAME);
         String requestFieldText = intent.getStringExtra(SEARCH_TEXT);

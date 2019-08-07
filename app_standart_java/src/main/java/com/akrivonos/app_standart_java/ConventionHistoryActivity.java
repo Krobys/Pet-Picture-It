@@ -7,7 +7,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,43 +24,42 @@ import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 public class ConventionHistoryActivity extends AppCompatActivity {
 
     DatabaseControlListener databaseControlListener;
-    ArrayList<ArrayList<PhotoInfo>> favoritePhotos = null;
+    ArrayList<ArrayList<PhotoInfo>> historyPhotos = null;
     String userName;
-    TextView textFavoritesResult;
+    TextView textHistoriesResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_convention_history);
-        textFavoritesResult = findViewById(R.id.textHistoryResult);
-        textFavoritesResult.setMovementMethod(LinkMovementMethod.getInstance());
+        textHistoriesResult = findViewById(R.id.textHistoryResult);
+        textHistoriesResult.setMovementMethod(LinkMovementMethod.getInstance());
 
         databaseControlListener = new DatabaseControl(getApplicationContext());
 
     }
 
-    void getListUserFavorites() {
+    private void getListUserHistory() {
         getUserName();
-        favoritePhotos = databaseControlListener.getHistoryConvention(userName);
+        historyPhotos = databaseControlListener.getHistoryConvention(userName);
     }
 
-    void getUserName() {
+    private void getUserName() {
         Intent intent = getIntent();
         if (intent.hasExtra(USER_NAME)) {
             userName = intent.getStringExtra(USER_NAME);
         }
     }
 
-    void fillFavoritesToTextView() {
-        if (favoritePhotos.size() != 0) {
-            textFavoritesResult.setText("");
+    private void fillHistoryToTextView() {
+        if (historyPhotos.size() != 0) {
+            textHistoriesResult.setText("");
         } else {
-            textFavoritesResult.setText("Нет информации");
+            textHistoriesResult.setText(getString(R.string.no_info));
         }
 
-        for (ArrayList<PhotoInfo> photoListByTitle : favoritePhotos) {
-            Log.d("test", "section: " + photoListByTitle.get(0).getRequestText());
-            textFavoritesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
+        for (ArrayList<PhotoInfo> photoListByTitle : historyPhotos) {
+            textHistoriesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
             for (PhotoInfo photo : photoListByTitle) {
                 photo.showPhotoInfos();
                 setSpanTextInView(photo);
@@ -80,15 +78,14 @@ public class ConventionHistoryActivity extends AppCompatActivity {
                         .putExtra(USER_NAME, currentUser));
             }
         }, 0, photo.getUrlText().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        textFavoritesResult.append(string);
-        textFavoritesResult.append("\n");
+        textHistoriesResult.append(string);
+        textHistoriesResult.append("\n");
     }
 
     @Override
     protected void onResume() {
-        Log.d("test", "refresh text view");
-        getListUserFavorites();
-        fillFavoritesToTextView();
+        getListUserHistory();
+        fillHistoryToTextView();
         super.onResume();
     }
 }

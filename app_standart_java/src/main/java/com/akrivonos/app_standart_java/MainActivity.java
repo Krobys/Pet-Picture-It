@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         }
     }
 
-    void restoreSearchField() { //востановление состояния поля для ввода
+    private void restoreSearchField() { //востановление состояния поля для ввода
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (sharedPreferences.contains(SEARCH_FIELD_TEXT)) {
             String searchFieldText = sharedPreferences.getString(SEARCH_FIELD_TEXT, "");
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         searchButton.setClickable(true);
     }
 
-    void getUserName() {
+    private void getUserName() {
         Intent intent = getIntent();
         if (intent != null) {
             currentUser = intent.getStringExtra(USER_NAME);

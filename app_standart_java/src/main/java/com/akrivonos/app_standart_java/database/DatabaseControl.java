@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
@@ -13,9 +12,8 @@ import java.util.ArrayList;
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
-    private String favoriteTable = "pictureFa";
+    private String favoriteTable = "pictureTable";
     private String historyTable = "historyTable";
-    private Context context;
     private SQLiteDatabase db;
     private Cursor query = null;
     private String CREATE_TABLE_FAVORITE = "CREATE TABLE IF NOT EXISTS " + favoriteTable + "(user TEXT, request TEXT, url TEXT)";
@@ -24,12 +22,10 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
     public DatabaseControl(Context context) {
         super(context, "app.database", null, 1);
-        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d("test", "CREATE TABLE");
         db.execSQL(CREATE_TABLE_FAVORITE);
         db.execSQL(CREATE_TABLE_HISTORY_CONVENTION);
     }
@@ -47,7 +43,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         cv.put(URL_TEXT, photoInfo.getUrlText());
         db.insert(favoriteTable, null, cv);
         db.close();
-        Log.d("test", "SET IS FAVORITE");
     }
 
     @Override
@@ -56,7 +51,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db = getWritableDatabase();
         db.execSQL("DELETE FROM " + favoriteTable + " WHERE user = '" + photoInfo.getUserName() + "' AND request = '" + photoInfo.getRequestText() + "' AND url = '" + photoInfo.getUrlText() + "';");
         db.close();
-        Log.d("test", "SET IS NO FAVORITE");
     }
 
     @Override
@@ -70,7 +64,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public ArrayList<ArrayList<PhotoInfo>> getAllFavoritesForUser(String userName) {//получаем список запросов с списков фотографий в каждом по запросам
+    public ArrayList<ArrayList<PhotoInfo>> getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
         db = getReadableDatabase();
         query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
         ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
@@ -90,7 +84,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public ArrayList<ArrayList<PhotoInfo>> getHistoryConvention(String userName) {
+    public ArrayList<ArrayList<PhotoInfo>> getHistoryConvention(String userName) {  //получаем список запросов с списком фотографий из истории в каждом по запросам
         ArrayList<PhotoInfo> photosHistory = new ArrayList<>();
         db = getReadableDatabase();
         query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
@@ -108,7 +102,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public void addToHistoryConvention(PhotoInfo photoInfo) {
+    public void addToHistoryConvention(PhotoInfo photoInfo) { //добавить в историю
         db = getWritableDatabase();
         String USER_NAME_FIELD = "user";
         String REQUEST_FIELD_TEXT = "request";

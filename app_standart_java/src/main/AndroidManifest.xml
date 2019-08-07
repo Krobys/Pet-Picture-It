@@ -13,8 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ConventionHistoryActivity"></activity>
-        <activity android:name=".FavoritesUserList" />
+        <activity
+            android:name=".ConventionHistoryActivity"
+            android:label="@string/history"
+            android:theme="@style/Theme.AppCompat.Light" />
+        <activity
+            android:name=".FavoritesUserList"
+            android:label="@string/favorites"
+            android:theme="@style/Theme.AppCompat.Light" />
         <activity
             android:name=".AuthActivity"
             android:screenOrientation="portrait"
