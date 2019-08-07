@@ -55,16 +55,15 @@ public class FavoritesUserList extends AppCompatActivity {
     private void fillFavoritesToTextView() {
         if (favoritePhotos.size() != 0) {
             textFavoritesResult.setText("");
+            for (ArrayList<PhotoInfo> photoListByTitle : favoritePhotos) {
+                textFavoritesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
+                for (PhotoInfo photo : photoListByTitle) {
+                    photo.showPhotoInfos();
+                    setSpanTextInView(photo);
+                }
+            }
         } else {
             textFavoritesResult.setText(getString(R.string.no_info));
-        }
-
-        for (ArrayList<PhotoInfo> photoListByTitle : favoritePhotos) {
-            textFavoritesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
-            for (PhotoInfo photo : photoListByTitle) {
-                photo.showPhotoInfos();
-                setSpanTextInView(photo);
-            }
         }
     }
 

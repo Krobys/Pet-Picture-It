@@ -54,16 +54,15 @@ public class ConventionHistoryActivity extends AppCompatActivity {
     private void fillHistoryToTextView() {
         if (historyPhotos.size() != 0) {
             textHistoriesResult.setText("");
+            for (ArrayList<PhotoInfo> photoListByTitle : historyPhotos) {
+                textHistoriesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
+                for (PhotoInfo photo : photoListByTitle) {
+                    photo.showPhotoInfos();
+                    setSpanTextInView(photo);
+                }
+            }
         } else {
             textHistoriesResult.setText(getString(R.string.no_info));
-        }
-
-        for (ArrayList<PhotoInfo> photoListByTitle : historyPhotos) {
-            textHistoriesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
-            for (PhotoInfo photo : photoListByTitle) {
-                photo.showPhotoInfos();
-                setSpanTextInView(photo);
-            }
         }
     }
 
