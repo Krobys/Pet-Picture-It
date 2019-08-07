@@ -12,9 +12,7 @@ import android.widget.TextView;
 
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
-import com.akrivonos.app_standart_java.models.PhotoInfo;
-
-import java.util.ArrayList;
+import com.akrivonos.app_standart_java.models.PhotoMap;
 
 import static com.akrivonos.app_standart_java.AuthActivity.USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
@@ -24,7 +22,7 @@ import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 public class ConventionHistoryActivity extends AppCompatActivity {
 
     DatabaseControlListener databaseControlListener;
-    ArrayList<ArrayList<PhotoInfo>> historyPhotos = null;
+    PhotoMap historyPhotos = null;
     String userName;
     TextView textHistoriesResult;
 
@@ -54,11 +52,11 @@ public class ConventionHistoryActivity extends AppCompatActivity {
     private void fillHistoryToTextView() {
         if (historyPhotos.size() != 0) {
             textHistoriesResult.setText("");
-            for (ArrayList<PhotoInfo> photoListByTitle : historyPhotos) {
-                textHistoriesResult.append(photoListByTitle.get(0).getRequestText() + ":\n");
-                for (PhotoInfo photo : photoListByTitle) {
-                    photo.showPhotoInfos();
-                    setSpanTextInView(photo);
+            while (historyPhotos.nextSection()) {
+                String sectionName = historyPhotos.getCurrentSectionName();
+                textHistoriesResult.append(sectionName + "\n");
+                for (String photo : historyPhotos.getValuesInSection()) {
+                    setSpanTextInView(photo, sectionName);
                 }
             }
         } else {
@@ -66,17 +64,17 @@ public class ConventionHistoryActivity extends AppCompatActivity {
         }
     }
 
-    private void setSpanTextInView(final PhotoInfo photo) { //добавление активной ссылки для каждой фото
-        final SpannableString string = new SpannableString(photo.getUrlText());
+    private void setSpanTextInView(final String url, final String request) { //добавление активной ссылки для каждой фото
+        final SpannableString string = new SpannableString(url);
         string.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
                 startActivity(new Intent(ConventionHistoryActivity.this, LinkContentActivity.class)
-                        .putExtra(SPAN_URL, photo.getUrlText())
-                        .putExtra(SEARCH_TEXT, photo.getRequestText())
+                        .putExtra(SPAN_URL, url)
+                        .putExtra(SEARCH_TEXT, request)
                         .putExtra(USER_NAME, currentUser));
             }
-        }, 0, photo.getUrlText().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }, 0, url.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textHistoriesResult.append(string);
         textHistoriesResult.append("\n");
     }

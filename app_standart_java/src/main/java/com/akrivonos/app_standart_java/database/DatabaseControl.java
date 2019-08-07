@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.models.PhotoMap;
 
 import java.util.ArrayList;
 
@@ -64,7 +66,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public ArrayList<ArrayList<PhotoInfo>> getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
+    public PhotoMap getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
         db = getReadableDatabase();
         query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
         ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
@@ -84,7 +86,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public ArrayList<ArrayList<PhotoInfo>> getHistoryConvention(String userName) {  //получаем список запросов с списком фотографий из истории в каждом по запросам
+    public PhotoMap getHistoryConvention(String userName) {  //получаем список запросов с списком фотографий из истории в каждом по запросам
         ArrayList<PhotoInfo> photosHistory = new ArrayList<>();
         db = getReadableDatabase();
         query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
@@ -127,29 +129,14 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db.close();
     }
 
-    private ArrayList<ArrayList<PhotoInfo>> sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям
-        PhotoInfo previousPhotoFromSection = null;
-        ArrayList<ArrayList<PhotoInfo>> favoritePhotosList = new ArrayList<>();
-        ArrayList<PhotoInfo> sectionPhotos = new ArrayList<>();
-        for (PhotoInfo photo : photos) {
-            if (previousPhotoFromSection == null) {
-                previousPhotoFromSection = photo;
-                sectionPhotos.add(photo);
-            } else {
-                if (photo.getRequestText().equals(previousPhotoFromSection.getRequestText())) {
-                    sectionPhotos.add(photo);
-                } else {
-                    favoritePhotosList.add(sectionPhotos);
-                    previousPhotoFromSection = photo;
-                    sectionPhotos = new ArrayList<>();
-                    sectionPhotos.add(photo);
-                }
-            }
+    private PhotoMap sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям
+        PhotoMap photoMap = new PhotoMap();
+
+        for (PhotoInfo photoInfo : photos) {
+            photoMap.addToMap(photoInfo.getRequestText(), photoInfo.getUrlText());
         }
-        if (sectionPhotos.size() != 0) {
-            favoritePhotosList.add(sectionPhotos);
-        }
-        return favoritePhotosList;
+        Log.d("test", "size of photomap (DB) " + photoMap.size());
+        return photoMap;
     }
 
     @Override
