@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.models.PhotoMap;
@@ -135,7 +134,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         for (PhotoInfo photoInfo : photos) {
             photoMap.addToMap(photoInfo.getRequestText(), photoInfo.getUrlText());
         }
-        Log.d("test", "size of photomap (DB) " + photoMap.size());
         return photoMap;
     }
 
