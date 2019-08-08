@@ -21,10 +21,10 @@ import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 
 public class ConventionHistoryActivity extends AppCompatActivity {
 
-    DatabaseControlListener databaseControlListener;
-    PhotoMap historyPhotos = null;
-    String userName;
-    TextView textHistoriesResult;
+    private DatabaseControlListener databaseControlListener;
+    private PhotoMap historyPhotos = null;
+    private String userName;
+    private TextView textHistoriesResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -21,10 +21,10 @@ import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 
 public class FavoritesUserList extends AppCompatActivity {
 
-    DatabaseControlListener databaseControlListener;
-    PhotoMap favoritePhotos = null;
-    String userName;
-    TextView textFavoritesResult;
+    private DatabaseControlListener databaseControlListener;
+    private PhotoMap favoritePhotos = null;
+    private String userName;
+    private TextView textFavoritesResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +34,7 @@ public class FavoritesUserList extends AppCompatActivity {
         textFavoritesResult = findViewById(R.id.textFavoritesResult);
         textFavoritesResult.setMovementMethod(LinkMovementMethod.getInstance());
         databaseControlListener = new DatabaseControl(getApplicationContext());
-
-
+        
     }
 
     private void getListUserFavorites() {

@@ -12,9 +12,9 @@ import android.widget.Toast;
 public class AuthActivity extends AppCompatActivity {
 
     protected static final String USER_NAME = "user_name";
-    EditText userNameField;
-    Button logInButton;
-    View.OnClickListener checkUser = new View.OnClickListener() {
+    private EditText userNameField;
+    private Button logInButton;
+    private View.OnClickListener checkUser = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             String userName = userNameField.getText().toString().toLowerCase();
