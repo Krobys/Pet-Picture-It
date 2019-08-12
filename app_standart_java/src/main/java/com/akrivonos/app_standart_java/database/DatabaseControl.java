@@ -3,6 +3,7 @@ package com.akrivonos.app_standart_java.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -57,8 +58,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     @Override
     public boolean checkIsFavorite(String photoUrl) {
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE url = '" + photoUrl + "' ORDER BY request DESC;", null);
-        boolean result = query.getCount() != 0;
+        long numEntries = DatabaseUtils.queryNumEntries(db, favoriteTable, "url = ?", new String[]{photoUrl});
+        boolean result = numEntries != 0;
         db.close();
         query.close();
         return result;

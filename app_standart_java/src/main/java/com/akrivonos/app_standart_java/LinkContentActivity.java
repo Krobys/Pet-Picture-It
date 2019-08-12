@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -12,12 +13,13 @@ import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
-import static com.akrivonos.app_standart_java.AuthActivity.USER_NAME;
+import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
 import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
 
 public class LinkContentActivity extends AppCompatActivity {
 
+    private static final String TAG = "test";
     private Toolbar toolbar;
     private DatabaseControlListener databaseControlListener;
     private PhotoInfo photoInfo;
@@ -41,11 +43,10 @@ public class LinkContentActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.user_info_menu, menu);
-        if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
-            toolbar.getMenu().getItem(1).setIcon(R.drawable.ic_favorite_black_active);
-        } else {
-            toolbar.getMenu().getItem(1).setIcon(R.drawable.ic_favorite_border_black_unactive);
-            }
+        int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
+                ? R.drawable.ic_favorite_black_active
+                : R.drawable.ic_favorite_border_black_unactive;
+        toolbar.getMenu().getItem(1).setIcon(iconIsFavorite);
         return true;
     }
 
@@ -73,7 +74,8 @@ public class LinkContentActivity extends AppCompatActivity {
 
     private void setPhotoInfo() {
         Intent intent = getIntent();
-        String userName = intent.getStringExtra(USER_NAME);
+        String userName = intent.getStringExtra(CURRENT_USER_NAME);
+        Log.d(TAG, "userName LinkContent setPhoto " + userName);
         String requestFieldText = intent.getStringExtra(SEARCH_TEXT);
         String urlText = intent.getStringExtra(SPAN_URL);
 

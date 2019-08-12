@@ -14,10 +14,9 @@ import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoMap;
 
-import static com.akrivonos.app_standart_java.AuthActivity.USER_NAME;
+import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
 import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
-import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 
 public class FavoritesUserList extends AppCompatActivity {
 
@@ -44,8 +43,8 @@ public class FavoritesUserList extends AppCompatActivity {
 
     private void getUserName() {
         Intent intent = getIntent();
-        if (intent.hasExtra(USER_NAME)) {
-            userName = intent.getStringExtra(USER_NAME);
+        if (intent.hasExtra(CURRENT_USER_NAME)) {
+            userName = intent.getStringExtra(CURRENT_USER_NAME);
         }
     }
 
@@ -72,7 +71,7 @@ public class FavoritesUserList extends AppCompatActivity {
                 startActivity(new Intent(FavoritesUserList.this, LinkContentActivity.class)
                         .putExtra(SPAN_URL, url)
                         .putExtra(SEARCH_TEXT, request)
-                        .putExtra(USER_NAME, currentUser));
+                        .putExtra(CURRENT_USER_NAME, userName));
             }
         }, 0, url.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textFavoritesResult.append(string);

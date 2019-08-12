@@ -11,6 +11,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +23,11 @@ import android.widget.Toast;
 
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
-import com.akrivonos.app_standart_java.services.PicturesDownloadService;
+import com.akrivonos.app_standart_java.services.PicturesDownloadTask;
 
 import java.util.ArrayList;
 
-import static com.akrivonos.app_standart_java.AuthActivity.USER_NAME;
+import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 
 public class MainActivity extends AppCompatActivity implements LoaderListener {
 
@@ -37,11 +38,11 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
     private EditText searchRequestEditText;
     private Button searchButton;
     private ProgressBar progressBar;
-    public static String currentUser;
+    public String currentUser;
     private Toolbar toolbar;
     private String searchText;
 
-    private PicturesDownloadService downloadPicturesManage;
+    private PicturesDownloadTask downloadPicturesManage;
 
     private View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
@@ -66,14 +67,13 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         searchResultTextView = findViewById(R.id.search_result);
         searchButton.setOnClickListener(startSearch);
         toolbar = findViewById(R.id.toolbar_actionbar);
+        currentUser = getCurrentUserName();
         setSupportActionBar(toolbar);
 
-
-        getUserName();
         restoreSearchField();
         searchResultTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        downloadPicturesManage = new PicturesDownloadService(this);
+        downloadPicturesManage = new PicturesDownloadTask(this);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
                     startActivity(new Intent(MainActivity.this, LinkContentActivity.class)
                             .putExtra(SPAN_URL, photoUrl)
                             .putExtra(SEARCH_TEXT, searchText)
-                            .putExtra(USER_NAME, currentUser));
+                            .putExtra(CURRENT_USER_NAME, currentUser));
                 }
             }, 0, photoUrl.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             searchResultTextView.append(string);
@@ -112,11 +112,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
     void saveSearchField() { //сохранение состояния поля для ввода
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String searchFieldText = searchRequestEditText.getText().toString();
-        if (!TextUtils.isEmpty(searchFieldText)) {
-            sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, searchFieldText).apply();
-        } else {
-            sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, null).apply();
-        }
+        sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, searchFieldText).apply();
     }
 
     private void restoreSearchField() { //востановление состояния поля для ввода
@@ -143,10 +139,9 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         searchButton.setClickable(true);
     }
 
-    private void getUserName() {
+    private void setUserNameTitle() {
         Intent intent = getIntent();
         if (intent != null) {
-            currentUser = intent.getStringExtra(USER_NAME);
             toolbar.setTitle(currentUser);
         }
     }
@@ -161,20 +156,31 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.getItem(1).setVisible(true).setIcon(R.drawable.ic_turned_in_black);
         menu.getItem(0).setVisible(true);
-        getUserName();
+        setUserNameTitle();
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Class openClassActivity = null;
         switch (item.getItemId()) {
             case R.id.favorire_pick:
-                startActivity(new Intent(MainActivity.this, FavoritesUserList.class).putExtra(USER_NAME, currentUser));
-                return true;
+                openClassActivity = FavoritesUserList.class;
+                break;
             case R.id.history:
-                startActivity(new Intent(MainActivity.this, ConventionHistoryActivity.class).putExtra(USER_NAME, currentUser));
-                return true;
+                openClassActivity = ConventionHistoryActivity.class;
+                break;
         }
-        return false;
+        Log.d("test", "curentuser startActivity: " + currentUser);
+        startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
+        return true;
+    }
+
+    private String getCurrentUserName() { //получение имени текущего пользователя
+        String currentUserName;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
+        Log.d("test", "getCurrentUserName: " + currentUserName);
+        return currentUserName;
     }
 }
