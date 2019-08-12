@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
     private EditText searchRequestEditText;
     private Button searchButton;
     private ProgressBar progressBar;
-    public String currentUser;
+    private String currentUser;
     private Toolbar toolbar;
     private String searchText;
 
@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
 
         restoreSearchField();
         searchResultTextView.setMovementMethod(LinkMovementMethod.getInstance());
+
         downloadPicturesManage = new PicturesDownloadTask(this);
     }
 
