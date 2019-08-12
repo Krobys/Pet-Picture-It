@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
-import com.akrivonos.app_standart_java.models.PhotoMap;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
@@ -21,7 +23,7 @@ import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
 public class ConventionHistoryActivity extends AppCompatActivity {
 
     private DatabaseControlListener databaseControlListener;
-    private PhotoMap historyPhotos = null;
+    private Map<String, ArrayList<String>> historyPhotos = null;
     private String userName;
     private TextView textHistoriesResult;
 
@@ -49,18 +51,18 @@ public class ConventionHistoryActivity extends AppCompatActivity {
 
     //TODO Сделать историю не сортированной по рзделам и имени, а просто подряд
     private void fillHistoryToTextView() {
-        if (historyPhotos.size() != 0) {
-            textHistoriesResult.setText("");
-            while (historyPhotos.nextSection()) {
-                String sectionName = historyPhotos.getCurrentSectionName();
-                textHistoriesResult.append(sectionName + "\n");
-                for (String photo : historyPhotos.getValuesInSection()) {
-                    setSpanTextInView(photo, sectionName);
+        if (historyPhotos != null)
+            if (historyPhotos.size() != 0) {
+                textHistoriesResult.setText("");
+                for (String key : historyPhotos.keySet()) {
+                    textHistoriesResult.append(key + ":\n");
+                    for (String url : historyPhotos.get(key)) {
+                        setSpanTextInView(url, key);
+                    }
                 }
+            } else {
+                textHistoriesResult.setText(getString(R.string.no_info));
             }
-        } else {
-            textHistoriesResult.setText(getString(R.string.no_info));
-        }
     }
 
     private void setSpanTextInView(final String url, final String request) { //добавление активной ссылки для каждой фото

@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
-import com.akrivonos.app_standart_java.models.PhotoMap;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
@@ -21,7 +23,7 @@ import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
 public class FavoritesUserList extends AppCompatActivity {
 
     private DatabaseControlListener databaseControlListener;
-    private PhotoMap favoritePhotos = null;
+    private Map<String, ArrayList<String>> favoritePhotos = null;
     private String userName;
     private TextView textFavoritesResult;
 
@@ -48,14 +50,14 @@ public class FavoritesUserList extends AppCompatActivity {
         }
     }
 
-    private void fillHistoryToTextView() {
+    private void fillFavoritesToTextView() {
+        if (favoritePhotos != null)
         if (favoritePhotos.size() != 0) {
             textFavoritesResult.setText("");
-            while (favoritePhotos.nextSection()) {
-                String sectionName = favoritePhotos.getCurrentSectionName();
-                textFavoritesResult.append(sectionName + "\n");
-                for (String photo : favoritePhotos.getValuesInSection()) {
-                    setSpanTextInView(photo, sectionName);
+            for (String key : favoritePhotos.keySet()) {
+                textFavoritesResult.append(key + ":\n");
+                for (String url : favoritePhotos.get(key)) {
+                    setSpanTextInView(url, key);
                 }
             }
         } else {
@@ -81,7 +83,7 @@ public class FavoritesUserList extends AppCompatActivity {
     @Override
     protected void onResume() {
         getListUserFavorites();
-        fillHistoryToTextView();
+        fillFavoritesToTextView();
         super.onResume();
     }
 
