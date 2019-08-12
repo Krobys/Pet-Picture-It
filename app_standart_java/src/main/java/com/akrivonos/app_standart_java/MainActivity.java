@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
 
         restoreSearchField();
         searchResultTextView.setMovementMethod(LinkMovementMethod.getInstance());
-
         downloadPicturesManage = new PicturesDownloadTask(this);
     }
 
