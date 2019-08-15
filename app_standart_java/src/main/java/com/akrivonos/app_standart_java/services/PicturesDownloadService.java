@@ -92,7 +92,7 @@ public class PicturesDownloadService {
             return photos;
         }
 
-        private ArrayList<Photo> loadInformation(String urlDownload) { // Загрузка xml в String
+        private ArrayList<Photo> loadInformation(String urlDownload) { // Загрузка xml в список
             BufferedReader reader = null;
             StringBuilder buf = new StringBuilder();
             URL url;
