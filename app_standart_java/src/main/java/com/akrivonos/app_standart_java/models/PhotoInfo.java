@@ -1,20 +1,33 @@
 package com.akrivonos.app_standart_java.models;
 
-import android.util.Log;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class PhotoInfo {
+public class PhotoInfo implements Parcelable {
     private String userName;
     private String requestText;
     private String urlText;
 
-    public PhotoInfo(String userName, String requestText, String urlText) {
-        this.userName = userName;
-        this.requestText = requestText;
-        this.urlText = urlText;
-    }
-
     public PhotoInfo() {
 
+    }
+
+    public static final Creator<PhotoInfo> CREATOR = new Creator<PhotoInfo>() {
+        @Override
+        public PhotoInfo createFromParcel(Parcel in) {
+            return new PhotoInfo(in);
+        }
+
+        @Override
+        public PhotoInfo[] newArray(int size) {
+            return new PhotoInfo[size];
+        }
+    };
+
+    private PhotoInfo(Parcel in) {
+        userName = in.readString();
+        requestText = in.readString();
+        urlText = in.readString();
     }
 
     public String getUserName() {
@@ -41,7 +54,15 @@ public class PhotoInfo {
         this.urlText = urlText;
     }
 
-    public void showPhotoInfos() {
-        Log.d("test", "user: " + userName + " request: " + requestText + " url: " + urlText);
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(userName);
+        dest.writeString(requestText);
+        dest.writeString(urlText);
     }
 }

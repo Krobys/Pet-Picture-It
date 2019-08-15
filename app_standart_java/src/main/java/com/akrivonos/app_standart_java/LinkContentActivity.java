@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -13,13 +12,10 @@ import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
-import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
-import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
-import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
+import static com.akrivonos.app_standart_java.MainActivity.BUNDLE_PHOTO_INFO;
 
 public class LinkContentActivity extends AppCompatActivity {
 
-    private static final String TAG = "test";
     private Toolbar toolbar;
     private DatabaseControlListener databaseControlListener;
     private PhotoInfo photoInfo;
@@ -74,11 +70,7 @@ public class LinkContentActivity extends AppCompatActivity {
 
     private void setPhotoInfo() {
         Intent intent = getIntent();
-        String userName = intent.getStringExtra(CURRENT_USER_NAME);
-        Log.d(TAG, "userName LinkContent setPhoto " + userName);
-        String requestFieldText = intent.getStringExtra(SEARCH_TEXT);
-        String urlText = intent.getStringExtra(SPAN_URL);
-
-        photoInfo = new PhotoInfo(userName, requestFieldText, urlText);
+        Bundle bundle = intent.getParcelableExtra(BUNDLE_PHOTO_INFO);
+        photoInfo = bundle.getParcelable(BUNDLE_PHOTO_INFO);
     }
 }

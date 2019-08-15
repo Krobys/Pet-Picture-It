@@ -1,10 +1,12 @@
-package com.akrivonos.app_standart_java.services;
+package com.akrivonos.app_standart_java.executors;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
+import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -22,24 +24,39 @@ import java.util.ArrayList;
 import javax.net.ssl.HttpsURLConnection;
 
 public class PicturesDownloadTask {
-    private WeakReference<LoaderListener> loaderListenerWeakReference;
-
+    private final WeakReference<LoaderListener> loaderListenerWeakReference;
+    private String searchText;
+    private String userName;
+    private int currentPage, pagesAmount;
     public PicturesDownloadTask(LoaderListener loaderListener) {
         loaderListenerWeakReference = new WeakReference<>(loaderListener);
     }
 
-    public void startLoadPictures(String searchText) {
-        String urlDownload = buildUrlForSearchWithSearchText(searchText);
+    public void startLoadPictures(String searchText, String userName, int pageToLoad) {
+        this.searchText = searchText;
+        this.userName = userName;
+        String urlDownload = buildUrlForSearchWithSearchText(searchText, pageToLoad);
         new RunLoadingPictures().execute(urlDownload);
     }
 
-    private String buildUrlForSearchWithSearchText(String searchText) { // Генерация адреса для поиска
+    private String buildUrlForSearchWithSearchText(String searchText, int pageToLoad) { // Генерация адреса для поиска
         String API_KEY = "c67772a7cb8e4c8be058a309f88f62cf";
-        return "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText;
+        String urlToLoad = "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText + "&page=" + pageToLoad;
+        Log.d("test", urlToLoad);
+        return urlToLoad;
+
+    }
+
+    private String getPhotoUrl(Photo photo) { // генерация адреса для каждой фото
+        String farm = photo.getFarm();
+        String server = photo.getServer();
+        String id = photo.getId();
+        String secret = photo.getSecret();
+        return "https://farm" + farm + ".staticflickr.com/" + server + "/" + id + "_" + secret + ".jpg";
     }
 
     @SuppressLint("StaticFieldLeak")
-    private class RunLoadingPictures extends AsyncTask<String, Void, ArrayList<Photo>> {
+    private class RunLoadingPictures extends AsyncTask<String, Void, ArrayList<PhotoInfo>> {
 
         @Override
         protected void onPreExecute() {
@@ -48,13 +65,13 @@ public class PicturesDownloadTask {
         }
 
         @Override
-        protected ArrayList<Photo> doInBackground(String... strings) {
+        protected ArrayList<PhotoInfo> doInBackground(String... strings) {
             return loadInformation(strings[0]);
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Photo> photos) {
-            loaderListenerWeakReference.get().finishLoading(photos);
+        protected void onPostExecute(ArrayList<PhotoInfo> photos) {
+            loaderListenerWeakReference.get().finishLoading(photos, new Integer[]{currentPage, pagesAmount});
             super.onPostExecute(photos);
         }
 
@@ -64,8 +81,24 @@ public class PicturesDownloadTask {
             factory.setNamespaceAware(true);
             XmlPullParser xpp = factory.newPullParser();
             xpp.setInput(new StringReader(xml));
+
             while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
                 if (xpp.getEventType() == XmlPullParser.START_TAG) {
+                    if (xpp.getName().equals("photos")) {
+                        for (int i = 0; i < xpp.getAttributeCount(); i++) {
+                            switch (xpp.getAttributeName(i)) {
+                                case "page":
+                                    currentPage = Integer.valueOf(xpp.getAttributeValue(i));
+                                    Log.d("test", "currentpage: " + currentPage);
+                                    break;
+                                case "pages":
+                                    pagesAmount = Integer.valueOf(xpp.getAttributeValue(i));
+                                    Log.d("test", "amountPages " + pagesAmount);
+                                    break;
+                            }
+                        }
+                    }
+
                     if (xpp.getName().equals("photo")) {
                         Photo photo = new Photo();
                         for (int i = 0; i < xpp.getAttributeCount(); i++) {
@@ -92,7 +125,8 @@ public class PicturesDownloadTask {
             return photos;
         }
 
-        private ArrayList<Photo> loadInformation(String urlDownload) { // Загрузка xml в список
+        private ArrayList<PhotoInfo> loadInformation(String urlDownload) { // Загрузка xml в список
+            Log.d("test", "loadInformation: url: " + urlDownload);
             BufferedReader reader = null;
             StringBuilder buf = new StringBuilder();
             URL url;
@@ -128,7 +162,16 @@ public class PicturesDownloadTask {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return photos;
+            ArrayList<PhotoInfo> photosFinal = new ArrayList<>();
+            PhotoInfo photoInfo;
+            for (Photo photo : photos) {
+                photoInfo = new PhotoInfo();
+                photoInfo.setUrlText(getPhotoUrl(photo));
+                photoInfo.setRequestText(searchText);
+                photoInfo.setUserName(userName);
+                photosFinal.add(photoInfo);
+            }
+            return photosFinal;
         }
     }
 }

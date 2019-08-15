@@ -1,47 +1,46 @@
 package com.akrivonos.app_standart_java;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.view.View;
-import android.widget.TextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 
+import com.akrivonos.app_standart_java.adapters.PictureAdapter;
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
+import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
+import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
-import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
-import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
+import static com.akrivonos.app_standart_java.MainActivity.BUNDLE_PHOTO_INFO;
 
-public class FavoritesUserList extends AppCompatActivity {
+public class FavoritesUserList extends AppCompatActivity implements StartActivityControlListener {
 
     private DatabaseControlListener databaseControlListener;
-    private Map<String, ArrayList<String>> favoritePhotos = null;
     private String userName;
-    private TextView textFavoritesResult;
+    private PictureAdapter favoritesPictureAdapter;
+    private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+            return false;
+        }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_favorites_user_list);
-
-        textFavoritesResult = findViewById(R.id.textFavoritesResult);
-        textFavoritesResult.setMovementMethod(LinkMovementMethod.getInstance());
-        databaseControlListener = new DatabaseControl(getApplicationContext());
-        
-    }
-
-    private void getListUserFavorites() {
-        getUserName();
-        favoritePhotos = databaseControlListener.getAllFavoritesForUser(userName);
-    }
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+            Log.d("test", "adapterPos: " + viewHolder.getAdapterPosition());
+            databaseControlListener.setPhotoNotFavorite(favoritesPictureAdapter
+                    .getData()
+                    .get(viewHolder.getAdapterPosition()));
+            favoritesPictureAdapter.deleteItem(viewHolder.getAdapterPosition());
+        }
+    };
 
     private void getUserName() {
         Intent intent = getIntent();
@@ -50,41 +49,42 @@ public class FavoritesUserList extends AppCompatActivity {
         }
     }
 
-    private void fillFavoritesToTextView() {
-        if (favoritePhotos != null)
-        if (favoritePhotos.size() != 0) {
-            textFavoritesResult.setText("");
-            for (String key : favoritePhotos.keySet()) {
-                textFavoritesResult.append(key + ":\n");
-                for (String url : favoritePhotos.get(key)) {
-                    setSpanTextInView(url, key);
-                }
-            }
-        } else {
-            textFavoritesResult.setText(getString(R.string.no_info));
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_favorites_user_list);
+        getUserName();
+
+        databaseControlListener = new DatabaseControl(getApplicationContext());
+
+        StartActivityControlListener startActivityControlListener = FavoritesUserList.this;
+        Context appContext = getApplicationContext();
+        favoritesPictureAdapter = new PictureAdapter(startActivityControlListener, appContext);
+        favoritesPictureAdapter.setVisibilityDeleteButton(true);
+
+        RecyclerView favoritesRecyclerView = findViewById(R.id.favoriter_recycler_view);
+        favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        favoritesRecyclerView.setAdapter(favoritesPictureAdapter);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(favoritesRecyclerView);
+
     }
 
-    private void setSpanTextInView(final String url, final String request) { //добавление активной ссылки для каждой фото
-        final SpannableString string = new SpannableString(url);
-        string.setSpan(new ClickableSpan() {
-            @Override
-            public void onClick(View widget) {
-                startActivity(new Intent(FavoritesUserList.this, LinkContentActivity.class)
-                        .putExtra(SPAN_URL, url)
-                        .putExtra(SEARCH_TEXT, request)
-                        .putExtra(CURRENT_USER_NAME, userName));
-            }
-        }, 0, url.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        textFavoritesResult.append(string);
-        textFavoritesResult.append("\n");
+    private void updateRecView() {
+        ArrayList<PhotoInfo> favoritePhotos = databaseControlListener.getAllFavoritesForUser(userName);
+        favoritesPictureAdapter.setData(favoritePhotos);
+        favoritesPictureAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onResume() {
-        getListUserFavorites();
-        fillFavoritesToTextView();
+        updateRecView();
         super.onResume();
     }
 
+    @Override
+    public void startActivity(PhotoInfo photoInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(BUNDLE_PHOTO_INFO, photoInfo);
+        startActivity(new Intent(this, LinkContentActivity.class).putExtra(BUNDLE_PHOTO_INFO, bundle));
+    }
 }

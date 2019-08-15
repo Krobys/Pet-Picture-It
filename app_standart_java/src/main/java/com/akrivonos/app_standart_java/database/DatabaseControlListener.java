@@ -3,7 +3,6 @@ package com.akrivonos.app_standart_java.database;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 
 public interface DatabaseControlListener {
@@ -13,9 +12,9 @@ public interface DatabaseControlListener {
 
     boolean checkIsFavorite(String photoUrl);
 
-    Map<String, ArrayList<String>> getAllFavoritesForUser(String userName);
+    ArrayList<PhotoInfo> getAllFavoritesForUser(String userName);
 
-    Map<String, ArrayList<String>> getHistoryConvention(String userName);
+    ArrayList<PhotoInfo> getHistoryConvention(String userName);
 
     void addToHistoryConvention(PhotoInfo photoInfo);
 }

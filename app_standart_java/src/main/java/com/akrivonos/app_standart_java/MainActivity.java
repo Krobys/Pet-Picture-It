@@ -1,16 +1,18 @@
 package com.akrivonos.app_standart_java;
 
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.Spanned;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,41 +20,58 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.akrivonos.app_standart_java.adapters.PictureAdapter;
+import com.akrivonos.app_standart_java.executors.PicturesDownloadTask;
+import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener;
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
-import com.akrivonos.app_standart_java.models.Photo;
-import com.akrivonos.app_standart_java.services.PicturesDownloadTask;
+import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
+import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.utils.InternetUtils;
 
 import java.util.ArrayList;
 
 import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 
-public class MainActivity extends AppCompatActivity implements LoaderListener {
+public class MainActivity extends AppCompatActivity implements LoaderListener,
+        StartActivityControlListener,
+        ControlBorderDownloaderListener {
 
-    protected static final String SPAN_URL = "span_url";
     private static final String SEARCH_FIELD_TEXT = "search_field_text";
-    protected static final String SEARCH_TEXT = "search_text";
-    private TextView searchResultTextView;
+    static final String BUNDLE_PHOTO_INFO = "bundle_photo_info";
     private EditText searchRequestEditText;
     private Button searchButton;
+    private String searchText;
     private ProgressBar progressBar;
     private String currentUser;
     private Toolbar toolbar;
-    private String searchText;
-
-    private PicturesDownloadTask downloadPicturesManage;
-
-    private View.OnClickListener startSearch = new View.OnClickListener() {
+    private final View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             searchText = searchRequestEditText.getText().toString().toLowerCase();
             if (!TextUtils.isEmpty(searchText)) {
-                downloadPicturesManage.startLoadPictures(searchText);
+                if (InternetUtils.isInternetConnectionEnable(getApplicationContext())) {
+                    downloadPicturesManage.startLoadPictures(searchText, currentUser, 1);
+                } else {
+                    Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(MainActivity.this, getString(R.string.empty_field), Toast.LENGTH_SHORT).show();
             }
+        }
+    };
+    private PicturesDownloadTask downloadPicturesManage;
+    private PictureAdapter pictureAdapter;
+    private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+            pictureAdapter.deleteItem(viewHolder.getAdapterPosition());
         }
     };
 
@@ -61,55 +80,30 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        StartActivityControlListener startActivityControlListener = MainActivity.this;
+        ControlBorderDownloaderListener controlBorderDownloaderListener = MainActivity.this;
+        Context appContext = getApplicationContext();
+        pictureAdapter = new PictureAdapter(startActivityControlListener, controlBorderDownloaderListener, appContext);
+
+        RecyclerView recyclerViewPictures = findViewById(R.id.rec_view_picture);
+        recyclerViewPictures.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewPictures.setAdapter(pictureAdapter);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewPictures);
+
         progressBar = findViewById(R.id.progressBar);
         searchRequestEditText = findViewById(R.id.search_request);
         searchButton = findViewById(R.id.search_button);
-        searchResultTextView = findViewById(R.id.search_result);
         searchButton.setOnClickListener(startSearch);
         toolbar = findViewById(R.id.toolbar_actionbar);
         currentUser = getCurrentUserName();
         setSupportActionBar(toolbar);
 
         restoreSearchField();
-        searchResultTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
         downloadPicturesManage = new PicturesDownloadTask(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        saveSearchField();
-        super.onDestroy();
-    }
-
-    private void setSpanTextInView(ArrayList<Photo> photos) { //добавление активной ссылки для каждой фото
-        for (Photo photo : photos) {
-            final String photoUrl = getPhotoUrl(photo);
-
-            final SpannableString string = new SpannableString(photoUrl);
-            string.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(View widget) {
-                    startActivity(new Intent(MainActivity.this, LinkContentActivity.class)
-                            .putExtra(SPAN_URL, photoUrl)
-                            .putExtra(SEARCH_TEXT, searchText)
-                            .putExtra(CURRENT_USER_NAME, currentUser));
-                }
-            }, 0, photoUrl.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            searchResultTextView.append(string);
-            searchResultTextView.append("\n");
-        }
-    }
-
-    private String getPhotoUrl(Photo photo) { // генерация адреса для каждой фото
-        String farm = photo.getFarm();
-        String server = photo.getServer();
-        String id = photo.getId();
-        String secret = photo.getSecret();
-        return "https://farm" + farm + ".staticflickr.com/" + server + "/" + id + "_" + secret + ".jpg";
-    }
-
-    void saveSearchField() { //сохранение состояния поля для ввода
+    private void saveSearchField() { //сохранение состояния поля для ввода
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String searchFieldText = searchRequestEditText.getText().toString();
         sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, searchFieldText).apply();
@@ -123,20 +117,12 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         }
     }
 
-    @Override
-    public void startLoading() {
-        progressBar.setVisibility(View.VISIBLE);
-        searchResultTextView.setVisibility(View.GONE);
-        searchButton.setClickable(false);
-    }
-
-    @Override
-    public void finishLoading(ArrayList<Photo> photos) {
-        progressBar.setVisibility(View.GONE);
-        searchResultTextView.setVisibility(View.VISIBLE);
-        searchResultTextView.setText("");
-        setSpanTextInView(photos);
-        searchButton.setClickable(true);
+    private String getCurrentUserName() { //получение имени текущего пользователя
+        String currentUserName;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
+        Log.d("test", "getCurrentUserName: " + currentUserName);
+        return currentUserName;
     }
 
     private void setUserNameTitle() {
@@ -144,6 +130,20 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         if (intent != null) {
             toolbar.setTitle(currentUser);
         }
+    }
+
+    @Override
+    public void startLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+        searchButton.setClickable(false);
+    }
+
+    @Override
+    public void finishLoading(ArrayList<PhotoInfo> photos, Integer[] pageSettings) {
+        progressBar.setVisibility(View.GONE);
+        pictureAdapter.setData(photos);
+        searchButton.setClickable(true);
+        pictureAdapter.setPageSettings(pageSettings[0], pageSettings[1]);
     }
 
     @Override
@@ -176,11 +176,21 @@ public class MainActivity extends AppCompatActivity implements LoaderListener {
         return true;
     }
 
-    private String getCurrentUserName() { //получение имени текущего пользователя
-        String currentUserName;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
-        Log.d("test", "getCurrentUserName: " + currentUserName);
-        return currentUserName;
+    @Override
+    public void startActivity(PhotoInfo photoInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(BUNDLE_PHOTO_INFO, photoInfo);
+        startActivity(new Intent(this, LinkContentActivity.class).putExtra(BUNDLE_PHOTO_INFO, bundle));
+    }
+
+    @Override
+    public void loadNextPage(int pageToLoad) {
+        downloadPicturesManage.startLoadPictures(searchText, currentUser, pageToLoad);
+    }
+
+    @Override
+    protected void onDestroy() {
+        saveSearchField();
+        super.onDestroy();
     }
 }

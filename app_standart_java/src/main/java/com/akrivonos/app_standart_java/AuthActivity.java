@@ -13,9 +13,9 @@ import android.widget.Toast;
 
 public class AuthActivity extends AppCompatActivity {
 
-    protected static final String CURRENT_USER_NAME = "user_name";
+    static final String CURRENT_USER_NAME = "user_name";
     private EditText userNameField;
-    private View.OnClickListener checkUser = new View.OnClickListener() {
+    private final View.OnClickListener checkUser = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             String userName = userNameField.getText().toString().toLowerCase();
@@ -40,7 +40,7 @@ public class AuthActivity extends AppCompatActivity {
         logInButton.setOnClickListener(checkUser);
     }
 
-    void saveCurrentUser(String currentUserName) { //сохранение состояния поля для ввода
+    private void saveCurrentUser(String currentUserName) { //сохранение состояния поля для ввода
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         sharedPreferences.edit().putString(CURRENT_USER_NAME, currentUserName).apply();
     }
