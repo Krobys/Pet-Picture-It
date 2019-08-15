@@ -3,13 +3,15 @@ package com.akrivonos.app_standart_java.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
-import com.akrivonos.app_standart_java.models.PhotoMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
@@ -57,15 +59,15 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     @Override
     public boolean checkIsFavorite(String photoUrl) {
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE url = '" + photoUrl + "' ORDER BY request DESC;", null);
-        boolean result = query.getCount() != 0;
+        long numEntries = DatabaseUtils.queryNumEntries(db, favoriteTable, "url = ?", new String[]{photoUrl});
+        boolean result = numEntries != 0;
         db.close();
         query.close();
         return result;
     }
 
     @Override
-    public PhotoMap getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
+    public Map<String, ArrayList<String>> getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
         db = getReadableDatabase();
         query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
         ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
@@ -85,7 +87,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public PhotoMap getHistoryConvention(String userName) {  //получаем список запросов с списком фотографий из истории в каждом по запросам
+    public Map<String, ArrayList<String>> getHistoryConvention(String userName) {  //получаем список запросов с списком фотографий из истории в каждом по запросам
         ArrayList<PhotoInfo> photosHistory = new ArrayList<>();
         db = getReadableDatabase();
         query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
@@ -128,11 +130,24 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db.close();
     }
 
-    private PhotoMap sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям
-        PhotoMap photoMap = new PhotoMap();
+    private Map<String, ArrayList<String>> sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям
+        Map<String, ArrayList<String>> photoMap = new HashMap<>();
+
 
         for (PhotoInfo photoInfo : photos) {
-            photoMap.addToMap(photoInfo.getRequestText(), photoInfo.getUrlText());
+            String key = photoInfo.getRequestText();
+            String value = photoInfo.getUrlText();
+
+            ArrayList<String> section;
+            if (photoMap.containsKey(key)) {
+                section = photoMap.get(key);
+                section.add(value);
+                photoMap.put(key, section);
+            } else {
+                section = new ArrayList<>();
+                section.add(value);
+                photoMap.put(key, section);
+            }
         }
         return photoMap;
     }

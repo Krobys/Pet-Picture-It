@@ -1,7 +1,6 @@
 package com.akrivonos.app_standart_java.services;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
@@ -15,17 +14,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.ref.WeakReference;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class PicturesDownloadService {
-    private LoaderListener loaderListener;
+public class PicturesDownloadTask {
+    private WeakReference<LoaderListener> loaderListenerWeakReference;
 
-    public PicturesDownloadService(Context context) {
-        loaderListener = (LoaderListener) context;
+    public PicturesDownloadTask(LoaderListener loaderListener) {
+        loaderListenerWeakReference = new WeakReference<>(loaderListener);
     }
 
     public void startLoadPictures(String searchText) {
@@ -43,7 +43,7 @@ public class PicturesDownloadService {
 
         @Override
         protected void onPreExecute() {
-            loaderListener.startLoading();
+            loaderListenerWeakReference.get().startLoading();
             super.onPreExecute();
         }
 
@@ -54,7 +54,7 @@ public class PicturesDownloadService {
 
         @Override
         protected void onPostExecute(ArrayList<Photo> photos) {
-            loaderListener.finishLoading(photos);
+            loaderListenerWeakReference.get().finishLoading(photos);
             super.onPostExecute(photos);
         }
 

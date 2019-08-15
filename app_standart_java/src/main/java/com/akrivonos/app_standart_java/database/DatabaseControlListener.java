@@ -1,7 +1,9 @@
 package com.akrivonos.app_standart_java.database;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
-import com.akrivonos.app_standart_java.models.PhotoMap;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 
 public interface DatabaseControlListener {
@@ -11,9 +13,9 @@ public interface DatabaseControlListener {
 
     boolean checkIsFavorite(String photoUrl);
 
-    PhotoMap getAllFavoritesForUser(String userName);
+    Map<String, ArrayList<String>> getAllFavoritesForUser(String userName);
 
-    PhotoMap getHistoryConvention(String userName);
+    Map<String, ArrayList<String>> getHistoryConvention(String userName);
 
     void addToHistoryConvention(PhotoInfo photoInfo);
 }

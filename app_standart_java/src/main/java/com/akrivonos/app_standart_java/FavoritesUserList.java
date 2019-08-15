@@ -12,17 +12,18 @@ import android.widget.TextView;
 
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
-import com.akrivonos.app_standart_java.models.PhotoMap;
 
-import static com.akrivonos.app_standart_java.AuthActivity.USER_NAME;
+import java.util.ArrayList;
+import java.util.Map;
+
+import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
 import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
-import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 
 public class FavoritesUserList extends AppCompatActivity {
 
     private DatabaseControlListener databaseControlListener;
-    private PhotoMap favoritePhotos = null;
+    private Map<String, ArrayList<String>> favoritePhotos = null;
     private String userName;
     private TextView textFavoritesResult;
 
@@ -44,19 +45,19 @@ public class FavoritesUserList extends AppCompatActivity {
 
     private void getUserName() {
         Intent intent = getIntent();
-        if (intent.hasExtra(USER_NAME)) {
-            userName = intent.getStringExtra(USER_NAME);
+        if (intent.hasExtra(CURRENT_USER_NAME)) {
+            userName = intent.getStringExtra(CURRENT_USER_NAME);
         }
     }
 
-    private void fillHistoryToTextView() {
+    private void fillFavoritesToTextView() {
+        if (favoritePhotos != null)
         if (favoritePhotos.size() != 0) {
             textFavoritesResult.setText("");
-            while (favoritePhotos.nextSection()) {
-                String sectionName = favoritePhotos.getCurrentSectionName();
-                textFavoritesResult.append(sectionName + "\n");
-                for (String photo : favoritePhotos.getValuesInSection()) {
-                    setSpanTextInView(photo, sectionName);
+            for (String key : favoritePhotos.keySet()) {
+                textFavoritesResult.append(key + ":\n");
+                for (String url : favoritePhotos.get(key)) {
+                    setSpanTextInView(url, key);
                 }
             }
         } else {
@@ -72,7 +73,7 @@ public class FavoritesUserList extends AppCompatActivity {
                 startActivity(new Intent(FavoritesUserList.this, LinkContentActivity.class)
                         .putExtra(SPAN_URL, url)
                         .putExtra(SEARCH_TEXT, request)
-                        .putExtra(USER_NAME, currentUser));
+                        .putExtra(CURRENT_USER_NAME, userName));
             }
         }, 0, url.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textFavoritesResult.append(string);
@@ -82,7 +83,7 @@ public class FavoritesUserList extends AppCompatActivity {
     @Override
     protected void onResume() {
         getListUserFavorites();
-        fillHistoryToTextView();
+        fillFavoritesToTextView();
         super.onResume();
     }
 

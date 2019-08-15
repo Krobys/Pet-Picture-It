@@ -12,17 +12,18 @@ import android.widget.TextView;
 
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
-import com.akrivonos.app_standart_java.models.PhotoMap;
 
-import static com.akrivonos.app_standart_java.AuthActivity.USER_NAME;
+import java.util.ArrayList;
+import java.util.Map;
+
+import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.SEARCH_TEXT;
 import static com.akrivonos.app_standart_java.MainActivity.SPAN_URL;
-import static com.akrivonos.app_standart_java.MainActivity.currentUser;
 
 public class ConventionHistoryActivity extends AppCompatActivity {
 
     private DatabaseControlListener databaseControlListener;
-    private PhotoMap historyPhotos = null;
+    private Map<String, ArrayList<String>> historyPhotos = null;
     private String userName;
     private TextView textHistoriesResult;
 
@@ -34,7 +35,6 @@ public class ConventionHistoryActivity extends AppCompatActivity {
         textHistoriesResult.setMovementMethod(LinkMovementMethod.getInstance());
 
         databaseControlListener = new DatabaseControl(getApplicationContext());
-
     }
 
     private void getListUserHistory() {
@@ -44,24 +44,25 @@ public class ConventionHistoryActivity extends AppCompatActivity {
 
     private void getUserName() {
         Intent intent = getIntent();
-        if (intent.hasExtra(USER_NAME)) {
-            userName = intent.getStringExtra(USER_NAME);
+        if (intent.hasExtra(CURRENT_USER_NAME)) {
+            userName = intent.getStringExtra(CURRENT_USER_NAME);
         }
     }
 
+    //TODO Сделать историю не сортированной по рзделам и имени, а просто подряд
     private void fillHistoryToTextView() {
-        if (historyPhotos.size() != 0) {
-            textHistoriesResult.setText("");
-            while (historyPhotos.nextSection()) {
-                String sectionName = historyPhotos.getCurrentSectionName();
-                textHistoriesResult.append(sectionName + "\n");
-                for (String photo : historyPhotos.getValuesInSection()) {
-                    setSpanTextInView(photo, sectionName);
+        if (historyPhotos != null)
+            if (historyPhotos.size() != 0) {
+                textHistoriesResult.setText("");
+                for (String key : historyPhotos.keySet()) {
+                    textHistoriesResult.append(key + ":\n");
+                    for (String url : historyPhotos.get(key)) {
+                        setSpanTextInView(url, key);
+                    }
                 }
+            } else {
+                textHistoriesResult.setText(getString(R.string.no_info));
             }
-        } else {
-            textHistoriesResult.setText(getString(R.string.no_info));
-        }
     }
 
     private void setSpanTextInView(final String url, final String request) { //добавление активной ссылки для каждой фото
@@ -72,7 +73,7 @@ public class ConventionHistoryActivity extends AppCompatActivity {
                 startActivity(new Intent(ConventionHistoryActivity.this, LinkContentActivity.class)
                         .putExtra(SPAN_URL, url)
                         .putExtra(SEARCH_TEXT, request)
-                        .putExtra(USER_NAME, currentUser));
+                        .putExtra(CURRENT_USER_NAME, userName));
             }
         }, 0, url.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textHistoriesResult.append(string);
