@@ -73,6 +73,7 @@ public class FavoritesUserList extends AppCompatActivity implements StartActivit
 
     private void updateRecView() {
         ArrayList<PhotoInfo> favoritePhotos = databaseControlListener.getAllFavoritesForUser(userName);
+        favoritesPictureAdapter.throwOffData();
         favoritesPictureAdapter.setData(favoritePhotos);
         favoritesPictureAdapter.notifyDataSetChanged();
     }

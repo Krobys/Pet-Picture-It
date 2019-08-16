@@ -126,13 +126,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         return currentUserName;
     }
 
-    private void setUserNameTitle() { //устанавливаем имя пользователя в тулбар
-        Intent intent = getIntent();
-        if (intent != null) {
-            toolbar.setTitle(currentUser);
-        }
-    }
-
     @Override
     public void startLoading() {
         progressBar.setVisibility(View.VISIBLE);
@@ -157,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.getItem(1).setVisible(true).setIcon(R.drawable.ic_turned_in_black);
         menu.getItem(0).setVisible(true);
-        setUserNameTitle();
+        toolbar.setTitle(currentUser);
         return super.onPrepareOptionsMenu(menu);
     }
 

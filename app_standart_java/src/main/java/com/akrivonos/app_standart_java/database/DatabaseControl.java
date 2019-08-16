@@ -2,17 +2,22 @@ package com.akrivonos.app_standart_java.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
@@ -20,10 +25,12 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     private final String historyTable = "historyTable";
     private SQLiteDatabase db;
     private Cursor query = null;
+    WeakReference<Context> contextWeakReference;
 
 
     public DatabaseControl(Context context) {
         super(context, "app.database", null, 1);
+        contextWeakReference = new WeakReference<>(context);
     }
 
     @Override
@@ -159,6 +166,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
         ArrayList<PhotoInfo> photosWithTitle = new ArrayList<>();
         PhotoInfo photoInfo;
+        String userName = getCurrentUserName();
         for (String key : photoMap.keySet()) {
             photoInfo = new PhotoInfo();
             photoInfo.setRequestText(key);
@@ -167,9 +175,18 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
                 photoInfo = new PhotoInfo();
                 photoInfo.setRequestText(key);
                 photoInfo.setUrlText(url);
+                photoInfo.setUserName(userName);
                 photosWithTitle.add(photoInfo);
             }
         }
         return photosWithTitle;
     }
+
+    private String getCurrentUserName() { //получение имени текущего пользователя
+        String currentUserName;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(contextWeakReference.get());
+        currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
+        return currentUserName;
+    }
 }
+

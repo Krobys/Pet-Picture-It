@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class AuthActivity extends AppCompatActivity {
 
-    static final String CURRENT_USER_NAME = "user_name";
+    public static final String CURRENT_USER_NAME = "user_name";
     private EditText userNameField;
     private final View.OnClickListener checkUser = new View.OnClickListener() {
         @Override
