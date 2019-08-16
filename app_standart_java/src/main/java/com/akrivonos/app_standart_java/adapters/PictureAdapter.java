@@ -65,7 +65,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         visibilityDeleteButton = visibility;
     }
 
-    public void deleteItem(int position) { //далить элемент из адаптера
+    public void deleteItem(int position) { //удалить элемент из адаптера
         photosPicture.remove(position);
         notifyItemRemoved(position);
     }
@@ -81,28 +81,17 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) { // разделяем элементы на два типа(карточка и заглавный секции)
-        if (photosPicture.get(position).getUrlText() == null) {
-            return VIEW_TYPE_TITLE;
-        } else {
-            return VIEW_TYPE_PICTURE_CARD;
-        }
+        return (photosPicture.get(position) == null)
+                ? VIEW_TYPE_TITLE
+                : VIEW_TYPE_PICTURE_CARD;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        View view;
-        switch (viewType) {
-            case VIEW_TYPE_TITLE:
-                view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_title_picture, viewGroup, false);
-                return new TitleViewHolder(view);
-            case VIEW_TYPE_PICTURE_CARD:
-                view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false);
-                return new PictureViewHolder(view);
-            default:
-                view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false);
-        }
-        return new PictureViewHolder(view);
+        return (viewType == VIEW_TYPE_TITLE)
+                ? new TitleViewHolder(LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_title_picture, viewGroup, false))
+                : new PictureViewHolder(LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false));
     }
 
     @Override
