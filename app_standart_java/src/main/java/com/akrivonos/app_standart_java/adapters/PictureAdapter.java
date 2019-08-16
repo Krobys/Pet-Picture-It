@@ -18,14 +18,14 @@ import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.bumptech.glide.Glide;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import static com.akrivonos.app_standart_java.utils.InternetUtils.isInternetConnectionEnable;
 
 public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final WeakReference<Context> contextWeakReference;
+    private Context appContext;
+    private LayoutInflater layoutInflater;
     public static final int VIEW_TYPE_PICTURE_CARD = 2;
     private final StartActivityControlListener activityControl;
     private final DatabaseControlListener databaseControlListener;
@@ -38,14 +38,16 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private int pagesAmount;
 
     public PictureAdapter(StartActivityControlListener startActivityControlListener, Context appContext) { // конструктор адаптера без бесконечной подгрузки
-        contextWeakReference = new WeakReference<>(appContext);
-        this.databaseControlListener = new DatabaseControl(contextWeakReference.get());
+        this.appContext = appContext;
+        layoutInflater = LayoutInflater.from(appContext);
+        this.databaseControlListener = new DatabaseControl(appContext);
         activityControl = startActivityControlListener;
     }
 
     public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context appContext) { //с бесконечной подгрузкой
-        contextWeakReference = new WeakReference<>(appContext);
-        this.databaseControlListener = new DatabaseControl(contextWeakReference.get());
+        this.appContext = appContext;
+        layoutInflater = LayoutInflater.from(appContext);
+        this.databaseControlListener = new DatabaseControl(appContext);
         activityControl = startActivityControlListener;
         borderDownloader = controlBorderDownloaderListener;
     }
@@ -91,8 +93,8 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return (viewType == VIEW_TYPE_TITLE)
-                ? new TitleViewHolder(LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_title_picture, viewGroup, false))
-                : new PictureViewHolder(LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false));
+                ? new TitleViewHolder(layoutInflater.inflate(R.layout.item_title_picture, viewGroup, false))
+                : new PictureViewHolder(layoutInflater.inflate(R.layout.item_picture, viewGroup, false));
     }
 
     @Override
@@ -104,7 +106,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
             case VIEW_TYPE_PICTURE_CARD:
                 PictureViewHolder pictureViewHolder = (PictureViewHolder) viewHolder;
-                Glide.with(contextWeakReference.get())
+                Glide.with(pictureViewHolder.picture)
                         .load(photosPicture.get(position).getUrlText())
                         .into(pictureViewHolder.picture);
                 pictureViewHolder.requestText.setText(photosPicture.get(position).getRequestText());
@@ -114,7 +116,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if (borderDownloader != null)
             if (position == (photosPicture.size() - 3))  //Скачивание следующей страницы данных при достижении 2 элемента в конце списка
-                if ((currentPage < pagesAmount) && isInternetConnectionEnable(contextWeakReference.get()))
+                if ((currentPage < pagesAmount) && isInternetConnectionEnable(appContext))
                     borderDownloader.loadNextPage(currentPage + 1);
 
     }

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     private ProgressBar progressBar;
     private String currentUser;
     private Toolbar toolbar;
-    private PicturesDownloadTask downloadPicturesManage;
     private PictureAdapter pictureAdapter;
 
     private final View.OnClickListener startSearch = new View.OnClickListener() {
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
             if (!TextUtils.isEmpty(searchText)) {
                 if (InternetUtils.isInternetConnectionEnable(getApplicationContext())) {
                     pictureAdapter.throwOffData();
-                    downloadPicturesManage.startLoadPictures(searchText, currentUser, 1);
+                    new PicturesDownloadTask(MainActivity.this).startLoadPictures(searchText, currentUser, 1);
                 } else {
                     Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
                 }
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
         restoreSearchField();
 
-        downloadPicturesManage = new PicturesDownloadTask(this);
     }
 
     private void saveSearchField() { //сохранение состояния поля для ввода
@@ -180,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     @Override
     public void loadNextPage(int pageToLoad) {
-        downloadPicturesManage.startLoadPictures(searchText, currentUser, pageToLoad);
+        new PicturesDownloadTask(this).startLoadPictures(searchText, currentUser, pageToLoad);
     }
 
     @Override
