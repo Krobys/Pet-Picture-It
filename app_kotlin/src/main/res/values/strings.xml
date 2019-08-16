@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">PI_School_W2</string>
-    <string name="text_for_search">text for search</string>
-    <string name="search">search</string>
-    <string name="error_download">Error downloading</string>
-    <string name="empty_field">Request field is empty</string>
-</resources>
