@@ -23,14 +23,16 @@ import java.util.ArrayList;
 
 import static com.akrivonos.app_standart_java.utils.InternetUtils.isInternetConnectionEnable;
 
-public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureViewHolder> {
+public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final WeakReference<Context> contextWeakReference;
-    private final ArrayList<PhotoInfo> photosPicture = new ArrayList<>();
+    public static final int VIEW_TYPE_PICTURE_CARD = 2;
     private final StartActivityControlListener activityControl;
     private final DatabaseControlListener databaseControlListener;
     private ControlBorderDownloaderListener borderDownloader;
     private boolean visibilityDeleteButton = false;
+    private static final int VIEW_TYPE_TITLE = 1;
+    private ArrayList<PhotoInfo> photosPicture = new ArrayList<>();
 
     private int currentPage;
     private int pagesAmount;
@@ -39,7 +41,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         contextWeakReference = new WeakReference<>(appContext);
         this.databaseControlListener = new DatabaseControl(contextWeakReference.get());
         activityControl = startActivityControlListener;
-
     }
 
     public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context appContext) {
@@ -74,20 +75,52 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         this.pagesAmount = pagesAmount;
     }
 
+    public void throwOffData() {
+        photosPicture = new ArrayList<>();
+    }
+
+    @Override
+    public int getItemViewType(int position) { // разделяем элементы на два типа(карточка и заглавный секции)
+        if (photosPicture.get(position).getUrlText() == null) {
+            return VIEW_TYPE_TITLE;
+        } else {
+            return VIEW_TYPE_PICTURE_CARD;
+        }
+    }
+
     @NonNull
     @Override
-    public PictureViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        View view;
+        switch (viewType) {
+            case VIEW_TYPE_TITLE:
+                view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_title_picture, viewGroup, false);
+                return new TitleViewHolder(view);
+            case VIEW_TYPE_PICTURE_CARD:
+                view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false);
+                return new PictureViewHolder(view);
+            default:
+                view = LayoutInflater.from(contextWeakReference.get()).inflate(R.layout.item_picture, viewGroup, false);
+        }
         return new PictureViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PictureViewHolder pictureViewHolder, int position) {
-        Glide.with(contextWeakReference.get())
-                .load(photosPicture.get(position).getUrlText())
-                .into(pictureViewHolder.picture);
-        pictureViewHolder.requestText.setText(photosPicture.get(position).getRequestText());
-        pictureViewHolder.photoInfo = photosPicture.get(position);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        switch (viewHolder.getItemViewType()) {
+            case VIEW_TYPE_TITLE:
+                TitleViewHolder titleViewHolder = (TitleViewHolder) viewHolder;
+                titleViewHolder.titlePictureSection.setText(photosPicture.get(position).getRequestText().toUpperCase());
+                break;
+            case VIEW_TYPE_PICTURE_CARD:
+                PictureViewHolder pictureViewHolder = (PictureViewHolder) viewHolder;
+                Glide.with(contextWeakReference.get())
+                        .load(photosPicture.get(position).getUrlText())
+                        .into(pictureViewHolder.picture);
+                pictureViewHolder.requestText.setText(photosPicture.get(position).getRequestText());
+                pictureViewHolder.photoInfo = photosPicture.get(position);
+                break;
+        }
 
         if (position == (photosPicture.size() - 3)) { //Скачивание следующей страницы данных
             if ((currentPage < pagesAmount) && isInternetConnectionEnable(contextWeakReference.get())) {
@@ -101,7 +134,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         return photosPicture.size();
     }
 
-    class PictureViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class PictureViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener { // Холдер для карточки с картинкой
 
         private final ImageView picture;
         private final TextView requestText;
@@ -132,6 +165,16 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             }
         }
 
+    }
+
+    class TitleViewHolder extends RecyclerView.ViewHolder { // Холдер для заглавия
+
+        final TextView titlePictureSection;
+
+        TitleViewHolder(@NonNull View itemView) {
+            super(itemView);
+            titlePictureSection = itemView.findViewById(R.id.title_picture_topic);
+        }
     }
 
 }

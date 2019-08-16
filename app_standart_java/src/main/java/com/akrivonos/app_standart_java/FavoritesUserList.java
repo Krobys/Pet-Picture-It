@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 
 import com.akrivonos.app_standart_java.adapters.PictureAdapter;
 import com.akrivonos.app_standart_java.database.DatabaseControl;
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 
 import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.MainActivity.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.adapters.PictureAdapter.VIEW_TYPE_PICTURE_CARD;
 
 public class FavoritesUserList extends AppCompatActivity implements StartActivityControlListener {
 
@@ -34,12 +34,14 @@ public class FavoritesUserList extends AppCompatActivity implements StartActivit
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-            Log.d("test", "adapterPos: " + viewHolder.getAdapterPosition());
-            databaseControlListener.setPhotoNotFavorite(favoritesPictureAdapter
-                    .getData()
-                    .get(viewHolder.getAdapterPosition()));
-            favoritesPictureAdapter.deleteItem(viewHolder.getAdapterPosition());
+            if (viewHolder.getItemViewType() == VIEW_TYPE_PICTURE_CARD) {
+                databaseControlListener.setPhotoNotFavorite(favoritesPictureAdapter
+                        .getData()
+                        .get(viewHolder.getAdapterPosition()));
+                favoritesPictureAdapter.deleteItem(viewHolder.getAdapterPosition());
+            }
         }
+
     };
 
     private void getUserName() {

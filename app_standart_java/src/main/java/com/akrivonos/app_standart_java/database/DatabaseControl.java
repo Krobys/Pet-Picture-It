@@ -11,6 +11,8 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
@@ -82,7 +84,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
         db.close();
         query.close();
-        return photosForTitle;
+        return sortBySections(photosForTitle);
     }
 
     @Override
@@ -133,5 +135,41 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    private ArrayList<PhotoInfo> sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям и добавляем элементы для заглавия
+        Map<String, ArrayList<String>> photoMap = new HashMap<>();
+
+
+        for (PhotoInfo photoInfo : photos) {
+            String key = photoInfo.getRequestText();
+            String value = photoInfo.getUrlText();
+
+            ArrayList<String> section;
+            if (photoMap.containsKey(key)) {
+                section = photoMap.get(key);
+                section.add(value);
+                photoMap.put(key, section);
+            } else {
+                section = new ArrayList<>();
+                section.add(value);
+                photoMap.put(key, section);
+            }
+        }
+
+        ArrayList<PhotoInfo> photosWithTitle = new ArrayList<>();
+        PhotoInfo photoInfo;
+        for (String key : photoMap.keySet()) {
+            photoInfo = new PhotoInfo();
+            photoInfo.setRequestText(key);
+            photosWithTitle.add(photoInfo);
+            for (String url : photoMap.get(key)) {
+                photoInfo = new PhotoInfo();
+                photoInfo.setRequestText(key);
+                photoInfo.setUrlText(url);
+                photosWithTitle.add(photoInfo);
+            }
+        }
+        return photosWithTitle;
     }
 }

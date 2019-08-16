@@ -2,7 +2,6 @@ package com.akrivonos.app_standart_java.executors;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
@@ -39,11 +38,9 @@ public class PicturesDownloadTask {
         new RunLoadingPictures().execute(urlDownload);
     }
 
-    private String buildUrlForSearchWithSearchText(String searchText, int pageToLoad) { // Генерация адреса для поиска
+    private String buildUrlForSearchWithSearchText(String searchText, int pageToLoad) { // Генерация адреса для поиска с указанием страницы
         String API_KEY = "c67772a7cb8e4c8be058a309f88f62cf";
-        String urlToLoad = "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText + "&page=" + pageToLoad;
-        Log.d("test", urlToLoad);
-        return urlToLoad;
+        return "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText + "&page=" + pageToLoad;
 
     }
 
@@ -89,11 +86,9 @@ public class PicturesDownloadTask {
                             switch (xpp.getAttributeName(i)) {
                                 case "page":
                                     currentPage = Integer.valueOf(xpp.getAttributeValue(i));
-                                    Log.d("test", "currentpage: " + currentPage);
                                     break;
                                 case "pages":
                                     pagesAmount = Integer.valueOf(xpp.getAttributeValue(i));
-                                    Log.d("test", "amountPages " + pagesAmount);
                                     break;
                             }
                         }
@@ -126,7 +121,6 @@ public class PicturesDownloadTask {
         }
 
         private ArrayList<PhotoInfo> loadInformation(String urlDownload) { // Загрузка xml в список
-            Log.d("test", "loadInformation: url: " + urlDownload);
             BufferedReader reader = null;
             StringBuilder buf = new StringBuilder();
             URL url;

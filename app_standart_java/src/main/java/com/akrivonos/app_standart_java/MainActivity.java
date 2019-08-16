@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,12 +45,16 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     private ProgressBar progressBar;
     private String currentUser;
     private Toolbar toolbar;
+    private PicturesDownloadTask downloadPicturesManage;
+    private PictureAdapter pictureAdapter;
+
     private final View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
-        public void onClick(View v) {
+        public void onClick(View v) { // Кнопка начала скачивания
             searchText = searchRequestEditText.getText().toString().toLowerCase();
             if (!TextUtils.isEmpty(searchText)) {
                 if (InternetUtils.isInternetConnectionEnable(getApplicationContext())) {
+                    pictureAdapter.throwOffData();
                     downloadPicturesManage.startLoadPictures(searchText, currentUser, 1);
                 } else {
                     Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
@@ -61,9 +64,8 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
             }
         }
     };
-    private PicturesDownloadTask downloadPicturesManage;
-    private PictureAdapter pictureAdapter;
-    private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+    private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
             return false;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         StartActivityControlListener startActivityControlListener = MainActivity.this;
         ControlBorderDownloaderListener controlBorderDownloaderListener = MainActivity.this;
         Context appContext = getApplicationContext();
-        pictureAdapter = new PictureAdapter(startActivityControlListener, controlBorderDownloaderListener, appContext);
+        pictureAdapter = new PictureAdapter(startActivityControlListener, controlBorderDownloaderListener, appContext); //создаем адаптер
 
         RecyclerView recyclerViewPictures = findViewById(R.id.rec_view_picture);
         recyclerViewPictures.setLayoutManager(new LinearLayoutManager(this));
@@ -121,11 +123,10 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         String currentUserName;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
-        Log.d("test", "getCurrentUserName: " + currentUserName);
         return currentUserName;
     }
 
-    private void setUserNameTitle() {
+    private void setUserNameTitle() { //устанавливаем имя пользователя в тулбар
         Intent intent = getIntent();
         if (intent != null) {
             toolbar.setTitle(currentUser);
@@ -171,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
                 openClassActivity = ConventionHistoryActivity.class;
                 break;
         }
-        Log.d("test", "curentuser startActivity: " + currentUser);
         startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
         return true;
     }

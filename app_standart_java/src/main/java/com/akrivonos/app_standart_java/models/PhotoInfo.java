@@ -4,9 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class PhotoInfo implements Parcelable {
-    private String userName;
-    private String requestText;
-    private String urlText;
+    private String userName = null;
+    private String requestText = null;
+    private String urlText = null;
 
     public PhotoInfo() {
 
