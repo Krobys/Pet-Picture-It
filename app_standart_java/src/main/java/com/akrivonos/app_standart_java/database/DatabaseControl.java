@@ -25,7 +25,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     private final String historyTable = "historyTable";
     private SQLiteDatabase db;
     private Cursor query = null;
-    WeakReference<Context> contextWeakReference;
+    private WeakReference<Context> contextWeakReference;
 
 
     public DatabaseControl(Context context) {
@@ -60,7 +60,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     public void setPhotoNotFavorite(PhotoInfo photoInfo) { // убрать фото из избранных
 
         db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + favoriteTable + " WHERE user = '" + photoInfo.getUserName() + "' AND request = '" + photoInfo.getRequestText() + "' AND url = '" + photoInfo.getUrlText() + "';");
+        db.execSQL("DELETE FROM " + favoriteTable + " WHERE user = ? AND request = ? AND url = ?;", new String[]{photoInfo.getUserName(), photoInfo.getRequestText(), photoInfo.getUrlText()});
         db.close();
     }
 
@@ -68,16 +68,15 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     public boolean checkIsFavorite(String photoUrl) {
         db = getReadableDatabase();
         long numEntries = DatabaseUtils.queryNumEntries(db, favoriteTable, "url = ?", new String[]{photoUrl});
-        boolean result = numEntries != 0;
         db.close();
         query.close();
-        return result;
+        return numEntries != 0;
     }
 
     @Override
     public ArrayList<PhotoInfo> getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE user = '" + userName + "' ORDER BY request DESC;", null);
+        query = db.rawQuery("SELECT * FROM " + favoriteTable + " WHERE user = ? ORDER BY request DESC;", new String[]{userName});
         ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
 
         while (query.moveToNext()) {
@@ -91,6 +90,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
         db.close();
         query.close();
+        Collections.reverse(photosForTitle);
         return sortBySections(photosForTitle);
     }
 
@@ -121,14 +121,14 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         String URL_TEXT = "url";
 
         db = getWritableDatabase();
-        query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = '" + photoInfo.getUserName() + "' ORDER BY request DESC;", null);
+        query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = ? ORDER BY request DESC;", new String[]{photoInfo.getUserName()});
         if (query.getCount() >= 20) {
-            query.moveToFirst();
+            query.moveToLast();
             PhotoInfo photoInfoForDelete = new PhotoInfo();
             photoInfoForDelete.setUserName(query.getString(0));
             photoInfoForDelete.setRequestText(query.getString(1));
             photoInfoForDelete.setUrlText(query.getString(2));
-            db.execSQL("DELETE FROM " + historyTable + " WHERE user = '" + photoInfoForDelete.getUserName() + "' AND request = '" + photoInfoForDelete.getRequestText() + "' AND url = '" + photoInfoForDelete.getUrlText() + "';");
+            db.execSQL("DELETE FROM " + historyTable + " WHERE user = ? AND request = ? AND url = ?;", new String[]{photoInfoForDelete.getUserName(), photoInfoForDelete.getRequestText(), photoInfoForDelete.getUrlText()});
         }
 
         ContentValues cv = new ContentValues();
@@ -147,7 +147,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     private ArrayList<PhotoInfo> sortBySections(ArrayList<PhotoInfo> photos) { // сортируем фотографии по секциям и добавляем элементы для заглавия
         Map<String, ArrayList<String>> photoMap = new HashMap<>();
 
-
         for (PhotoInfo photoInfo : photos) {
             String key = photoInfo.getRequestText();
             String value = photoInfo.getUrlText();
@@ -163,10 +162,14 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
                 photoMap.put(key, section);
             }
         }
+        return addTitleItemToArray(photoMap);
+    }
 
+    private ArrayList<PhotoInfo> addTitleItemToArray(Map<String, ArrayList<String>> photoMap) {//добавление оглавляющего элемента для каждого раздела
+        String userName = getCurrentUserName();
         ArrayList<PhotoInfo> photosWithTitle = new ArrayList<>();
         PhotoInfo photoInfo;
-        String userName = getCurrentUserName();
+
         for (String key : photoMap.keySet()) {
             photoInfo = new PhotoInfo();
             photoInfo.setRequestText(key);
