@@ -29,7 +29,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public static final int VIEW_TYPE_PICTURE_CARD = 2;
     private final StartActivityControlListener activityControl;
     private final DatabaseControlListener databaseControlListener;
-    private ControlBorderDownloaderListener borderDownloader;
+    private ControlBorderDownloaderListener borderDownloader = null;
     private boolean visibilityDeleteButton = false;
     private static final int VIEW_TYPE_TITLE = 1;
     private ArrayList<PhotoInfo> photosPicture = new ArrayList<>();
@@ -37,13 +37,13 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private int currentPage;
     private int pagesAmount;
 
-    public PictureAdapter(StartActivityControlListener startActivityControlListener, Context appContext) {
+    public PictureAdapter(StartActivityControlListener startActivityControlListener, Context appContext) { // конструктор адаптера без бесконечной подгрузки
         contextWeakReference = new WeakReference<>(appContext);
         this.databaseControlListener = new DatabaseControl(contextWeakReference.get());
         activityControl = startActivityControlListener;
     }
 
-    public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context appContext) {
+    public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context appContext) { //с бесконечной подгрузкой
         contextWeakReference = new WeakReference<>(appContext);
         this.databaseControlListener = new DatabaseControl(contextWeakReference.get());
         activityControl = startActivityControlListener;
@@ -56,8 +56,9 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void setData(ArrayList<PhotoInfo> photosPicture) { // добавляем информацию в адаптер для отображения
         int oldSize = this.photosPicture.size();
+        int newSize = oldSize + photosPicture.size();
+
         this.photosPicture.addAll(photosPicture);
-        int newSize = this.photosPicture.size();
         notifyItemRangeChanged(oldSize, newSize);
     }
 
@@ -75,7 +76,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.pagesAmount = pagesAmount;
     }
 
-    public void throwOffData() {
+    public void throwOffData() { //очищаем адаптер
         photosPicture = new ArrayList<>();
     }
 
@@ -111,11 +112,11 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
         }
 
-        if (position == (photosPicture.size() - 3)) { //Скачивание следующей страницы данных
-            if ((currentPage < pagesAmount) && isInternetConnectionEnable(contextWeakReference.get())) {
-                borderDownloader.loadNextPage(currentPage + 1);
-            }
-        }
+        if (borderDownloader != null)
+            if (position == (photosPicture.size() - 3))  //Скачивание следующей страницы данных при достижении 2 элемента в конце списка
+                if ((currentPage < pagesAmount) && isInternetConnectionEnable(contextWeakReference.get()))
+                    borderDownloader.loadNextPage(currentPage + 1);
+
     }
 
     @Override

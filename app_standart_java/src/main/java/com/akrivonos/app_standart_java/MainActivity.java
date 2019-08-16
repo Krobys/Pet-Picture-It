@@ -85,7 +85,9 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         StartActivityControlListener startActivityControlListener = MainActivity.this;
         ControlBorderDownloaderListener controlBorderDownloaderListener = MainActivity.this;
         Context appContext = getApplicationContext();
-        pictureAdapter = new PictureAdapter(startActivityControlListener, controlBorderDownloaderListener, appContext); //создаем адаптер
+        pictureAdapter = new PictureAdapter(startActivityControlListener,
+                controlBorderDownloaderListener,
+                appContext); //создаем адаптер
 
         RecyclerView recyclerViewPictures = findViewById(R.id.rec_view_picture);
         recyclerViewPictures.setLayoutManager(new LinearLayoutManager(this));
