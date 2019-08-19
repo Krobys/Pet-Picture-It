@@ -3,6 +3,7 @@ package com.akrivonos.app_standart_java.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,7 +85,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) { // разделяем элементы на два типа(карточка и заглавный секции)
-        return (photosPicture.get(position) == null)
+        return (photosPicture.get(position).getUrlText() == null)
                 ? VIEW_TYPE_TITLE
                 : VIEW_TYPE_PICTURE_CARD;
     }
@@ -92,6 +93,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        Log.d("test", "onCreateViewHolder: " + ((viewType == VIEW_TYPE_TITLE) ? "title" : "card"));
         return (viewType == VIEW_TYPE_TITLE)
                 ? new TitleViewHolder(layoutInflater.inflate(R.layout.item_title_picture, viewGroup, false))
                 : new PictureViewHolder(layoutInflater.inflate(R.layout.item_picture, viewGroup, false));
@@ -99,6 +101,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        Log.d("test", "userName: " + photosPicture.get(position).getUserName() + " searchRequest: " + photosPicture.get(position).getRequestText() + " url: " + photosPicture.get(position).getUrlText());
         switch (viewHolder.getItemViewType()) {
             case VIEW_TYPE_TITLE:
                 TitleViewHolder titleViewHolder = (TitleViewHolder) viewHolder;
