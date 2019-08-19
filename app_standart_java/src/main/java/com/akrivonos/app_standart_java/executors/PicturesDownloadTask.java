@@ -1,6 +1,7 @@
 package com.akrivonos.app_standart_java.executors;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
@@ -54,7 +55,10 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     @Override
     protected void onPreExecute() {
-        loaderListenerWeakReference.get().startLoading();
+        if (loaderListenerWeakReference.get() == null)
+            loaderListenerWeakReference.get().startLoading();
+        else
+            Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
         super.onPreExecute();
     }
 
@@ -65,7 +69,11 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     @Override
     protected void onPostExecute(ArrayList<PhotoInfo> photos) {
-        loaderListenerWeakReference.get().finishLoading(photos, new Integer[]{currentPage, pagesAmount});
+        if (loaderListenerWeakReference.get() == null) {
+            loaderListenerWeakReference.get().finishLoading(photos, new Integer[]{currentPage, pagesAmount});
+            loaderListenerWeakReference.clear();
+        } else
+            Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
         super.onPostExecute(photos);
     }
 
