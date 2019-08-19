@@ -55,8 +55,9 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     @Override
     protected void onPreExecute() {
-        if (loaderListenerWeakReference.get() != null)
-            loaderListenerWeakReference.get().startLoading();
+        LoaderListener loaderListener = loaderListenerWeakReference.get();
+        if (loaderListener != null)
+            loaderListener.startLoading();
         else
             Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
         super.onPreExecute();
