@@ -55,7 +55,7 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     @Override
     protected void onPreExecute() {
-        if (loaderListenerWeakReference.get() == null)
+        if (loaderListenerWeakReference.get() != null)
             loaderListenerWeakReference.get().startLoading();
         else
             Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
@@ -69,8 +69,9 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     @Override
     protected void onPostExecute(ArrayList<PhotoInfo> photos) {
-        if (loaderListenerWeakReference.get() == null) {
-            loaderListenerWeakReference.get().finishLoading(photos, new Integer[]{currentPage, pagesAmount});
+        LoaderListener loaderListener = loaderListenerWeakReference.get();
+        if (loaderListener != null) {
+            loaderListener.finishLoading(photos, new Integer[]{currentPage, pagesAmount});
             loaderListenerWeakReference.clear();
         } else
             Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
