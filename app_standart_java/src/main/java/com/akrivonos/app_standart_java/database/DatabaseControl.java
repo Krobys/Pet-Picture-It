@@ -123,7 +123,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db = getWritableDatabase();
         query = db.rawQuery("SELECT * FROM " + historyTable + " WHERE user = ? ORDER BY request DESC;", new String[]{photoInfo.getUserName()});
         if (query.getCount() >= 20) {
-            query.moveToLast();
+            query.moveToFirst();
             PhotoInfo photoInfoForDelete = new PhotoInfo();
             photoInfoForDelete.setUserName(query.getString(0));
             photoInfoForDelete.setRequestText(query.getString(1));
