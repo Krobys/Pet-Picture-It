@@ -11,9 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
+
 public class AuthActivity extends AppCompatActivity {
 
-    public static final String CURRENT_USER_NAME = "user_name";
+
     private EditText userNameField;
     private final View.OnClickListener checkUser = new View.OnClickListener() {
         @Override

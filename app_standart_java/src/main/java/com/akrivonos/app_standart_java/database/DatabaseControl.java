@@ -8,6 +8,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
@@ -17,28 +18,31 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
+import static com.akrivonos.app_standart_java.constants.Values.favoriteTable;
+import static com.akrivonos.app_standart_java.constants.Values.historyTable;
+
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
-    private final String favoriteTable = "pictureTable";
-    private final String historyTable = "historyTable";
+
     private SQLiteDatabase db;
     private Cursor query = null;
-    private WeakReference<Context> contextWeakReference;
-
+    private final WeakReference<Context> contextWeakReference;
 
     public DatabaseControl(Context context) {
         super(context, "app.database", null, 1);
+        db = getWritableDatabase();
+        String CREATE_TABLE_FAVORITE = "CREATE TABLE IF NOT EXISTS " + favoriteTable + "(user TEXT, request TEXT, url TEXT)";
+        db.execSQL(CREATE_TABLE_FAVORITE);
+        String CREATE_TABLE_HISTORY_CONVENTION = "CREATE TABLE IF NOT EXISTS " + historyTable + "(user TEXT, request TEXT, url TEXT)";
+        db.execSQL(CREATE_TABLE_HISTORY_CONVENTION);
         contextWeakReference = new WeakReference<>(context);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE_FAVORITE = "CREATE TABLE IF NOT EXISTS " + favoriteTable + "(user TEXT, request TEXT, url TEXT)";
-        db.execSQL(CREATE_TABLE_FAVORITE);
-        String CREATE_TABLE_HISTORY_CONVENTION = "CREATE TABLE IF NOT EXISTS " + historyTable + "(user TEXT, request TEXT, url TEXT)";
-        db.execSQL(CREATE_TABLE_HISTORY_CONVENTION);
+        Log.d("test", "create DATABASE");
     }
 
     @Override

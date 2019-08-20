@@ -13,4 +13,10 @@
         android:icon="@drawable/ic_favorite_border_black_unactive"
         android:title="@string/user_name"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/find_on_map"
+        android:icon="@drawable/ic_pin_drop_black_24dp"
+        android:title="@string/user_name"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -12,7 +12,7 @@ import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
-import static com.akrivonos.app_standart_java.MainActivity.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 
 public class LinkContentActivity extends AppCompatActivity {
 
@@ -65,6 +65,7 @@ public class LinkContentActivity extends AppCompatActivity {
         toolbar.setTitle(photoInfo.getRequestText());
         toolbar.setSubtitle(photoInfo.getUserName());
         toolbar.getMenu().getItem(0).setVisible(false);
+        toolbar.getMenu().getItem(2).setVisible(false);
         return super.onPrepareOptionsMenu(menu);
     }
 

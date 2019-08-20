@@ -2,16 +2,15 @@
     <string name="app_name">PI_School_W2</string>
     <string name="text_for_search">text for search</string>
     <string name="search">search</string>
-    <string name="error_download">Error downloading</string>
     <string name="empty_field">Request field is empty</string>
     <string name="auth_field_empty_error">"The Auth Field is Empty"</string>
     <string name="user_name">user_name</string>
     <string name="history">History</string>
     <string name="favorites">Favorites</string>
-    <string name="no_info">No information</string>
     <string name="no_internet_connection">Mo Internet Connection</string>
     <string name="picture">picture</string>
     <string name="delete_button">delete button</string>
     <string name="name_of_user">Name of user</string>
     <string name="login">Login</string>
+    <string name="API_KEY_GOOGLE_MAP">AIzaSyA-EdZ2o85CQvRhMvKv30fQiIfZ-KpiP8s</string>
 </resources>

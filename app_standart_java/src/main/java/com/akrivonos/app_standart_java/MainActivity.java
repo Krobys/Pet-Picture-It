@@ -1,12 +1,16 @@
 package com.akrivonos.app_standart_java;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,17 +32,22 @@ import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.InternetUtils;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
-import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
+import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
+import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
+import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
+import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
+import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT;
 
 public class MainActivity extends AppCompatActivity implements LoaderListener,
         StartActivityControlListener,
         ControlBorderDownloaderListener {
 
-    private static final String SEARCH_FIELD_TEXT = "search_field_text";
-    static final String BUNDLE_PHOTO_INFO = "bundle_photo_info";
+
     private EditText searchRequestEditText;
     private Button searchButton;
     private String searchText;
@@ -46,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     private String currentUser;
     private Toolbar toolbar;
     private PictureAdapter pictureAdapter;
+    private static final String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+    private LatLng coordinatesToFindPics;
 
     private final View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
@@ -126,6 +140,19 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         return currentUserName;
     }
 
+    private boolean checkPermissionsMap() {
+        Context baseContext = getBaseContext();
+        if (baseContext != null) {
+            if (ActivityCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void startLoading() {
         progressBar.setVisibility(View.VISIBLE);
@@ -135,9 +162,12 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     @Override
     public void finishLoading(ArrayList<PhotoInfo> photos, Integer[] pageSettings) {
         progressBar.setVisibility(View.GONE);
+        pictureAdapter.setTypeLoadingPage(pageSettings[2]);
         pictureAdapter.setData(photos);
+
         searchButton.setClickable(true);
         pictureAdapter.setPageSettings(pageSettings[0], pageSettings[1]);
+
     }
 
     @Override
@@ -164,9 +194,26 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
             case R.id.history:
                 openClassActivity = ConventionHistoryActivity.class;
                 break;
+            case R.id.find_on_map:
+                if (checkPermissionsMap()) {
+                    startActivityForResult(new Intent(this, MapPictureActivity.class), 1);
+                    return true;
+                } else {
+                    return false;
+                }
         }
         startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        if (data != null) {
+            coordinatesToFindPics = data.getBundleExtra(LAT_LNG).getParcelable(LAT_LNG);
+            pictureAdapter.throwOffData();
+            new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, 1);
+        }
     }
 
     @Override
@@ -177,8 +224,15 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     }
 
     @Override
-    public void loadNextPage(int pageToLoad) {
-        new PicturesDownloadTask(this).startLoadPictures(searchText, currentUser, pageToLoad);
+    public void loadNextPage(int pageToLoad, int typePage) {
+        switch (typePage) {
+            case PAGE_DEF_PIC:
+                new PicturesDownloadTask(this).startLoadPictures(searchText, currentUser, pageToLoad);
+                break;
+            case PAGE_MAP_PIC:
+                new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, pageToLoad);
+                break;
+        }
     }
 
     @Override

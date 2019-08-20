@@ -17,9 +17,9 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import java.util.ArrayList;
 
-import static com.akrivonos.app_standart_java.AuthActivity.CURRENT_USER_NAME;
-import static com.akrivonos.app_standart_java.MainActivity.BUNDLE_PHOTO_INFO;
-import static com.akrivonos.app_standart_java.adapters.PictureAdapter.VIEW_TYPE_PICTURE_CARD;
+import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
+import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
 
 public class FavoritesUserList extends AppCompatActivity implements StartActivityControlListener {
 

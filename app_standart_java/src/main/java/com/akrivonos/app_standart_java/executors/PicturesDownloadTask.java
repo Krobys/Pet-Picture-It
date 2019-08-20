@@ -6,6 +6,7 @@ import android.util.Log;
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -22,11 +23,16 @@ import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import static com.akrivonos.app_standart_java.constants.Values.API_KEY_FLICKR;
+import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
+import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
+
 public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<PhotoInfo>>{
     private final WeakReference<LoaderListener> loaderListenerWeakReference;
     private String searchText;
     private String userName;
     private int currentPage, pagesAmount;
+    private int typeLoadPageTask;
 
     public PicturesDownloadTask(LoaderListener loaderListener) {
         loaderListenerWeakReference = new WeakReference<>(loaderListener);
@@ -35,14 +41,26 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
     public void startLoadPictures(String searchText, String userName, int pageToLoad) {
         this.searchText = searchText;
         this.userName = userName;
-        String urlDownload = buildUrlForSearchWithSearchText(searchText, pageToLoad);
+        String urlDownload = buildUrlForSearch(searchText, pageToLoad);
         execute(urlDownload);
+        typeLoadPageTask = PAGE_DEF_PIC;
     }
 
-    private String buildUrlForSearchWithSearchText(String searchText, int pageToLoad) { // Генерация адреса для поиска с указанием страницы
-        String API_KEY = "c67772a7cb8e4c8be058a309f88f62cf";
-        return "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY + "&text=" + searchText + "&page=" + pageToLoad;
+    public void startLoadPictures(LatLng coordinatesToSearch, String userName, int pageToLoad) {
+        this.userName = userName;
+        String urlDownload = buildUrlForSearch(coordinatesToSearch, pageToLoad);
+        execute(urlDownload);
+        typeLoadPageTask = PAGE_MAP_PIC;
+    }
 
+    private String buildUrlForSearch(String searchText, int pageToLoad) { // Генерация адреса для поиска с указанием страницы
+        return "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + API_KEY_FLICKR + "&text=" + searchText + "&page=" + pageToLoad;
+    }
+
+    private String buildUrlForSearch(LatLng latLng, int pageToLoad) {
+        String urlRequest = "https://www.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=" + API_KEY_FLICKR + "&page=" + pageToLoad + "&lat=" + latLng.latitude + "&lng=" + latLng.longitude;
+        Log.d("test", urlRequest);
+        return urlRequest;
     }
 
     private String getPhotoUrl(Photo photo) { // генерация адреса для каждой фото
@@ -72,11 +90,11 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
     protected void onPostExecute(ArrayList<PhotoInfo> photos) {
         LoaderListener loaderListener = loaderListenerWeakReference.get();
         if (loaderListener != null) {
-            loaderListener.finishLoading(photos, new Integer[]{currentPage, pagesAmount});
+            Log.d("test", "countPhotos: " + photos.size());
+            loaderListener.finishLoading(photos, new Integer[]{currentPage, pagesAmount, typeLoadPageTask});
             loaderListenerWeakReference.clear();
         } else
             Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
-        super.onPostExecute(photos);
     }
 
     private ArrayList<Photo> parseXml(String xml) throws XmlPullParserException, IOException { // Парсинг фотографий в список
@@ -168,7 +186,7 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
         for (Photo photo : photos) {
             photoInfo = new PhotoInfo();
             photoInfo.setUrlText(getPhotoUrl(photo));
-            photoInfo.setRequestText(searchText);
+            photoInfo.setRequestText((typeLoadPageTask == PAGE_DEF_PIC) ? searchText : "geo");
             photoInfo.setUserName(userName);
             photosFinal.add(photoInfo);
         }

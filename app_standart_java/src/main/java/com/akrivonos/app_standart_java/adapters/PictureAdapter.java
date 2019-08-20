@@ -20,18 +20,22 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
+import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
+import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
+import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_TITLE;
 import static com.akrivonos.app_standart_java.utils.InternetUtils.isInternetConnectionEnable;
 
 public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context appContext;
-    private LayoutInflater layoutInflater;
-    public static final int VIEW_TYPE_PICTURE_CARD = 2;
+    private final Context appContext;
+    private final LayoutInflater layoutInflater;
+
     private final StartActivityControlListener activityControl;
     private final DatabaseControlListener databaseControlListener;
     private ControlBorderDownloaderListener borderDownloader = null;
     private boolean visibilityDeleteButton = false;
-    private static final int VIEW_TYPE_TITLE = 1;
+
+    private int typeLoadPage;
     private ArrayList<PhotoInfo> photosPicture = new ArrayList<>();
 
     private int currentPage;
@@ -62,6 +66,10 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         this.photosPicture.addAll(photosPicture);
         notifyItemRangeChanged(oldSize, newSize);
+    }
+
+    public void setTypeLoadingPage(int typeLoadingPage) {
+        typeLoadPage = typeLoadingPage;
     }
 
     public void setVisibilityDeleteButton(boolean visibility) { // показывать кнопку удаления
@@ -109,16 +117,17 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 Glide.with(pictureViewHolder.picture)
                         .load(photosPicture.get(position).getUrlText())
                         .into(pictureViewHolder.picture);
-                pictureViewHolder.requestText.setText(photosPicture.get(position).getRequestText());
+                if (typeLoadPage == PAGE_DEF_PIC)
+                    pictureViewHolder.requestText.setText(photosPicture.get(position).getRequestText());
                 pictureViewHolder.photoInfo = photosPicture.get(position);
                 break;
         }
 
         if (borderDownloader != null)
             if (position == (photosPicture.size() - 3))  //Скачивание следующей страницы данных при достижении 2 элемента в конце списка
-                if ((currentPage < pagesAmount) && isInternetConnectionEnable(appContext))
-                    borderDownloader.loadNextPage(currentPage + 1);
-
+                if ((currentPage < pagesAmount) && isInternetConnectionEnable(appContext)) {
+                    borderDownloader.loadNextPage(currentPage + 1, typeLoadPage);
+                }
     }
 
     @Override
