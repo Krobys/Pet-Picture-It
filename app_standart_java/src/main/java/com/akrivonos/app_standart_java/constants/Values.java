@@ -13,5 +13,4 @@ public class Values {
     public static final int PAGE_MAP_PIC = 2;
     public static final int VIEW_TYPE_TITLE = 1;
     public static final int VIEW_TYPE_PICTURE_CARD = 2;
-
 }
