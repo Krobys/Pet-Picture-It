@@ -7,7 +7,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -49,8 +48,6 @@ public class MapPictureActivity extends AppCompatActivity implements OnMapReadyC
         SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapContainer);
         if (supportMapFragment != null) {
             supportMapFragment.getMapAsync(this);
-        } else {
-            Log.d("test", "supportMapFragment is null");
         }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getBaseContext());
     }
@@ -66,7 +63,6 @@ public class MapPictureActivity extends AppCompatActivity implements OnMapReadyC
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation() {
-        Log.d("test", "get current location start");
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -79,8 +75,6 @@ public class MapPictureActivity extends AppCompatActivity implements OnMapReadyC
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(15).build();
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
                         map.moveCamera(cameraUpdate);
-                        Log.d("test", latLng.toString());
-                        Log.d("test", "get current location finish move");
                     }
                 }
             });

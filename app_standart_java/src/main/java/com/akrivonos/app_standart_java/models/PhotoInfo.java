@@ -54,6 +54,12 @@ public class PhotoInfo implements Parcelable {
         this.urlText = urlText;
     }
 
+
+    @Override
+    public String toString() {
+        return "user: " + userName + " request: " + requestText + " url: " + urlText;
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -8,7 +8,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
@@ -42,7 +41,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d("test", "create DATABASE");
     }
 
     @Override

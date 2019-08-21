@@ -3,7 +3,6 @@ package com.akrivonos.app_standart_java.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,7 +123,6 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 pictureViewHolder.photoInfo = photosPicture.get(position);
                 break;
         }
-        Log.d("test", "user: " + photosPicture.get(position).getUserName() + " request: " + photosPicture.get(position).getRequestText() + " url: " + photosPicture.get(position).getUrlText() + "typePage: " + typeLoadPage);
         if (borderDownloader != null)
             if (position == (photosPicture.size() - 3))  //Скачивание следующей страницы данных при достижении 2 элемента в конце списка
                 if ((currentPage < pagesAmount) && isInternetConnectionEnable(appContext)) {

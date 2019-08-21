@@ -59,7 +59,6 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     private String buildUrlForSearch(LatLng latLng, int pageToLoad) {
         String urlRequest = "https://www.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=" + API_KEY_FLICKR + "&page=" + pageToLoad + "&lat=" + latLng.latitude + "&lng=" + latLng.longitude;
-        Log.d("test", urlRequest);
         return urlRequest;
     }
 
@@ -90,7 +89,6 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
     protected void onPostExecute(ArrayList<PhotoInfo> photos) {
         LoaderListener loaderListener = loaderListenerWeakReference.get();
         if (loaderListener != null) {
-            Log.d("test", "countPhotos: " + photos.size());
             loaderListener.finishLoading(photos, new Integer[]{currentPage, pagesAmount, typeLoadPageTask});
             loaderListenerWeakReference.clear();
         } else
