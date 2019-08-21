@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
+import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_TITLE;
 import static com.akrivonos.app_standart_java.utils.InternetUtils.isInternetConnectionEnable;
@@ -118,7 +118,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 Glide.with(pictureViewHolder.picture)
                         .load(photosPicture.get(position).getUrlText())
                         .into(pictureViewHolder.picture);
-                pictureViewHolder.requestText.setText((typeLoadPage == PAGE_DEF_PIC)
+                pictureViewHolder.requestText.setText((typeLoadPage != PAGE_MAP_PIC)
                         ? photosPicture.get(position).getRequestText()
                         : "");
                 pictureViewHolder.photoInfo = photosPicture.get(position);
