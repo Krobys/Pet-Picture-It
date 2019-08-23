@@ -154,6 +154,18 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1) {
+            for (int perm : grantResults) {
+                if (perm != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+            }
+            startActivityForResult(new Intent(this, MapPictureActivity.class), 1);
+        }
+    }
+
+    @Override
     public void startLoading() {
         progressBar.setVisibility(View.VISIBLE);
         searchButton.setClickable(false);
@@ -164,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         progressBar.setVisibility(View.GONE);
         pictureAdapter.setTypeLoadingPage(pageSettings[2]);
         pictureAdapter.setData(photos);
-
         searchButton.setClickable(true);
         pictureAdapter.setPageSettings(pageSettings[0], pageSettings[1]);
 

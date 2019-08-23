@@ -187,11 +187,14 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         return photosWithTitle;
     }
 
-    private String getCurrentUserName() { //получение имени текущего пользователя
-        String currentUserName;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(contextWeakReference.get());
-        currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
-        return currentUserName;
+    private String getCurrentUserName() {
+        if (contextWeakReference.get() != null) {
+            String currentUserName;
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(contextWeakReference.get());
+            currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
+            return currentUserName;
+        }
+        return "";
     }
 }
 

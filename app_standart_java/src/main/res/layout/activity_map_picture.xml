@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/mapContainer"
-        class="com.google.android.gms.maps.SupportMapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/choose_button"
@@ -38,5 +38,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_arrow_downward_black_24dp" />
 
-    <!--class="com.google.android.gms.maps.SupportMapFragment"-->
 </android.support.constraint.ConstraintLayout>
