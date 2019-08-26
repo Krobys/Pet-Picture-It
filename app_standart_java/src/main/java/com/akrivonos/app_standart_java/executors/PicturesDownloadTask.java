@@ -82,7 +82,9 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
 
     @Override
     protected ArrayList<PhotoInfo> doInBackground(String... strings) {
-        return loadInformation(strings[0]);
+        String informationXml = loadInformation(strings[0]);
+        ArrayList<Photo> photosInList = parseXml(informationXml);
+        return convertPhotoToPhotoInfo(photosInList);
     }
 
     @Override
@@ -95,9 +97,12 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
             Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");
     }
 
-    private ArrayList<Photo> parseXml(String xml) throws XmlPullParserException, IOException { // Парсинг фотографий в список
+    private ArrayList<Photo> parseXml(String xml) { // Парсинг фотографий в список
         ArrayList<Photo> photos = new ArrayList<>();
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        XmlPullParserFactory factory;
+        try {
+            factory = XmlPullParserFactory.newInstance();
+
         factory.setNamespaceAware(true);
         XmlPullParser xpp = factory.newPullParser();
         xpp.setInput(new StringReader(xml));
@@ -140,10 +145,29 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
             }
             xpp.next();
         }
+
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return photos;
     }
 
-    private ArrayList<PhotoInfo> loadInformation(String urlDownload) { // Загрузка xml в список
+    private ArrayList<PhotoInfo> convertPhotoToPhotoInfo(ArrayList<Photo> photos){
+        ArrayList<PhotoInfo> photosFinal = new ArrayList<>();
+        PhotoInfo photoInfo;
+        for (Photo photo : photos) {
+            photoInfo = new PhotoInfo();
+            photoInfo.setUrlText(getPhotoUrl(photo));
+            photoInfo.setRequestText((typeLoadPageTask == PAGE_DEF_PIC) ? searchText : "geo");
+            photoInfo.setUserName(userName);
+            photosFinal.add(photoInfo);
+        }
+        return photosFinal;
+    }
+
+    private String loadInformation(String urlDownload) { // Загрузка xml в список
         BufferedReader reader = null;
         StringBuilder buf = new StringBuilder();
         URL url;
@@ -171,23 +195,7 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
                 }
             }
         }
-        ArrayList<Photo> photos = new ArrayList<>();
-        try {
-            photos = parseXml(new String(buf));
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ArrayList<PhotoInfo> photosFinal = new ArrayList<>();
-        PhotoInfo photoInfo;
-        for (Photo photo : photos) {
-            photoInfo = new PhotoInfo();
-            photoInfo.setUrlText(getPhotoUrl(photo));
-            photoInfo.setRequestText((typeLoadPageTask == PAGE_DEF_PIC) ? searchText : "geo");
-            photoInfo.setUserName(userName);
-            photosFinal.add(photoInfo);
-        }
-        return photosFinal;
+
+        return new String(buf);
     }
 }

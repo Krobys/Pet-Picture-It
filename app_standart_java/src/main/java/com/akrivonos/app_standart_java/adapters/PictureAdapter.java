@@ -87,7 +87,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void throwOffData() { //очищаем адаптер
-        photosPicture = new ArrayList<>();
+        photosPicture.clear();
     }
 
     @Override

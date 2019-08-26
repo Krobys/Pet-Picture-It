@@ -41,6 +41,7 @@ import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME
 import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
+import static com.akrivonos.app_standart_java.constants.Values.RESULT_MAP_COORDINATES;
 import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT;
 
 public class MainActivity extends AppCompatActivity implements LoaderListener,
@@ -141,15 +142,12 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     }
 
     private boolean checkPermissionsMap() {
-        Context baseContext = getBaseContext();
-        if (baseContext != null) {
-            if (ActivityCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
             } else {
                 return true;
             }
-        }
         return false;
     }
 
@@ -219,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
+        if (resultCode == RESULT_MAP_COORDINATES)
         if (data != null) {
             coordinatesToFindPics = data.getBundleExtra(LAT_LNG).getParcelable(LAT_LNG);
             pictureAdapter.throwOffData();

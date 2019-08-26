@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
+import static com.akrivonos.app_standart_java.constants.Values.RESULT_MAP_COORDINATES;
 
 public class MapPictureActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -33,7 +34,7 @@ public class MapPictureActivity extends AppCompatActivity implements OnMapReadyC
             LatLng latLng = map.getCameraPosition().target;
             Bundle bundle = new Bundle();
             bundle.putParcelable(LAT_LNG, latLng);
-            setResult(1, new Intent().putExtra(LAT_LNG, bundle));
+            setResult(RESULT_MAP_COORDINATES, new Intent().putExtra(LAT_LNG, bundle));
             finish();
         }
     };

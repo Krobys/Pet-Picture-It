@@ -6,8 +6,9 @@ public class Values {
     public static final String SEARCH_FIELD_TEXT = "search_field_text";
     public static final String BUNDLE_PHOTO_INFO = "bundle_photo_info";
     public static final String CURRENT_USER_NAME = "user_name";
-    public static final String favoriteTable = "pictureTable";
-    public static final String historyTable = "historyTable";
+    public static final String FAVORITE_TABLE = "pictureTable";
+    public static final String HISTORY_TABLE = "HISTORY_TABLE";
+    public static final int RESULT_MAP_COORDINATES = 1;
     public static final String LAT_LNG = "lat_lng";
     public static final int PAGE_DEF_PIC = 1;
     public static final int PAGE_MAP_PIC = 2;
