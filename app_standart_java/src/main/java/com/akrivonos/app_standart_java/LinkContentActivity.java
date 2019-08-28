@@ -23,6 +23,7 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 import static com.akrivonos.app_standart_java.constants.Values.MY_CAMERA_PERMISSION_CODE;
+import static com.akrivonos.app_standart_java.constants.Values.MY_DOWNLOAD_PERMISSION_CODE;
 
 public class LinkContentActivity extends AppCompatActivity {
 
@@ -111,7 +112,7 @@ public class LinkContentActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_CAMERA_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_DOWNLOAD_PERMISSION_CODE);
         } else {
             downloadPhotoWithDownloadManager(photoInfo.getUrlText());
         }
@@ -119,7 +120,7 @@ public class LinkContentActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == MY_CAMERA_PERMISSION_CODE){
+        if(requestCode == MY_DOWNLOAD_PERMISSION_CODE){
             for (int perm : grantResults) {
                 if (perm != PackageManager.PERMISSION_GRANTED) {
                     return;

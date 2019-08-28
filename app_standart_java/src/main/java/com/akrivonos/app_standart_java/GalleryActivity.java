@@ -40,7 +40,6 @@ import static com.akrivonos.app_standart_java.constants.Values.MY_CAMERA_PERMISS
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_IMAGE_CAPTURE;
 
 public class GalleryActivity extends AppCompatActivity implements StartUCropListener, NotifyGalleryAdapterListener {
-    private final String TAG = "test";
     private Toolbar toolbar;
     private File currentPhoto;
     private Uri photoUri;
@@ -132,10 +131,9 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
     private void dispatchTakePictureIntent() {  // запуск камеры для снятия фотографии
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            File imagefile;
-            imagefile = createImageFile();
-            if(imagefile != null){
-                photoUri = FileProvider.getUriForFile(this, "com.akrivonos.app_standart_java.provider", imagefile);
+            File imageFile = createImageFile();
+            if(imageFile != null){
+                photoUri = FileProvider.getUriForFile(this, "com.akrivonos.app_standart_java.provider", imageFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
             }
