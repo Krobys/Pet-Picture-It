@@ -58,8 +58,7 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
     }
 
     private String buildUrlForSearch(LatLng latLng, int pageToLoad) {
-        String urlRequest = "https://www.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=" + API_KEY_FLICKR + "&page=" + pageToLoad + "&lat=" + latLng.latitude + "&lng=" + latLng.longitude;
-        return urlRequest;
+        return "https://www.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=" + API_KEY_FLICKR + "&page=" + pageToLoad + "&lat=" + latLng.latitude + "&lng=" + latLng.longitude;
     }
 
     private String getPhotoUrl(Photo photo) { // генерация адреса для каждой фото

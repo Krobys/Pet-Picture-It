@@ -32,6 +32,7 @@ import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.InternetUtils;
+import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
+import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.RESULT_MAP_COORDINATES;
@@ -47,7 +49,6 @@ import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT
 public class MainActivity extends AppCompatActivity implements LoaderListener,
         StartActivityControlListener,
         ControlBorderDownloaderListener {
-
 
     private EditText searchRequestEditText;
     private Button searchButton;
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(startSearch);
         toolbar = findViewById(R.id.toolbar_actionbar);
-        currentUser = getCurrentUserName();
+        currentUser = PreferenceUtils.getCurrentUserName(this);
         setSupportActionBar(toolbar);
 
         restoreSearchField();
@@ -134,17 +135,10 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         }
     }
 
-    private String getCurrentUserName() { //получение имени текущего пользователя
-        String currentUserName;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
-        return currentUserName;
-    }
-
     private boolean checkPermissionsMap() {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 1);
+                    || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_MAP_PERMISSION_CODE);
             } else {
                 return true;
             }
@@ -153,13 +147,13 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1) {
+        if (requestCode == MY_MAP_PERMISSION_CODE) {
             for (int perm : grantResults) {
                 if (perm != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
             }
-            startActivityForResult(new Intent(this, MapPictureActivity.class), 1);
+            startActivityForResult(new Intent(this, MapPictureActivity.class), RESULT_MAP_COORDINATES);
         }
     }
 
@@ -187,10 +181,8 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(1).setVisible(true).setIcon(R.drawable.ic_turned_in_black);
-        menu.getItem(0).setVisible(true);
         toolbar.setTitle(currentUser);
-        return super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     @Override
@@ -210,6 +202,9 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
                 } else {
                     return false;
                 }
+            case R.id.gallery:
+                openClassActivity = GalleryActivity.class;
+                break;
         }
         startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
         return true;

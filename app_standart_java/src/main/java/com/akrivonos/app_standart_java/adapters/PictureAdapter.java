@@ -36,7 +36,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private boolean visibilityDeleteButton = false;
 
     private int typeLoadPage;
-    private ArrayList<PhotoInfo> photosPicture = new ArrayList<>();
+    private final ArrayList<PhotoInfo> photosPicture = new ArrayList<>();
 
     private int currentPage;
     private int pagesAmount;
@@ -149,7 +149,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             deleteButton.setVisibility((visibilityDeleteButton)
                     ? View.VISIBLE
                     : View.GONE);
-            picture = itemView.findViewById(R.id.picture_downloaded);
+            picture = itemView.findViewById(R.id.photo_from_camera);
             requestText = itemView.findViewById(R.id.request_text);
             itemView.setOnClickListener(this);
 

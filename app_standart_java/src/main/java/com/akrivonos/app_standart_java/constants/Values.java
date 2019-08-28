@@ -6,12 +6,17 @@ public class Values {
     public static final String SEARCH_FIELD_TEXT = "search_field_text";
     public static final String BUNDLE_PHOTO_INFO = "bundle_photo_info";
     public static final String CURRENT_USER_NAME = "user_name";
-    public static final String FAVORITE_TABLE = "pictureTable";
-    public static final String HISTORY_TABLE = "HISTORY_TABLE";
+    public static final String FAVORITE_TABLE = "picture_table";
+    public static final String HISTORY_TABLE = "history_table";
+    public static final String GALLERY_TABLE = "gallery_table";
     public static final int RESULT_MAP_COORDINATES = 1;
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final String LAT_LNG = "lat_lng";
     public static final int PAGE_DEF_PIC = 1;
     public static final int PAGE_MAP_PIC = 2;
     public static final int VIEW_TYPE_TITLE = 1;
     public static final int VIEW_TYPE_PICTURE_CARD = 2;
+    public static final int MY_CAMERA_PERMISSION_CODE = 1;
+    public static final int MY_MAP_PERMISSION_CODE = 2;
+    public static final int MY_DOWNLOAD_PERMISSION_CODE = 3;
 }

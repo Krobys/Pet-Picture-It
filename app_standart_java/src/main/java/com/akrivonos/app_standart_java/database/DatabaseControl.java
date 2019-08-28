@@ -2,14 +2,15 @@ package com.akrivonos.app_standart_java.database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.preference.PreferenceManager;
+import android.net.Uri;
 
+import com.akrivonos.app_standart_java.models.PhotoGallery;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -17,13 +18,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.FAVORITE_TABLE;
+import static com.akrivonos.app_standart_java.constants.Values.GALLERY_TABLE;
 import static com.akrivonos.app_standart_java.constants.Values.HISTORY_TABLE;
 
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
-
 
     private SQLiteDatabase db;
     private Cursor query = null;
@@ -36,6 +36,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db.execSQL(CREATE_TABLE_FAVORITE);
         String CREATE_TABLE_HISTORY_CONVENTION = "CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE + "(user TEXT, request TEXT, url TEXT)";
         db.execSQL(CREATE_TABLE_HISTORY_CONVENTION);
+        String CREATE_TABLE_GALLERY = "CREATE TABLE IF NOT EXISTS " + GALLERY_TABLE + "(user TEXT, date INTEGER, uri TEXT)";
+        db.execSQL(CREATE_TABLE_GALLERY);
         contextWeakReference = new WeakReference<>(context);
     }
 
@@ -142,6 +144,47 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
+    public void addToGallery(PhotoGallery photoGallery) {
+        String USER_NAME_FIELD = "user";
+        String DATE_FIELD = "date";
+        String URI_TEXT = "uri";
+
+        db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(USER_NAME_FIELD, photoGallery.getUserName());
+        cv.put(DATE_FIELD, photoGallery.getDateMillis());
+        cv.put(URI_TEXT, photoGallery.getUriPhoto().toString());
+        db.insert(GALLERY_TABLE, null, cv);
+        db.close();
+    }
+
+    @Override
+    public void deleteFromGallery(Uri uriPhotoToDelete) {
+        db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + GALLERY_TABLE + " WHERE uri = ?;", new String[]{uriPhotoToDelete.toString()});
+        db.close();
+    }
+
+    @Override
+    public ArrayList<PhotoGallery> getPhotosFromGallery(String userName) {
+        ArrayList<PhotoGallery> photosGallery = new ArrayList<>();
+        db = getReadableDatabase();
+        query = db.rawQuery("SELECT * FROM " + GALLERY_TABLE + " WHERE user = ? ORDER BY date DESC;", new String[]{userName});
+        while (query.moveToNext()) {
+            PhotoGallery photoGallery = new PhotoGallery();
+            photoGallery.setUserName(query.getString(0));
+            photoGallery.setDateMillis(Long.valueOf(query.getString(1)));
+            photoGallery.setUriPhoto(query.getString(2));
+
+            photosGallery.add(photoGallery);
+        }
+        //Collections.reverse(photosGallery);
+        db.close();
+        query.close();
+        return photosGallery;
+    }
+
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
@@ -188,11 +231,9 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     private String getCurrentUserName() {
-        if (contextWeakReference.get() != null) {
-            String currentUserName;
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(contextWeakReference.get());
-            currentUserName = sharedPreferences.getString(CURRENT_USER_NAME, "");
-            return currentUserName;
+        Context context = contextWeakReference.get();
+        if (context != null) {
+            return PreferenceUtils.getCurrentUserName(context);
         }
         return "";
     }

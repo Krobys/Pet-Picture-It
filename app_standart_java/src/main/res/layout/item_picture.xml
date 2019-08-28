@@ -20,9 +20,9 @@
             android:padding="6dp" />
 
         <ImageView
-            android:id="@+id/picture_downloaded"
-            android:layout_width="282dp"
-            android:layout_height="253dp"
+            android:id="@+id/photo_from_camera"
+            android:layout_width="309dp"
+            android:layout_height="240dp"
             android:layout_below="@id/request_text"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
