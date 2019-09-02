@@ -142,6 +142,7 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         cv.put(URL_TEXT, photoInfo.getUrlText());
         db.insert(HISTORY_TABLE, null, cv);
         db.close();
+        query.close();
     }
 
     @Override
