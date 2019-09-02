@@ -23,6 +23,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     }
 
     public void setDataGallery(ArrayList<PhotoGallery> photos){
+        if(photos == null) return;
         this.photos = photos;
         notifyDataSetChanged();
     }

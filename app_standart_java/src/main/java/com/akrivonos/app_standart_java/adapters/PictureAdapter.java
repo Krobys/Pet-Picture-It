@@ -19,6 +19,7 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
@@ -60,7 +61,8 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return photosPicture;
     }
 
-    public void setData(ArrayList<PhotoInfo> photosPicture) { // добавляем информацию в адаптер для отображения
+    public void setData(List<PhotoInfo> photosPicture) {
+        if (photosPicture == null) return;// добавляем информацию в адаптер для отображения
         int oldSize = this.photosPicture.size();
         int newSize = oldSize + photosPicture.size();
 

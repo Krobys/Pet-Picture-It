@@ -26,7 +26,6 @@ import static com.akrivonos.app_standart_java.constants.Values.HISTORY_TABLE;
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
 
     private SQLiteDatabase db;
-    private Cursor query = null;
     private final WeakReference<Context> contextWeakReference;
 
     public DatabaseControl(Context context) {
@@ -73,14 +72,14 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         db = getReadableDatabase();
         long numEntries = DatabaseUtils.queryNumEntries(db, FAVORITE_TABLE, "url = ?", new String[]{photoUrl});
         db.close();
-        query.close();
         return numEntries != 0;
     }
 
     @Override
     public ArrayList<PhotoInfo> getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM " + FAVORITE_TABLE + " WHERE user = ? ORDER BY request DESC;", new String[]{userName});
+        Cursor query = db.rawQuery("SELECT * FROM " + FAVORITE_TABLE + " WHERE user = ? ORDER BY request DESC;", new String[]{userName});
+        if (query == null) return null;
         ArrayList<PhotoInfo> photosForTitle = new ArrayList<>();
 
         while (query.moveToNext()) {
@@ -102,7 +101,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     public ArrayList<PhotoInfo> getHistoryConvention(String userName) {  //получаем список запросов с списком фотографий из истории в каждом по запросам
         ArrayList<PhotoInfo> photosHistory = new ArrayList<>();
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM " + HISTORY_TABLE + " WHERE user = ? ORDER BY ? DESC;", new String[]{userName, userName});
+        Cursor query = db.rawQuery("SELECT * FROM " + HISTORY_TABLE + " WHERE user = ? ORDER BY ? DESC;", new String[]{userName, userName});
+        if (query == null) return null;
         while (query.moveToNext()) {
             PhotoInfo photoInfo = new PhotoInfo();
             photoInfo.setUserName(query.getString(0));
@@ -125,7 +125,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         String URL_TEXT = "url";
 
         db = getWritableDatabase();
-        query = db.rawQuery("SELECT * FROM " + HISTORY_TABLE + " WHERE user = ? ORDER BY request DESC;", new String[]{photoInfo.getUserName()});
+        Cursor query = db.rawQuery("SELECT * FROM " + HISTORY_TABLE + " WHERE user = ? ORDER BY request DESC;", new String[]{photoInfo.getUserName()});
+        if (query == null) return;
         if (query.getCount() >= 20) {
             query.moveToFirst();
             PhotoInfo photoInfoForDelete = new PhotoInfo();
@@ -169,7 +170,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     public ArrayList<PhotoGallery> getPhotosFromGallery(String userName) {
         ArrayList<PhotoGallery> photosGallery = new ArrayList<>();
         db = getReadableDatabase();
-        query = db.rawQuery("SELECT * FROM " + GALLERY_TABLE + " WHERE user = ? ORDER BY date DESC;", new String[]{userName});
+        Cursor query = db.rawQuery("SELECT * FROM " + GALLERY_TABLE + " WHERE user = ? ORDER BY date DESC;", new String[]{userName});
+        if (query == null) return null;
         while (query.moveToNext()) {
             PhotoGallery photoGallery = new PhotoGallery();
             photoGallery.setUserName(query.getString(0));
@@ -178,7 +180,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
             photosGallery.add(photoGallery);
         }
-        //Collections.reverse(photosGallery);
         db.close();
         query.close();
         return photosGallery;
