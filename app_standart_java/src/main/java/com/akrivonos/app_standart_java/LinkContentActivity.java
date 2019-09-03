@@ -27,7 +27,6 @@ import static com.akrivonos.app_standart_java.constants.Values.MY_DOWNLOAD_PERMI
 
 public class LinkContentActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
     private DatabaseControlListener databaseControlListener;
     private PhotoInfo photoInfo;
     private static final String[] PERMISSIONS_STORAGE = {
@@ -38,9 +37,6 @@ public class LinkContentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_link_content);
-
-        toolbar = findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
 
         databaseControlListener = new DatabaseControl(getApplicationContext());
         setPhotoInfo();
@@ -56,7 +52,7 @@ public class LinkContentActivity extends AppCompatActivity {
         int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
                 ? R.drawable.ic_favorite_black_active
                 : R.drawable.ic_favorite_border_black_unactive;
-        toolbar.getMenu().findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
+        menu.findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
         return true;
     }
 
@@ -66,10 +62,10 @@ public class LinkContentActivity extends AppCompatActivity {
             case R.id.favorire_pick:
                 if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
                     databaseControlListener.setPhotoNotFavorite(photoInfo);
-                    toolbar.getMenu().findItem(R.id.favorire_pick).setIcon(R.drawable.ic_favorite_border_black_unactive);
+                    item.setIcon(R.drawable.ic_favorite_border_black_unactive);
                 } else {
                     databaseControlListener.setPhotoFavorite(photoInfo);
-                    toolbar.getMenu().findItem(R.id.favorire_pick).setIcon(R.drawable.ic_favorite_black_active);
+                   item.setIcon(R.drawable.ic_favorite_black_active);
                 }
                 return true;
             case R.id.picture_download:
@@ -82,8 +78,7 @@ public class LinkContentActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        toolbar.setTitle(photoInfo.getRequestText());
-        toolbar.setSubtitle(photoInfo.getUserName());
+        setTitle(photoInfo.getRequestText() +"\n"+ photoInfo.getUserName());
         return super.onPrepareOptionsMenu(menu);
     }
 

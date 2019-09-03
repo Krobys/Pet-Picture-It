@@ -5,6 +5,7 @@ public class Values {
     public static final String API_KEY_FLICKR_PRIVATE = "e139f14f228198f8";
     public static final String SEARCH_FIELD_TEXT = "search_field_text";
     public static final String BUNDLE_PHOTO_INFO = "bundle_photo_info";
+    public static final String CURRENT_POSITION_LAYOUT = "current_position_layout";
     public static final String CURRENT_USER_NAME = "user_name";
     public static final String FAVORITE_TABLE = "picture_table";
     public static final String HISTORY_TABLE = "history_table";

@@ -7,16 +7,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +40,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
+import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
+import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_LAYOUT;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
@@ -55,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     private String searchText;
     private ProgressBar progressBar;
     private String currentUser;
-    private Toolbar toolbar;
+    private RecyclerView recyclerViewPictures;
+    private LinearLayoutManager linearLayoutManager;
     private PictureAdapter pictureAdapter;
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -80,6 +87,11 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         }
     };
 
+    static{
+        AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO);
+        Log.d("Test", "static initializer: ");
+    }
+
     private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
@@ -94,8 +106,11 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         StartActivityControlListener startActivityControlListener = MainActivity.this;
         ControlBorderDownloaderListener controlBorderDownloaderListener = MainActivity.this;
@@ -104,18 +119,18 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
                 controlBorderDownloaderListener,
                 appContext); //создаем адаптер
 
-        RecyclerView recyclerViewPictures = findViewById(R.id.rec_view_picture);
-        recyclerViewPictures.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerViewPictures = findViewById(R.id.rec_view_picture);
+        recyclerViewPictures.setLayoutManager(linearLayoutManager);
         recyclerViewPictures.setAdapter(pictureAdapter);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewPictures);
 
         progressBar = findViewById(R.id.progressBar);
         searchRequestEditText = findViewById(R.id.search_request);
+        unFocusEditText();
         searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(startSearch);
-        toolbar = findViewById(R.id.toolbar_actionbar);
         currentUser = PreferenceUtils.getCurrentUserName(this);
-        setSupportActionBar(toolbar);
 
         restoreSearchField();
 
@@ -181,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        toolbar.setTitle(currentUser);
+        setTitle(currentUser);
+        initAppThemeStyleIcon(menu.findItem(R.id.settings_app_theme));
         return true;
     }
 
@@ -205,6 +221,9 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
             case R.id.gallery:
                 openClassActivity = GalleryActivity.class;
                 break;
+            case R.id.settings_app_theme:
+                    changeAppThemeStyle(item);
+                    return true;
         }
         startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
         return true;
@@ -243,5 +262,50 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     protected void onDestroy() {
         saveSearchField();
         super.onDestroy();
+    }
+
+    private void changeAppThemeStyle(MenuItem item){
+        int style_mode = AppCompatDelegate.getDefaultNightMode();
+        style_mode = (style_mode == MODE_NIGHT_YES)
+                ? MODE_NIGHT_NO
+                : MODE_NIGHT_YES;
+        item.setIcon((style_mode == MODE_NIGHT_YES)
+                ? R.drawable.ic_night_mode_icon
+                : R.drawable.ic_day_mode_icon);
+        AppCompatDelegate.setDefaultNightMode(style_mode);
+        recreate();
+        pictureAdapter.notifyDataSetChanged();
+    }
+
+    private void initAppThemeStyleIcon(MenuItem item){
+        int style_mode = AppCompatDelegate.getDefaultNightMode();
+        item.setIcon((style_mode == MODE_NIGHT_YES)
+                ? R.drawable.ic_night_mode_icon
+                : R.drawable.ic_day_mode_icon);
+    }
+
+    private void unFocusEditText(){
+        searchRequestEditText.setFocusableInTouchMode(false);
+        searchRequestEditText.setFocusable(false);
+        searchRequestEditText.setFocusableInTouchMode(true);
+        searchRequestEditText.setFocusable(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        ArrayList<PhotoInfo> pictures = pictureAdapter.getData();
+        int currentPosition = linearLayoutManager.findLastVisibleItemPosition();
+
+        outState.putParcelableArrayList(BUNDLE_PHOTO_INFO, pictures);
+        outState.putInt(CURRENT_POSITION_LAYOUT, currentPosition);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        ArrayList<PhotoInfo> restoredPictures = savedInstanceState.getParcelableArrayList(BUNDLE_PHOTO_INFO);
+        int restoreCurrentPosition = savedInstanceState.getInt(CURRENT_POSITION_LAYOUT);
+        pictureAdapter.setData(restoredPictures);
+        recyclerViewPictures.scrollToPosition(restoreCurrentPosition - 1);
     }
 }

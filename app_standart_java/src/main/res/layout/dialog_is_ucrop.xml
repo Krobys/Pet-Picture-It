@@ -47,6 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="103dp"
             android:gravity="center_horizontal|center_vertical"
+            android:textColor="@color/common_google_signin_btn_text_light_default"
             android:text="@string/ucrop_text_dialog"
             android:textSize="17sp"
             android:textStyle="bold"

@@ -25,4 +25,10 @@
         android:icon="@drawable/ic_photo_black_24dp"
         android:title="@string/gallery"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/settings_app_theme"
+        android:icon="@drawable/ic_day_mode_icon"
+        android:title="@string/mode_app_theme"
+        app:showAsAction="always"/>
 </menu>

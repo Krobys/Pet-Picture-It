@@ -14,15 +14,16 @@
         android:ems="10"
         android:hint="@string/name_of_user"
         android:inputType="textPersonName"
-        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/EditTextMaterialCustom" />
 
     <Button
         android:id="@+id/logInButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/ButtonMaterialCustom"
         android:layout_marginTop="80dp"
         android:text="@string/login"
         app:layout_constraintEnd_toEndOf="parent"

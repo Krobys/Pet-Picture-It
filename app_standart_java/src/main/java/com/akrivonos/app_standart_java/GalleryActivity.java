@@ -40,7 +40,6 @@ import static com.akrivonos.app_standart_java.constants.Values.MY_CAMERA_PERMISS
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_IMAGE_CAPTURE;
 
 public class GalleryActivity extends AppCompatActivity implements StartUCropListener, NotifyGalleryAdapterListener {
-    private Toolbar toolbar;
     private File currentPhoto;
     private Uri photoUri;
     private GalleryAdapter galleryAdapter;
@@ -70,8 +69,6 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
-        toolbar = findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
 
         databaseControlListener = new DatabaseControl(this);
 
@@ -103,7 +100,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        toolbar.setTitle(getString(R.string.gallery));
+        setTitle(getString(R.string.gallery));
         return super.onPrepareOptionsMenu(menu);
     }
 
