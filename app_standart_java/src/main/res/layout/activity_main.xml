@@ -8,10 +8,10 @@
 
     <EditText
         android:id="@+id/search_request"
+        style="@style/EditTextMaterialCustom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        style="@style/EditTextMaterialCustom"
+        android:layout_marginTop="35dp"
         android:ems="10"
         android:hint="@string/text_for_search"
         android:inputType="textPersonName"
@@ -24,7 +24,7 @@
         style="@style/ButtonMaterialCustom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="20dp"
         android:text="@string/search"
         app:layout_constraintEnd_toEndOf="@+id/search_request"
         app:layout_constraintHorizontal_bias="0.496"
