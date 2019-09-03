@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -22,7 +21,6 @@ import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
-import static com.akrivonos.app_standart_java.constants.Values.MY_CAMERA_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_DOWNLOAD_PERMISSION_CODE;
 
 public class LinkContentActivity extends AppCompatActivity {

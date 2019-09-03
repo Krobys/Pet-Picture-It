@@ -20,4 +20,6 @@
     <string name="change_photo">Обработать</string>
     <string name="ucrop_text_dialog">Обработать фотографию с помощью uCrop?</string>
     <string name="mode_app_theme">settings_app_theme</string>
+    <string name="choose">Choose</string>
+    <string name="pointer">pointer</string>
 </resources>
