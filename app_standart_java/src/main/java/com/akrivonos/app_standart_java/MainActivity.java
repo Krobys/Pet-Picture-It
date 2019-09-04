@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
     static{
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO);
-        Log.d("Test", "static initializer: ");
     }
 
     private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
@@ -288,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) { //сохранение списка загруженных картинок при пересоздании
         ArrayList<PhotoInfo> pictures = pictureAdapter.getData();
         int currentPosition = linearLayoutManager.findLastVisibleItemPosition();
 
@@ -298,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {//восстановление списка загруженных картинок при пересоздании
         ArrayList<PhotoInfo> restoredPictures = savedInstanceState.getParcelableArrayList(BUNDLE_PHOTO_INFO);
         int restoreCurrentPosition = savedInstanceState.getInt(CURRENT_POSITION_LAYOUT);
         pictureAdapter.setData(restoredPictures);
