@@ -43,6 +43,7 @@ import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_LAYOUT;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
+import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
@@ -85,10 +86,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         }
     };
 
-    static{
-        AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO);
-    }
-
     private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
@@ -122,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
 
         progressBar = findViewById(R.id.progressBar);
         searchRequestEditText = findViewById(R.id.search_request);
-        unFocusEditText();
         searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(startSearch);
         currentUser = PreferenceUtils.getCurrentUserName(this);
@@ -143,6 +139,11 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
             String searchFieldText = sharedPreferences.getString(SEARCH_FIELD_TEXT, "");
             searchRequestEditText.setText(searchFieldText);
         }
+    }
+
+    private void saveDefaultNightMode(int defaultMode){ //сохранить тему приложения (восстанавливается в AuthActivity)
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putInt(DEFAULT_MODE_NIGHT, defaultMode).apply();
     }
 
     private boolean checkPermissionsMap() {
@@ -259,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         super.onDestroy();
     }
 
-    private void changeAppThemeStyle(MenuItem item){
+    private void changeAppThemeStyle(MenuItem item){ //изменить тему
         int style_mode = AppCompatDelegate.getDefaultNightMode();
         style_mode = (style_mode == MODE_NIGHT_YES)
                 ? MODE_NIGHT_NO
@@ -268,22 +269,16 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
                 ? R.drawable.ic_night_mode_icon
                 : R.drawable.ic_day_mode_icon);
         AppCompatDelegate.setDefaultNightMode(style_mode);
+        saveDefaultNightMode(style_mode);
         recreate();
         pictureAdapter.notifyDataSetChanged();
     }
 
-    private void initAppThemeStyleIcon(MenuItem item){
+    private void initAppThemeStyleIcon(MenuItem item){ //установить иконку соответствующую теме
         int style_mode = AppCompatDelegate.getDefaultNightMode();
         item.setIcon((style_mode == MODE_NIGHT_YES)
                 ? R.drawable.ic_night_mode_icon
                 : R.drawable.ic_day_mode_icon);
-    }
-
-    private void unFocusEditText(){
-        searchRequestEditText.setFocusableInTouchMode(false);
-        searchRequestEditText.setFocusable(false);
-        searchRequestEditText.setFocusableInTouchMode(true);
-        searchRequestEditText.setFocusable(true);
     }
 
     @Override
@@ -303,4 +298,6 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         pictureAdapter.setData(restoredPictures);
         recyclerViewPictures.scrollToPosition(restoreCurrentPosition - 1);
     }
+
+
 }
