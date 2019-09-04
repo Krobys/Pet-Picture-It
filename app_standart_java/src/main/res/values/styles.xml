@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
@@ -13,7 +13,7 @@
     </style>
 
     <style name="ButtonMaterialCustom" parent="TextAppearance.AppCompat.Button">
-        <item name="android:background">@drawable/shape_button</item>
+        <item name="android:background">@drawable/button_state</item>
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
@@ -21,7 +21,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textColorHint">@color/colorPrimary</item>
-        <item name="android:textCursorDrawable">@color/DarkGrey</item>
+        <item name="android:textCursorDrawable">@color/colorBlack</item>
         <item name="android:padding">5dp</item>
         <item name="android:background">@drawable/shape_edittext</item>
     </style>
