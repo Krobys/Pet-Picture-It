@@ -213,7 +213,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     private ArrayList<PhotoInfo> addTitleItemToArray(Map<String, ArrayList<String>> photoMap) {//добавление оглавляющего элемента для каждого раздела
-        String userName = getCurrentUserName();
+
+        String userName = PreferenceUtils.getCurrentUserName(contextWeakReference.get());//проверка на null делается в методе
         ArrayList<PhotoInfo> photosWithTitle = new ArrayList<>();
         PhotoInfo photoInfo;
 
@@ -230,14 +231,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
             }
         }
         return photosWithTitle;
-    }
-
-    private String getCurrentUserName() {
-        Context context = contextWeakReference.get();
-        if (context != null) {
-            return PreferenceUtils.getCurrentUserName(context);
-        }
-        return "";
     }
 }
 
