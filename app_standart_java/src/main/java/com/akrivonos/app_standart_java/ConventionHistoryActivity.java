@@ -32,8 +32,7 @@ public class ConventionHistoryActivity extends AppCompatActivity implements Star
         databaseControlListener = new DatabaseControl(getApplicationContext());
 
         StartActivityControlListener startActivityControlListener = ConventionHistoryActivity.this;
-        Context appContext = getApplicationContext();
-        historyPictureAdapter = new PictureAdapter(startActivityControlListener, appContext);
+        historyPictureAdapter = new PictureAdapter(startActivityControlListener, this);
 
         RecyclerView recyclerView = findViewById(R.id.history_recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

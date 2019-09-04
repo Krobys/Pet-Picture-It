@@ -3,9 +3,9 @@
     <color name="colorPrimary">#FFA000</color>
     <color name="colorPrimaryDark">#FF8000</color>
     <color name="colorAccent">#A52A2A</color>
-    <color name="grey_light">#c8c8c8</color>
+    <color name="grey_light">#E9E9E9</color>
     <color name="colorGrey">#808080</color>
     <color name="DarkGrey">#121212</color>
-    <color name="colorBeige">#FFC0CB</color>
+    <color name="colorCardBackground">#E7E7E7</color>
     <color name="colorWhite">#FFFFFF</color>
 </resources>

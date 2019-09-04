@@ -108,14 +108,12 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         StartActivityControlListener startActivityControlListener = MainActivity.this;
         ControlBorderDownloaderListener controlBorderDownloaderListener = MainActivity.this;
-        Context appContext = getApplicationContext();
+
         pictureAdapter = new PictureAdapter(startActivityControlListener,
                 controlBorderDownloaderListener,
-                appContext); //создаем адаптер
+                this); //создаем адаптер
 
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerViewPictures = findViewById(R.id.rec_view_picture);

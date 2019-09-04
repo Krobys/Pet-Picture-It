@@ -28,7 +28,7 @@ import static com.akrivonos.app_standart_java.utils.InternetUtils.isInternetConn
 
 public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final Context appContext;
+    private final Context context;
     private final LayoutInflater layoutInflater;
 
     private final StartActivityControlListener activityControl;
@@ -42,17 +42,17 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private int currentPage;
     private int pagesAmount;
 
-    public PictureAdapter(StartActivityControlListener startActivityControlListener, Context appContext) { // конструктор адаптера без бесконечной подгрузки
-        this.appContext = appContext;
-        layoutInflater = LayoutInflater.from(appContext);
-        this.databaseControlListener = new DatabaseControl(appContext);
+    public PictureAdapter(StartActivityControlListener startActivityControlListener, Context context) { // конструктор адаптера без бесконечной подгрузки
+        this.context = context;
+        layoutInflater = LayoutInflater.from(context);
+        this.databaseControlListener = new DatabaseControl(context);
         activityControl = startActivityControlListener;
     }
 
-    public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context appContext) { //с бесконечной подгрузкой
-        this.appContext = appContext;
-        layoutInflater = LayoutInflater.from(appContext);
-        this.databaseControlListener = new DatabaseControl(appContext);
+    public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context context) { //с бесконечной подгрузкой
+        this.context = context;
+        layoutInflater = LayoutInflater.from(context);
+        this.databaseControlListener = new DatabaseControl(context);
         activityControl = startActivityControlListener;
         borderDownloader = controlBorderDownloaderListener;
     }
@@ -127,7 +127,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         if (borderDownloader != null)
             if (position == (photosPicture.size() - 3))  //Скачивание следующей страницы данных при достижении 2 элемента в конце списка
-                if ((currentPage < pagesAmount) && isInternetConnectionEnable(appContext)) {
+                if ((currentPage < pagesAmount) && isInternetConnectionEnable(context)) {
                     borderDownloader.loadNextPage(currentPage + 1, typeLoadPage);
                 }
     }

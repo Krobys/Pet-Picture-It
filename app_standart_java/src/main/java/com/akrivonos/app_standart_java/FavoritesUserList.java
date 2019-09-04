@@ -60,8 +60,8 @@ public class FavoritesUserList extends AppCompatActivity implements StartActivit
         databaseControlListener = new DatabaseControl(getApplicationContext());
 
         StartActivityControlListener startActivityControlListener = FavoritesUserList.this;
-        Context appContext = getApplicationContext();
-        favoritesPictureAdapter = new PictureAdapter(startActivityControlListener, appContext);
+
+        favoritesPictureAdapter = new PictureAdapter(startActivityControlListener, this);
         favoritesPictureAdapter.setVisibilityDeleteButton(true);
 
         RecyclerView favoritesRecyclerView = findViewById(R.id.favoriter_recycler_view);
