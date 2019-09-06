@@ -8,6 +8,11 @@ public class Values {
     public static final String DEFAULT_MODE_NIGHT = "default_mode_night";
     public static final String CURRENT_POSITION_LAYOUT = "current_position_layout";
     public static final String CURRENT_USER_NAME = "user_name";
+    public static final String USER_NAME_FIELD = "user";
+    public static final String REQUEST_TEXT_FIELD = "request";
+    public static final String URL_TEXT_FIELD = "url";
+    public static final String DATE_PHOTO_FIELD = "date";
+    public static final String URI_PHOTO_FIELD = "uri";
     public static final String FAVORITE_TABLE = "picture_table";
     public static final String HISTORY_TABLE = "history_table";
     public static final String GALLERY_TABLE = "gallery_table";

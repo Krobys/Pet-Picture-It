@@ -13,14 +13,20 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.akrivonos.app_standart_java.constants.Values.DATE_PHOTO_FIELD;
 import static com.akrivonos.app_standart_java.constants.Values.FAVORITE_TABLE;
 import static com.akrivonos.app_standart_java.constants.Values.GALLERY_TABLE;
 import static com.akrivonos.app_standart_java.constants.Values.HISTORY_TABLE;
+import static com.akrivonos.app_standart_java.constants.Values.REQUEST_TEXT_FIELD;
+import static com.akrivonos.app_standart_java.constants.Values.URI_PHOTO_FIELD;
+import static com.akrivonos.app_standart_java.constants.Values.URL_TEXT_FIELD;
+import static com.akrivonos.app_standart_java.constants.Values.USER_NAME_FIELD;
 
 
 public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControlListener {
@@ -47,14 +53,14 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     @Override
     public void setPhotoFavorite(PhotoInfo photoInfo) { // установить фото в избранные
         String USER_NAME_FIELD = "user";
-        String REQUEST_FIELD_TEXT = "request";
-        String URL_TEXT = "url";
+        String REQUEST_TEXT_FIELD = "request";
+        String URL_TEXT_FIELD = "url";
 
         db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(USER_NAME_FIELD, photoInfo.getUserName());
-        cv.put(REQUEST_FIELD_TEXT, photoInfo.getRequestText());
-        cv.put(URL_TEXT, photoInfo.getUrlText());
+        cv.put(REQUEST_TEXT_FIELD, photoInfo.getRequestText());
+        cv.put(URL_TEXT_FIELD, photoInfo.getUrlText());
         db.insert(FAVORITE_TABLE, null, cv);
         db.close();
     }
@@ -84,9 +90,9 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
         while (query.moveToNext()) {
             PhotoInfo photoInfo = new PhotoInfo();
-            photoInfo.setUserName(query.getString(0));
-            photoInfo.setRequestText(query.getString(1));
-            photoInfo.setUrlText(query.getString(2));
+            photoInfo.setUserName(query.getString(query.getColumnIndex(USER_NAME_FIELD)));
+            photoInfo.setRequestText(query.getString(query.getColumnIndex(REQUEST_TEXT_FIELD)));
+            photoInfo.setUrlText(query.getString(query.getColumnIndex(URL_TEXT_FIELD)));
 
             photosForTitle.add(photoInfo);
         }
@@ -105,9 +111,9 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         if (query == null) return null;
         while (query.moveToNext()) {
             PhotoInfo photoInfo = new PhotoInfo();
-            photoInfo.setUserName(query.getString(0));
-            photoInfo.setRequestText(query.getString(1));
-            photoInfo.setUrlText(query.getString(2));
+            photoInfo.setUserName(query.getString(query.getColumnIndex(USER_NAME_FIELD)));
+            photoInfo.setRequestText(query.getString(query.getColumnIndex(REQUEST_TEXT_FIELD)));
+            photoInfo.setUrlText(query.getString(query.getColumnIndex(URL_TEXT_FIELD)));
 
             photosHistory.add(photoInfo);
         }
@@ -119,10 +125,6 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
 
     @Override
     public void addToHistoryConvention(PhotoInfo photoInfo) { //добавить в историю
-        db = getWritableDatabase();
-        String USER_NAME_FIELD = "user";
-        String REQUEST_FIELD_TEXT = "request";
-        String URL_TEXT = "url";
 
         db = getWritableDatabase();
         Cursor query = db.rawQuery("SELECT * FROM " + HISTORY_TABLE + " WHERE user = ? ORDER BY request DESC;", new String[]{photoInfo.getUserName()});
@@ -130,19 +132,19 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         if (query.getCount() >= 20) {
             query.moveToFirst();
             PhotoInfo photoInfoForDelete = new PhotoInfo();
-            photoInfoForDelete.setUserName(query.getString(0));
-            photoInfoForDelete.setRequestText(query.getString(1));
-            photoInfoForDelete.setUrlText(query.getString(2));
+            photoInfoForDelete.setUserName(query.getString(query.getColumnIndex(USER_NAME_FIELD)));
+            photoInfoForDelete.setRequestText(query.getString(query.getColumnIndex(REQUEST_TEXT_FIELD)));
+            photoInfoForDelete.setUrlText(query.getString(query.getColumnIndex(URL_TEXT_FIELD)));
             db.execSQL("DELETE FROM " + HISTORY_TABLE + " WHERE user = ? AND request = ? AND url = ?;", new String[]{photoInfoForDelete.getUserName(), photoInfoForDelete.getRequestText(), photoInfoForDelete.getUrlText()});
         }
+        query.close();
 
         ContentValues cv = new ContentValues();
         cv.put(USER_NAME_FIELD, photoInfo.getUserName());
-        cv.put(REQUEST_FIELD_TEXT, photoInfo.getRequestText());
-        cv.put(URL_TEXT, photoInfo.getUrlText());
+        cv.put(REQUEST_TEXT_FIELD, photoInfo.getRequestText());
+        cv.put(URL_TEXT_FIELD, photoInfo.getUrlText());
         db.insert(HISTORY_TABLE, null, cv);
         db.close();
-        query.close();
     }
 
     @Override
@@ -175,9 +177,9 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
         if (query == null) return null;
         while (query.moveToNext()) {
             PhotoGallery photoGallery = new PhotoGallery();
-            photoGallery.setUserName(query.getString(0));
-            photoGallery.setDateMillis(Long.valueOf(query.getString(1)));
-            photoGallery.setUriPhoto(query.getString(2));
+            photoGallery.setUserName(query.getString(query.getColumnIndex(USER_NAME_FIELD)));
+            photoGallery.setDateMillis(Long.valueOf(query.getString(query.getColumnIndex(DATE_PHOTO_FIELD))));
+            photoGallery.setUriPhoto(query.getString(query.getColumnIndex(URI_PHOTO_FIELD)));
 
             photosGallery.add(photoGallery);
         }
