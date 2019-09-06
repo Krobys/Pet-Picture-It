@@ -19,26 +19,27 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     private ArrayList<PhotoGallery> photos = new ArrayList<>();
     private final LayoutInflater layoutInflater;
-    public GalleryAdapter(Context context){
+
+    public GalleryAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
     }
 
-    public void setDataGallery(List<PhotoGallery> photos){
-        if(photos == null) return;
+    public void setDataGallery(List<PhotoGallery> photos) {
+        if (photos == null) return;
         this.photos = (ArrayList<PhotoGallery>) photos;
         notifyDataSetChanged();
     }
 
-    public void addItemPhoto(PhotoGallery photoGallery){
+    public void addItemPhoto(PhotoGallery photoGallery) {
         photos.add(0, photoGallery);
         notifyItemInserted(0);
     }
 
-    public ArrayList<PhotoGallery> getData(){
+    public ArrayList<PhotoGallery> getData() {
         return photos;
     }
 
-    public void deleteFromGallery(int positionToRemove){
+    public void deleteFromGallery(int positionToRemove) {
         photos.remove(positionToRemove);
         notifyItemRemoved(positionToRemove);
     }
@@ -60,7 +61,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         return photos.size();
     }
 
-    class PhotoViewHolder extends RecyclerView.ViewHolder{
+    class PhotoViewHolder extends RecyclerView.ViewHolder {
 
         final ImageView photoImageView;
 

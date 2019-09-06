@@ -140,18 +140,18 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         }
     }
 
-    private void saveDefaultNightMode(int defaultMode){ //сохранить тему приложения (восстанавливается в AuthActivity)
+    private void saveDefaultNightMode(int defaultMode) { //сохранить тему приложения (восстанавливается в AuthActivity)
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.edit().putInt(DEFAULT_MODE_NIGHT, defaultMode).apply();
     }
 
     private boolean checkPermissionsMap() {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_MAP_PERMISSION_CODE);
-            } else {
-                return true;
-            }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_MAP_PERMISSION_CODE);
+        } else {
+            return true;
+        }
         return false;
     }
 
@@ -216,8 +216,8 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
                 openClassActivity = GalleryActivity.class;
                 break;
             case R.id.settings_app_theme:
-                    changeAppThemeStyle(item);
-                    return true;
+                changeAppThemeStyle(item);
+                return true;
         }
         startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
         return true;
@@ -226,11 +226,11 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_MAP_COORDINATES)
-        if (data != null) {
-            coordinatesToFindPics = data.getBundleExtra(LAT_LNG).getParcelable(LAT_LNG);
-            pictureAdapter.throwOffData();
-            new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, 1);
-        }
+            if (data != null) {
+                coordinatesToFindPics = data.getBundleExtra(LAT_LNG).getParcelable(LAT_LNG);
+                pictureAdapter.throwOffData();
+                new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, 1);
+            }
     }
 
     @Override
@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         super.onDestroy();
     }
 
-    private void changeAppThemeStyle(MenuItem item){ //изменить тему
+    private void changeAppThemeStyle(MenuItem item) { //изменить тему
         int style_mode = AppCompatDelegate.getDefaultNightMode();
         style_mode = (style_mode == MODE_NIGHT_YES)
                 ? MODE_NIGHT_NO
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         pictureAdapter.notifyDataSetChanged();
     }
 
-    private void initAppThemeStyleIcon(MenuItem item){ //установить иконку соответствующую теме
+    private void initAppThemeStyleIcon(MenuItem item) { //установить иконку соответствующую теме
         int style_mode = AppCompatDelegate.getDefaultNightMode();
         item.setIcon((style_mode == MODE_NIGHT_YES)
                 ? R.drawable.ic_night_mode_icon

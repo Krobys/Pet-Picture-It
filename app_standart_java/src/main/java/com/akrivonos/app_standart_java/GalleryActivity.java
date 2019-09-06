@@ -88,8 +88,8 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.photo_camera){
-            if(checkPermissionsCamera()){
+        if (item.getItemId() == R.id.photo_camera) {
+            if (checkPermissionsCamera()) {
                 dispatchTakePictureIntent();
             }
             return true;
@@ -105,13 +105,13 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_IMAGE_CAPTURE:
-                if(resultCode == RESULT_OK)
-                showUCropDialog();
+                if (resultCode == RESULT_OK)
+                    showUCropDialog();
                 break;
             case UCrop.REQUEST_CROP:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     final Uri resultUri = UCrop.getOutput(data);
                     PhotoGallery photoGallery = new PhotoGallery();
                     photoGallery.setUriPhoto(resultUri);
@@ -120,7 +120,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
                     databaseControlListener.addToGallery(photoGallery);
                     galleryAdapter.addItemPhoto(photoGallery);
                 }
-        break;
+                break;
         }
     }
 
@@ -128,7 +128,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             File imageFile = createImageFile();
-            if(imageFile != null){
+            if (imageFile != null) {
                 photoUri = FileProvider.getUriForFile(this, "com.akrivonos.app_standart_java.provider", imageFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
@@ -159,7 +159,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == MY_CAMERA_PERMISSION_CODE){
+        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
             for (int perm : grantResults) {
                 if (perm != PackageManager.PERMISSION_GRANTED) {
                     return;
@@ -169,12 +169,12 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
         }
     }
 
-    private void showUCropDialog(){//показать диалог выбора использования uCrop
+    private void showUCropDialog() {//показать диалог выбора использования uCrop
         PhotoGallery photoGallery = new PhotoGallery();
         photoGallery.setUriPhoto(photoUri);
         photoGallery.setUserName(PreferenceUtils.getCurrentUserName(this));
         photoGallery.setDateMillis(System.currentTimeMillis());
-        UCropDialog cdd = new UCropDialog(this,this,this, photoGallery);
+        UCropDialog cdd = new UCropDialog(this, this, this, photoGallery);
         Objects.requireNonNull(cdd.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         cdd.show();
     }
@@ -194,12 +194,11 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
         galleryAdapter.addItemPhoto(photoGallery);
     }
 
-    private void deleteFileFromDevice(String fileName){
-        if(getApplicationContext().deleteFile(fileName)) {
-            Toast.makeText(getApplicationContext(),"File Deleted",Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Toast.makeText(getApplicationContext(),"Not Deleted",Toast.LENGTH_SHORT).show();
+    private void deleteFileFromDevice(String fileName) {
+        if (getApplicationContext().deleteFile(fileName)) {
+            Toast.makeText(getApplicationContext(), "File Deleted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
         }
     }
 }

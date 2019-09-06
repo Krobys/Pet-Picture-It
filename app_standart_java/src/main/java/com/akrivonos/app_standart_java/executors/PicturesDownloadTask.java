@@ -28,7 +28,7 @@ import static com.akrivonos.app_standart_java.constants.Values.API_KEY_FLICKR;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
 
-public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<PhotoInfo>>{
+public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<PhotoInfo>> {
     private final WeakReference<LoaderListener> loaderListenerWeakReference;
     private String searchText;
     private String userName;
@@ -102,14 +102,14 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
         XmlPullParserFactory factory;
         try {
 
-        factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        XmlPullParser xpp = factory.newPullParser();
-        xpp.setInput(new StringReader(xml));
+            factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            XmlPullParser xpp = factory.newPullParser();
+            xpp.setInput(new StringReader(xml));
 
-        while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
-            if (xpp.getEventType() == XmlPullParser.START_TAG) {
-                    switch (xpp.getName()){
+            while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
+                if (xpp.getEventType() == XmlPullParser.START_TAG) {
+                    switch (xpp.getName()) {
                         case "photos":
                             for (int i = 0; i < xpp.getAttributeCount(); i++) {
                                 switch (xpp.getAttributeName(i)) {
@@ -143,9 +143,9 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
                             photos.add(photo);
                             break;
                     }
+                }
+                xpp.next();
             }
-            xpp.next();
-        }
 
         } catch (XmlPullParserException e) {
             e.printStackTrace();
@@ -155,7 +155,7 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
         return photos;
     }
 
-    private ArrayList<PhotoInfo> convertPhotoToPhotoInfo(ArrayList<Photo> photos){
+    private ArrayList<PhotoInfo> convertPhotoToPhotoInfo(ArrayList<Photo> photos) {
         ArrayList<PhotoInfo> photosFinal = new ArrayList<>();
         PhotoInfo photoInfo;
         for (Photo photo : photos) {

@@ -56,14 +56,14 @@ public class LinkContentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.favorire_pick:
                 if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
                     databaseControlListener.setPhotoNotFavorite(photoInfo);
                     item.setIcon(R.drawable.ic_favorite_border_black_unactive);
                 } else {
                     databaseControlListener.setPhotoFavorite(photoInfo);
-                   item.setIcon(R.drawable.ic_favorite_black_active);
+                    item.setIcon(R.drawable.ic_favorite_black_active);
                 }
                 return true;
             case R.id.picture_download:
@@ -76,7 +76,7 @@ public class LinkContentActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        setTitle(photoInfo.getRequestText() +"\n"+ photoInfo.getUserName());
+        setTitle(photoInfo.getRequestText() + "\n" + photoInfo.getUserName());
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -86,15 +86,15 @@ public class LinkContentActivity extends AppCompatActivity {
         photoInfo = bundle.getParcelable(BUNDLE_PHOTO_INFO);
     }
 
-    private void downloadPhotoWithDownloadManager(String url){
+    private void downloadPhotoWithDownloadManager(String url) {
         String requestText = photoInfo.getRequestText();
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setDescription("Downloading picture by request "+ requestText);
+        request.setDescription("Downloading picture by request " + requestText);
         request.setTitle("Download with PI_School");
 
-            request.allowScanningByMediaScanner();
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, requestText+".png");
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, requestText + ".png");
 
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
@@ -113,7 +113,7 @@ public class LinkContentActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == MY_DOWNLOAD_PERMISSION_CODE){
+        if (requestCode == MY_DOWNLOAD_PERMISSION_CODE) {
             for (int perm : grantResults) {
                 if (perm != PackageManager.PERMISSION_GRANTED) {
                     return;

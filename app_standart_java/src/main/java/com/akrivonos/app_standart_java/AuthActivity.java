@@ -50,11 +50,11 @@ public class AuthActivity extends AppCompatActivity {
         sharedPreferences.edit().putString(CURRENT_USER_NAME, currentUserName).apply();
     }
 
-    private void restoreDefaultNightMode(){
+    private void restoreDefaultNightMode() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int nightMode = sharedPreferences.getInt(DEFAULT_MODE_NIGHT, MODE_NIGHT_NO);
         int currentNightMode = AppCompatDelegate.getDefaultNightMode();
-        if(currentNightMode != nightMode){
+        if (currentNightMode != nightMode) {
             AppCompatDelegate.setDefaultNightMode(nightMode);
             recreate();
         }
