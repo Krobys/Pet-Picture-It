@@ -4,14 +4,13 @@ public class SettingsLoadPage {
 
     private int currentPage;
     private int pagesAmount;
+    private int typeLoadPage;
 
     public SettingsLoadPage(int currentPage, int pagesAmount, int typeLoadPage) {
         this.currentPage = currentPage;
         this.pagesAmount = pagesAmount;
         this.typeLoadPage = typeLoadPage;
     }
-
-    private int typeLoadPage;
 
     public int getCurrentPage() {
         return currentPage;
