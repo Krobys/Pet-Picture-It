@@ -100,47 +100,48 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
         ArrayList<Photo> photos = new ArrayList<>();
         XmlPullParserFactory factory;
         try {
-            factory = XmlPullParserFactory.newInstance();
 
+        factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
         XmlPullParser xpp = factory.newPullParser();
         xpp.setInput(new StringReader(xml));
 
         while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
             if (xpp.getEventType() == XmlPullParser.START_TAG) {
-                if (xpp.getName().equals("photos")) {
-                    for (int i = 0; i < xpp.getAttributeCount(); i++) {
-                        switch (xpp.getAttributeName(i)) {
-                            case "page":
-                                currentPage = Integer.valueOf(xpp.getAttributeValue(i));
-                                break;
-                            case "pages":
-                                pagesAmount = Integer.valueOf(xpp.getAttributeValue(i));
-                                break;
-                        }
+                    switch (xpp.getName()){
+                        case "photos":
+                            for (int i = 0; i < xpp.getAttributeCount(); i++) {
+                                switch (xpp.getAttributeName(i)) {
+                                    case "page":
+                                        currentPage = Integer.valueOf(xpp.getAttributeValue(i));
+                                        break;
+                                    case "pages":
+                                        pagesAmount = Integer.valueOf(xpp.getAttributeValue(i));
+                                        break;
+                                }
+                            }
+                            break;
+                        case "photo":
+                            Photo photo = new Photo();
+                            for (int i = 0; i < xpp.getAttributeCount(); i++) {
+                                switch (xpp.getAttributeName(i)) {
+                                    case "id":
+                                        photo.setId(xpp.getAttributeValue(i));
+                                        break;
+                                    case "secret":
+                                        photo.setSecret(xpp.getAttributeValue(i));
+                                        break;
+                                    case "server":
+                                        photo.setServer(xpp.getAttributeValue(i));
+                                        break;
+                                    case "farm":
+                                        photo.setFarm(xpp.getAttributeValue(i));
+                                        break;
+                                }
+                            }
+                            photos.add(photo);
+                            break;
                     }
-                }
-
-                if (xpp.getName().equals("photo")) {
-                    Photo photo = new Photo();
-                    for (int i = 0; i < xpp.getAttributeCount(); i++) {
-                        switch (xpp.getAttributeName(i)) {
-                            case "id":
-                                photo.setId(xpp.getAttributeValue(i));
-                                break;
-                            case "secret":
-                                photo.setSecret(xpp.getAttributeValue(i));
-                                break;
-                            case "server":
-                                photo.setServer(xpp.getAttributeValue(i));
-                                break;
-                            case "farm":
-                                photo.setFarm(xpp.getAttributeValue(i));
-                                break;
-                        }
-                    }
-                    photos.add(photo);
-                }
             }
             xpp.next();
         }
