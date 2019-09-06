@@ -18,20 +18,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:padding="6dp"
-            android:visibility="gone" />
+            android:textSize="16sp"
+            android:layout_marginBottom="5dp"
+            android:padding="6dp" />
 
         <ImageView
             android:id="@+id/photo_from_camera"
-            android:layout_width="309dp"
-            android:layout_height="240dp"
+            android:layout_width="329dp"
+            android:layout_height="257dp"
             android:layout_below="@id/request_text"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
             android:layout_gravity="center"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="24dp"
             android:contentDescription="@string/picture"
             app:srcCompat="@drawable/no_image" />
 
@@ -40,8 +37,7 @@
             android:layout_height="1dp"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
+            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:background="@color/colorBlack" />
 
