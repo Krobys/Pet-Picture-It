@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFA000</color>
-    <color name="colorPrimaryDark">#FF8000</color>
-    <color name="colorAccent">#A52A2A</color>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1565C0</color>
+    <color name="colorAccent">#2962FF</color>
     <color name="grey_light">#E9E9E9</color>
-    <color name="colorGrey">#808080</color>
-    <color name="colorDarkGrey">#414141</color>
+    <color name="colorDeepPurple50">#EDE7F6</color>
+    <color name="colorDeepPurple100">#D1C4E9</color>
     <color name="colorBlack">#030303</color>
     <color name="colorCardBackground">#E7E7E7</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlueText">#0D47A1</color>
 </resources>

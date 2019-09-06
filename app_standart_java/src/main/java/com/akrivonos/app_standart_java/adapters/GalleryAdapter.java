@@ -13,6 +13,7 @@ import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.models.PhotoGallery;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder> {
 
@@ -22,9 +23,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         layoutInflater = LayoutInflater.from(context);
     }
 
-    public void setDataGallery(ArrayList<PhotoGallery> photos){
+    public void setDataGallery(List<PhotoGallery> photos){
         if(photos == null) return;
-        this.photos = photos;
+        this.photos = (ArrayList<PhotoGallery>) photos;
         notifyDataSetChanged();
     }
 
