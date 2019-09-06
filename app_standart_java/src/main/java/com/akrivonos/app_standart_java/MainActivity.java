@@ -30,6 +30,7 @@ import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.models.SettingsLoadPage;
 import com.akrivonos.app_standart_java.utils.InternetUtils;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
@@ -173,13 +174,12 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
     }
 
     @Override
-    public void finishLoading(ArrayList<PhotoInfo> photos, Integer[] pageSettings) {
+    public void finishLoading(ArrayList<PhotoInfo> photos, SettingsLoadPage pageSettings) {
         progressBar.setVisibility(View.GONE);
-        pictureAdapter.setTypeLoadingPage(pageSettings[2]);
+        pictureAdapter.setTypeLoadingPage(pageSettings.getTypeLoadPage());
         pictureAdapter.setData(photos);
         searchButton.setClickable(true);
-        pictureAdapter.setPageSettings(pageSettings[0], pageSettings[1]);
-
+        pictureAdapter.setPageSettings(pageSettings.getCurrentPage(), pageSettings.getPagesAmount());
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.util.Log;
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
 import com.akrivonos.app_standart_java.models.Photo;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.models.SettingsLoadPage;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -90,7 +91,7 @@ public class PicturesDownloadTask extends AsyncTask<String, Void, ArrayList<Phot
     protected void onPostExecute(ArrayList<PhotoInfo> photos) {
         LoaderListener loaderListener = loaderListenerWeakReference.get();
         if (loaderListener != null) {
-            loaderListener.finishLoading(photos, new Integer[]{currentPage, pagesAmount, typeLoadPageTask});
+            loaderListener.finishLoading(photos, new SettingsLoadPage(currentPage, pagesAmount, typeLoadPageTask));
             loaderListenerWeakReference.clear();
         } else
             Log.d("WeakReferenceError", "loaderListenerWeakReference has been cleaned");

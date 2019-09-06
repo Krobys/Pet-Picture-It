@@ -109,20 +109,21 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        PhotoInfo photoInfo = photosPicture.get(position);
         switch (viewHolder.getItemViewType()) {
             case VIEW_TYPE_TITLE:
                 TitleViewHolder titleViewHolder = (TitleViewHolder) viewHolder;
-                titleViewHolder.titlePictureSection.setText(photosPicture.get(position).getRequestText().toUpperCase());
+                titleViewHolder.titlePictureSection.setText(photoInfo.getRequestText().toUpperCase());
                 break;
             case VIEW_TYPE_PICTURE_CARD:
                 PictureViewHolder pictureViewHolder = (PictureViewHolder) viewHolder;
                 Glide.with(pictureViewHolder.picture)
-                        .load(photosPicture.get(position).getUrlText())
+                        .load(photoInfo.getUrlText())
                         .into(pictureViewHolder.picture);
                 pictureViewHolder.requestText.setText((typeLoadPage != PAGE_MAP_PIC)
-                        ? photosPicture.get(position).getRequestText()
+                        ? photoInfo.getRequestText()
                         : "");
-                pictureViewHolder.photoInfo = photosPicture.get(position);
+                pictureViewHolder.photoInfo = photoInfo;
                 break;
         }
         if (borderDownloader != null)
