@@ -22,4 +22,12 @@
     <string name="mode_app_theme">Change app theme</string>
     <string name="choose">Choose</string>
     <string name="pointer">pointer</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_pictures">Search Pictures</string>
+    <string name="night_mode">Night mode</string>
+    <string name="settings">Settings</string>
 </resources>

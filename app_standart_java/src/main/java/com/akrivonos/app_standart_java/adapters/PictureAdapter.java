@@ -14,7 +14,7 @@ import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener;
-import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
+import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.bumptech.glide.Glide;
 
@@ -31,7 +31,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final Context context;
     private final LayoutInflater layoutInflater;
 
-    private final StartActivityControlListener activityControl;
+    private final OpenListItemLinkListener activityControl;
     private final DatabaseControlListener databaseControlListener;
     private ControlBorderDownloaderListener borderDownloader = null;
     private boolean visibilityDeleteButton = false;
@@ -42,14 +42,14 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private int currentPage;
     private int pagesAmount;
 
-    public PictureAdapter(StartActivityControlListener startActivityControlListener, Context context) { // конструктор адаптера без бесконечной подгрузки
+    public PictureAdapter(OpenListItemLinkListener startActivityControlListener, Context context) { // конструктор адаптера без бесконечной подгрузки
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         this.databaseControlListener = new DatabaseControl(context);
         activityControl = startActivityControlListener;
     }
 
-    public PictureAdapter(StartActivityControlListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context context) { //с бесконечной подгрузкой
+    public PictureAdapter(OpenListItemLinkListener startActivityControlListener, ControlBorderDownloaderListener controlBorderDownloaderListener, Context context) { //с бесконечной подгрузкой
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         this.databaseControlListener = new DatabaseControl(context);
@@ -165,7 +165,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 databaseControlListener.setPhotoNotFavorite(photosPicture.get(adapterPosition));
                 deleteItem(adapterPosition);
             } else {
-                activityControl.startActivity(photoInfo);
+                activityControl.openLinkItem(photoInfo);
             }
         }
 

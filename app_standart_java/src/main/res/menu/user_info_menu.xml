@@ -1,31 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <item
-        android:id="@+id/history"
-        android:icon="@drawable/ic_archive_black_24dp"
-        android:title="@string/history"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/favorire_pick"
-        android:icon="@drawable/ic_turned_in_black"
-        android:title="@string/favorite"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/find_on_map"
-        android:icon="@drawable/ic_pin_drop_black_24dp"
-        android:title="@string/photo_on_map"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/gallery"
-        android:icon="@drawable/ic_photo_black_24dp"
-        android:title="@string/gallery"
-        app:showAsAction="always" />
-
     <item
         android:id="@+id/settings_app_theme"
         android:icon="@drawable/ic_day_mode_icon"

@@ -1,101 +1,36 @@
 package com.akrivonos.app_standart_java;
 
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.TextUtils;
-import android.view.Menu;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.FrameLayout;
 
-import com.akrivonos.app_standart_java.adapters.PictureAdapter;
-import com.akrivonos.app_standart_java.executors.PicturesDownloadTask;
-import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener;
-import com.akrivonos.app_standart_java.listeners.LoaderListener;
-import com.akrivonos.app_standart_java.listeners.StartActivityControlListener;
+import com.akrivonos.app_standart_java.fragments.FavoritesFragment;
+import com.akrivonos.app_standart_java.fragments.HistoryFragment;
+import com.akrivonos.app_standart_java.fragments.LinkContentFragment;
+import com.akrivonos.app_standart_java.fragments.SearchPictureFragment;
+import com.akrivonos.app_standart_java.fragments.SettingsFragment;
+import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
-import com.akrivonos.app_standart_java.models.SettingsLoadPage;
-import com.akrivonos.app_standart_java.utils.InternetUtils;
-import com.akrivonos.app_standart_java.utils.PreferenceUtils;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
-
-import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
-import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
-import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_LAYOUT;
-import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
-import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
-import static com.akrivonos.app_standart_java.constants.Values.LAT_LNG;
-import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
-import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
-import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
-import static com.akrivonos.app_standart_java.constants.Values.RESULT_MAP_COORDINATES;
-import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT;
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_FRAGMENT;
 
-public class MainActivity extends AppCompatActivity implements LoaderListener,
-        StartActivityControlListener,
-        ControlBorderDownloaderListener {
-
-    private EditText searchRequestEditText;
-    private Button searchButton;
-    private String searchText;
-    private ProgressBar progressBar;
-    private String currentUser;
-    private RecyclerView recyclerViewPictures;
-    private LinearLayoutManager linearLayoutManager;
-    private PictureAdapter pictureAdapter;
-    private static final String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
-    private LatLng coordinatesToFindPics;
-
-    private final View.OnClickListener startSearch = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) { // Кнопка начала скачивания
-            searchText = searchRequestEditText.getText().toString().toLowerCase();
-            if (!TextUtils.isEmpty(searchText)) {
-                if (InternetUtils.isInternetConnectionEnable(getApplicationContext())) {
-                    pictureAdapter.throwOffData();
-                    new PicturesDownloadTask(MainActivity.this).startLoadPictures(searchText, currentUser, 1);
-                } else {
-                    Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(MainActivity.this, getString(R.string.empty_field), Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-    private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-            pictureAdapter.deleteItem(viewHolder.getAdapterPosition());
-        }
-    };
+public class MainActivity extends AppCompatActivity implements OpenListItemLinkListener {
+    private DrawerLayout drawer;
+    private Toolbar toolbar;
+    private ActionBarDrawerToggle toggle;
+    private boolean mDualPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,199 +38,116 @@ public class MainActivity extends AppCompatActivity implements LoaderListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StartActivityControlListener startActivityControlListener = MainActivity.this;
-        ControlBorderDownloaderListener controlBorderDownloaderListener = MainActivity.this;
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        pictureAdapter = new PictureAdapter(startActivityControlListener,
-                controlBorderDownloaderListener,
-                this); //создаем адаптер
+        drawer = findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(this,
+                drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-        linearLayoutManager = new LinearLayoutManager(this);
-        recyclerViewPictures = findViewById(R.id.rec_view_picture);
-        recyclerViewPictures.setLayoutManager(linearLayoutManager);
-        recyclerViewPictures.setAdapter(pictureAdapter);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewPictures);
+        NavigationView navigationView = findViewById(R.id.nvView);
+        setupDrawerContent(navigationView);
 
-        progressBar = findViewById(R.id.progressBar);
-        searchRequestEditText = findViewById(R.id.search_request);
-        searchButton = findViewById(R.id.search_button);
-        searchButton.setOnClickListener(startSearch);
-        currentUser = PreferenceUtils.getCurrentUserName(this);
-
-        restoreSearchField();
-
+        setUpDefaultPage();
     }
 
-    private void saveSearchField() { //сохранение состояния поля для ввода
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String searchFieldText = searchRequestEditText.getText().toString();
-        sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, searchFieldText).apply();
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
     }
 
-    private void restoreSearchField() { //востановление состояния поля для ввода
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.contains(SEARCH_FIELD_TEXT)) {
-            String searchFieldText = sharedPreferences.getString(SEARCH_FIELD_TEXT, "");
-            searchRequestEditText.setText(searchFieldText);
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+        Fragment fragment = null;
+        Class fragmentClass;
+
+        switch (menuItem.getItemId()) {
+            case R.id.search_pictures:
+                fragmentClass = SearchPictureFragment.class;
+                break;
+            case R.id.history:
+                fragmentClass = HistoryFragment.class;
+                break;
+            case R.id.favorire_pick:
+                fragmentClass = FavoritesFragment.class;
+                break;
+//            case R.id.find_on_map:
+//                fragmentClass = ThirdFragment.class;
+//                break;
+//            case R.id.gallery:
+//                fragmentClass = ThirdFragment.class;
+//                break;
+            case R.id.settings:
+                fragmentClass = SettingsFragment.class;
+                break;
+            default:
+                fragmentClass = SearchPictureFragment.class;
         }
-    }
 
-    private void saveDefaultNightMode(int defaultMode) { //сохранить тему приложения (восстанавливается в AuthActivity)
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.edit().putInt(DEFAULT_MODE_NIGHT, defaultMode).apply();
-    }
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
 
-    private boolean checkPermissionsMap() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_MAP_PERMISSION_CODE);
-        } else {
-            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return false;
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment, CURRENT_FRAGMENT).commit();
+
+        menuItem.setChecked(true);
+
+        setTitle(menuItem.getTitle());
+
+        drawer.closeDrawers();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == MY_MAP_PERMISSION_CODE) {
-            for (int perm : grantResults) {
-                if (perm != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-            }
-            startActivityForResult(new Intent(this, MapPictureActivity.class), RESULT_MAP_COORDINATES);
-        }
-    }
-
-    @Override
-    public void startLoading() {
-        progressBar.setVisibility(View.VISIBLE);
-        searchButton.setClickable(false);
-    }
-
-    @Override
-    public void finishLoading(ArrayList<PhotoInfo> photos, SettingsLoadPage pageSettings) {
-        progressBar.setVisibility(View.GONE);
-        pictureAdapter.setTypeLoadingPage(pageSettings.getTypeLoadPage());
-        pictureAdapter.setData(photos);
-        searchButton.setClickable(true);
-        pictureAdapter.setPageSettings(pageSettings.getCurrentPage(), pageSettings.getPagesAmount());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_info_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        setTitle(currentUser);
-        initAppThemeStyleIcon(menu.findItem(R.id.settings_app_theme));
-        return true;
+    private void setUpDefaultPage() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, new SearchPictureFragment(), CURRENT_FRAGMENT).commit();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Class openClassActivity = null;
         switch (item.getItemId()) {
-            case R.id.favorire_pick:
-                openClassActivity = FavoritesUserList.class;
-                break;
-            case R.id.history:
-                openClassActivity = ConventionHistoryActivity.class;
-                break;
-            case R.id.find_on_map:
-                if (checkPermissionsMap()) {
-                    startActivityForResult(new Intent(this, MapPictureActivity.class), 1);
-                    return true;
-                } else {
-                    return false;
-                }
-            case R.id.gallery:
-                openClassActivity = GalleryActivity.class;
-                break;
-            case R.id.settings_app_theme:
-                changeAppThemeStyle(item);
+            case android.R.id.home:
+                drawer.openDrawer(GravityCompat.START);
                 return true;
         }
-        startActivity(new Intent(MainActivity.this, openClassActivity).putExtra(CURRENT_USER_NAME, currentUser));
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_MAP_COORDINATES)
-            if (data != null) {
-                coordinatesToFindPics = data.getBundleExtra(LAT_LNG).getParcelable(LAT_LNG);
-                pictureAdapter.throwOffData();
-                new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, 1);
-            }
-    }
-
-    @Override
-    public void startActivity(PhotoInfo photoInfo) {
+    public void openLinkItem(PhotoInfo photoInfo) {
+        Fragment fragLinkContent = new LinkContentFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(BUNDLE_PHOTO_INFO, photoInfo);
-        startActivity(new Intent(this, LinkContentActivity.class).putExtra(BUNDLE_PHOTO_INFO, bundle));
-    }
+        fragLinkContent.setArguments(bundle);
+        if (mDualPane) {
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
+            FrameLayout container;
+            if (fragment != null) {
+                View view = fragment.getView();
+                if (view != null) {
+                    container = view.findViewById(R.id.details_picture_container);
+                    if (container != null) {
 
-    @Override
-    public void loadNextPage(int pageToLoad, int typePage) {
-        switch (typePage) {
-            case PAGE_DEF_PIC:
-                new PicturesDownloadTask(this).startLoadPictures(searchText, currentUser, pageToLoad);
-                break;
-            case PAGE_MAP_PIC:
-                new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, pageToLoad);
-                break;
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.details_picture_container, fragLinkContent).commit();
+                    }
+                }
+            }
+        } else {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragLinkContent).commit();
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        saveSearchField();
-        super.onDestroy();
-    }
-
-    private void changeAppThemeStyle(MenuItem item) { //изменить тему
-        int style_mode = AppCompatDelegate.getDefaultNightMode();
-        style_mode = (style_mode == MODE_NIGHT_YES)
-                ? MODE_NIGHT_NO
-                : MODE_NIGHT_YES;
-        item.setIcon((style_mode == MODE_NIGHT_YES)
-                ? R.drawable.ic_night_mode_icon
-                : R.drawable.ic_day_mode_icon);
-        AppCompatDelegate.setDefaultNightMode(style_mode);
-        saveDefaultNightMode(style_mode);
-        recreate();
-        pictureAdapter.notifyDataSetChanged();
-    }
-
-    private void initAppThemeStyleIcon(MenuItem item) { //установить иконку соответствующую теме
-        int style_mode = AppCompatDelegate.getDefaultNightMode();
-        item.setIcon((style_mode == MODE_NIGHT_YES)
-                ? R.drawable.ic_night_mode_icon
-                : R.drawable.ic_day_mode_icon);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) { //сохранение списка загруженных картинок при пересоздании
-        ArrayList<PhotoInfo> pictures = pictureAdapter.getData();
-        int currentPosition = linearLayoutManager.findLastVisibleItemPosition();
-
-        outState.putParcelableArrayList(BUNDLE_PHOTO_INFO, pictures);
-        outState.putInt(CURRENT_POSITION_LAYOUT, currentPosition);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {//восстановление списка загруженных картинок при пересоздании
-        ArrayList<PhotoInfo> restoredPictures = savedInstanceState.getParcelableArrayList(BUNDLE_PHOTO_INFO);
-        int restoreCurrentPosition = savedInstanceState.getInt(CURRENT_POSITION_LAYOUT);
-        pictureAdapter.setData(restoredPictures);
-        recyclerViewPictures.scrollToPosition(restoreCurrentPosition - 1);
-    }
-
-
 }
