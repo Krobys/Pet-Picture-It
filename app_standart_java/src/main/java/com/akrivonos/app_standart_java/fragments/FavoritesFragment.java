@@ -8,6 +8,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +18,10 @@ import com.akrivonos.app_standart_java.adapters.PictureAdapter;
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
+import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.utils.PreferenceUtils;
+
+import java.util.ArrayList;
 
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
 
@@ -54,8 +60,9 @@ public class FavoritesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
+        setHasOptionsMenu(true);
         databaseControlListener = new DatabaseControl(getContext());
-
+        userName = PreferenceUtils.getCurrentUserName(getContext());
         OpenListItemLinkListener startActivityControlListener = (OpenListItemLinkListener) getActivity();
 
         favoritesPictureAdapter = new PictureAdapter(startActivityControlListener, getContext());
@@ -66,7 +73,20 @@ public class FavoritesFragment extends Fragment {
         favoritesRecyclerView.setAdapter(favoritesPictureAdapter);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(favoritesRecyclerView);
 
+        updateRecView();
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().setTitle("Favorite");
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void updateRecView() {
+        ArrayList<PhotoInfo> favoritePhotos = databaseControlListener.getAllFavoritesForUser(userName);
+        favoritesPictureAdapter.throwOffData();
+        favoritesPictureAdapter.setData(favoritePhotos);
+        favoritesPictureAdapter.notifyDataSetChanged();
+    }
 }

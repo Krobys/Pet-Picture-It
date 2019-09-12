@@ -1,12 +1,16 @@
 package com.akrivonos.app_standart_java.fragments;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatDelegate;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -17,6 +21,7 @@ import com.akrivonos.app_standart_java.R;
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static android.support.v7.app.AppCompatDelegate.getDefaultNightMode;
+import static com.akrivonos.app_standart_java.constants.TagsFragments.SETTINGS_FRAGMENT;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 
 
@@ -36,15 +41,15 @@ public class SettingsFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         aSwitch = view.findViewById(R.id.switch1);
-        aSwitch.setOnCheckedChangeListener(onCheckedChangeListener);
         setSwitchDependsStyle();
+        aSwitch.setOnCheckedChangeListener(onCheckedChangeListener);
+
         return view;
     }
 
@@ -59,10 +64,36 @@ public class SettingsFragment extends Fragment {
                 : MODE_NIGHT_NO;
         AppCompatDelegate.setDefaultNightMode(style_mode);
         saveDefaultNightMode(style_mode);
+        recreateActivity();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().setTitle("Settings");
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void setSwitchDependsStyle() {
         int styleMode = getDefaultNightMode();
         aSwitch.setChecked((styleMode == MODE_NIGHT_YES));
+    }
+
+    private void recreateActivity(){
+        new Handler().post(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                Intent intent = getActivity().getIntent();
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                getActivity().overridePendingTransition(0, 0);
+                getActivity().finish();
+
+                getActivity().overridePendingTransition(0, 0);
+                startActivity(intent.putExtra(SETTINGS_FRAGMENT, "settings" ));
+            }
+        });
     }
 }

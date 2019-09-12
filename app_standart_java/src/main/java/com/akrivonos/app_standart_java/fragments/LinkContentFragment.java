@@ -11,6 +11,9 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -33,24 +36,54 @@ public class LinkContentFragment extends Fragment {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE};
     private PhotoInfo photoInfo;
-
+    private DatabaseControlListener databaseControlListener;
     public LinkContentFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_link_content, container, false);
-
-        DatabaseControlListener databaseControlListener = new DatabaseControl(getContext());
+        setHasOptionsMenu(true);
+        databaseControlListener = new DatabaseControl(getContext());
         setPhotoInfo();
         databaseControlListener.addToHistoryConvention(photoInfo);
         WebView webView = view.findViewById(R.id.web_view);
 
         webView.loadUrl(photoInfo.getUrlText());
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.link_content_menu, menu);
+        int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
+                ? R.drawable.ic_favorite_black_active
+                : R.drawable.ic_favorite_border_black_unactive;
+        menu.findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
+        getActivity().setTitle(photoInfo.getRequestText());
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.favorire_pick:
+                if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
+                    databaseControlListener.setPhotoNotFavorite(photoInfo);
+                    item.setIcon(R.drawable.ic_favorite_border_black_unactive);
+                } else {
+                    databaseControlListener.setPhotoFavorite(photoInfo);
+                    item.setIcon(R.drawable.ic_favorite_black_active);
+                }
+                return true;
+            case R.id.picture_download:
+                checkPermissionsDownload();
+                return true;
+
+        }
+        return false;
     }
 
     private void setPhotoInfo() {
@@ -77,7 +110,7 @@ public class LinkContentFragment extends Fragment {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS_STORAGE, MY_DOWNLOAD_PERMISSION_CODE);
+            requestPermissions(PERMISSIONS_STORAGE, MY_DOWNLOAD_PERMISSION_CODE);
         } else {
             downloadPhotoWithDownloadManager(photoInfo.getUrlText());
         }

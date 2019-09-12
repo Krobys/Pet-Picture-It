@@ -40,12 +40,6 @@
             </meta-data>
         </provider>
 
-        <activity android:name=".GalleryActivity">
-
-        </activity>
-        <activity android:name=".MapPictureActivity">
-
-        </activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
@@ -54,13 +48,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/API_KEY_GOOGLE_MAP" />
-
-        <activity
-            android:name=".ConventionHistoryActivity"
-            android:label="@string/history" />
-        <activity
-            android:name=".FavoritesUserList"
-            android:label="@string/favorites" />
         <activity
             android:name=".AuthActivity"
             android:screenOrientation="portrait"
@@ -69,13 +56,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".LinkContentActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity

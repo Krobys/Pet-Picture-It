@@ -7,13 +7,13 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.util.Log;
 
 import com.akrivonos.app_standart_java.models.PhotoGallery;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
 import java.lang.ref.WeakReference;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,7 +82,8 @@ public class DatabaseControl extends SQLiteOpenHelper implements DatabaseControl
     }
 
     @Override
-    public ArrayList<PhotoInfo> getAllFavoritesForUser(String userName) {//получаем список запросов с списком избранных фотографий в каждом по запросам
+    public ArrayList<PhotoInfo> getAllFavoritesForUser(String userName) {
+        Log.d("test", "uer name: "+userName);//получаем список запросов с списком избранных фотографий в каждом по запросам
         db = getReadableDatabase();
         Cursor query = db.rawQuery("SELECT * FROM " + FAVORITE_TABLE + " WHERE user = ? ORDER BY request DESC;", new String[]{userName});
         if (query == null) return null;

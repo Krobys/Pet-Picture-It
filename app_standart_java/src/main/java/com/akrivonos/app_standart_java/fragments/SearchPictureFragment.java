@@ -1,20 +1,21 @@
 package com.akrivonos.app_standart_java.fragments;
 
 
-import android.Manifest;
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,12 +23,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.akrivonos.app_standart_java.MapPictureActivity;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.PictureAdapter;
 import com.akrivonos.app_standart_java.executors.PicturesDownloadTask;
 import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener;
 import com.akrivonos.app_standart_java.listeners.LoaderListener;
+import com.akrivonos.app_standart_java.listeners.OnResultCoordinatesPictureListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.models.SettingsLoadPage;
@@ -37,24 +38,16 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
-import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
-import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
+import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_LAYOUT;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
-import static com.akrivonos.app_standart_java.constants.Values.RESULT_MAP_COORDINATES;
 import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SearchPictureFragment extends Fragment implements LoaderListener,
-        ControlBorderDownloaderListener {
+        ControlBorderDownloaderListener,
+        OnResultCoordinatesPictureListener {
 
-    private static final String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
     private EditText searchRequestEditText;
     private Button searchButton;
     private String searchText;
@@ -97,29 +90,40 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
         // Required empty public constructor
     }
 
+    @Override
+    public void onAttach(Context context) {
+
+        super.onAttach(context);
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View layoutView = inflater.inflate(R.layout.fragment_search_picture, container, false);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("test", "onCreate: ");
         ControlBorderDownloaderListener controlBorderDownloaderListener = this;
         OpenListItemLinkListener openListItemLinkListener = (OpenListItemLinkListener) getActivity();
         pictureAdapter = new PictureAdapter(openListItemLinkListener,
                 controlBorderDownloaderListener,
                 getContext()); //создаем адаптер
+        super.onCreate(savedInstanceState);
+    }
 
-        linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerViewPictures = layoutView.findViewById(R.id.rec_view_picture);
-        recyclerViewPictures.setLayoutManager(linearLayoutManager);
-        recyclerViewPictures.setAdapter(pictureAdapter);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewPictures);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View layoutView = inflater.inflate(R.layout.fragment_search_picture, container, false);
 
-        progressBar = layoutView.findViewById(R.id.progressBar);
-        searchRequestEditText = layoutView.findViewById(R.id.search_request);
-        searchButton = layoutView.findViewById(R.id.search_button);
-        searchButton.setOnClickListener(startSearch);
-        currentUser = PreferenceUtils.getCurrentUserName(getContext());
+            setRetainInstance(true);
+            linearLayoutManager = new LinearLayoutManager(getContext());
+            recyclerViewPictures = layoutView.findViewById(R.id.rec_view_picture);
+            recyclerViewPictures.setLayoutManager(linearLayoutManager);
+            recyclerViewPictures.setAdapter(pictureAdapter);
+            new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewPictures);
 
+            progressBar = layoutView.findViewById(R.id.progressBar);
+            searchRequestEditText = layoutView.findViewById(R.id.search_request);
+            searchButton = layoutView.findViewById(R.id.search_button);
+            searchButton.setOnClickListener(startSearch);
+            currentUser = PreferenceUtils.getCurrentUserName(getContext());
         restoreSearchField();
         return layoutView;
     }
@@ -135,33 +139,6 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
         if (sharedPreferences.contains(SEARCH_FIELD_TEXT)) {
             String searchFieldText = sharedPreferences.getString(SEARCH_FIELD_TEXT, "");
             searchRequestEditText.setText(searchFieldText);
-        }
-    }
-
-    private void saveDefaultNightMode(int defaultMode) { //сохранить тему приложения (восстанавливается в AuthActivity)
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        sharedPreferences.edit().putInt(DEFAULT_MODE_NIGHT, defaultMode).apply();
-    }
-
-    private boolean checkPermissionsMap() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS_STORAGE, MY_MAP_PERMISSION_CODE);
-        } else {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == MY_MAP_PERMISSION_CODE) {
-            for (int perm : grantResults) {
-                if (perm != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-            }
-            startActivityForResult(new Intent(getContext(), MapPictureActivity.class), RESULT_MAP_COORDINATES);
         }
     }
 
@@ -197,5 +174,28 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
     public void onDestroyView() {
         saveSearchField();
         super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {//сохранение списка загруженных картинок при пересоздании
+            ArrayList<PhotoInfo> pictures = pictureAdapter.getData();
+            int currentPosition = linearLayoutManager.findLastVisibleItemPosition();
+
+            outState.putParcelableArrayList(BUNDLE_PHOTO_INFO, pictures);
+            outState.putInt(CURRENT_POSITION_LAYOUT, currentPosition);
+            super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().setTitle("PICTURE IT");
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void startCoordinatesSearch(LatLng latLng) {
+        coordinatesToFindPics = latLng;
+        pictureAdapter.throwOffData();
+        new PicturesDownloadTask(this).startLoadPictures(coordinatesToFindPics, currentUser, 1);
     }
 }

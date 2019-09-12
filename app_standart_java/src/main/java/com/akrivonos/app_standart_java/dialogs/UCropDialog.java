@@ -1,12 +1,12 @@
 package com.akrivonos.app_standart_java.dialogs;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
-import com.akrivonos.app_standart_java.GalleryActivity;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
@@ -20,15 +20,15 @@ public class UCropDialog extends Dialog implements View.OnClickListener {
     private final StartUCropListener startUCropListener;
     private final NotifyGalleryAdapterListener notifyGalleryAdapterListener;
 
-    public UCropDialog(GalleryActivity activity,
+    public UCropDialog(Context context,
                        StartUCropListener startUCropListener,
                        NotifyGalleryAdapterListener notifyGalleryAdapterListener,
                        PhotoGallery photoGallery) {
-        super(activity);
+        super(context);
         this.photoGallery = photoGallery;
         this.startUCropListener = startUCropListener;
         this.notifyGalleryAdapterListener = notifyGalleryAdapterListener;
-        databaseControl = new DatabaseControl(activity);
+        databaseControl = new DatabaseControl(context);
     }
 
     @Override

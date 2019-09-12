@@ -1,4 +1,5 @@
-package com.akrivonos.app_standart_java;
+package com.akrivonos.app_standart_java.fragments;
+
 
 import android.Manifest;
 import android.content.Intent;
@@ -10,15 +11,20 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.GalleryAdapter;
 import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
@@ -35,10 +41,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
+import static android.app.Activity.RESULT_OK;
 import static com.akrivonos.app_standart_java.constants.Values.MY_CAMERA_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_IMAGE_CAPTURE;
 
-public class GalleryActivity extends AppCompatActivity implements StartUCropListener, NotifyGalleryAdapterListener {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class GalleryFragment extends Fragment implements StartUCropListener, NotifyGalleryAdapterListener {
     private File currentPhoto;
     private Uri photoUri;
     private GalleryAdapter galleryAdapter;
@@ -64,26 +74,33 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
         }
     };
 
+    public GalleryFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        View view = inflater.inflate(R.layout.fragment_gallery, container, false);
+        databaseControlListener = new DatabaseControl(getContext());
 
-        databaseControlListener = new DatabaseControl(this);
+        galleryAdapter = new GalleryAdapter(getContext());
+        galleryAdapter.setDataGallery(databaseControlListener.getPhotosFromGallery(PreferenceUtils.getCurrentUserName(getContext())));
 
-        galleryAdapter = new GalleryAdapter(this);
-        galleryAdapter.setDataGallery(databaseControlListener.getPhotosFromGallery(PreferenceUtils.getCurrentUserName(this)));
-
-        RecyclerView recyclerViewGallery = findViewById(R.id.recycler_view_gallery);
-        recyclerViewGallery.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView recyclerViewGallery = view.findViewById(R.id.recycler_view_gallery);
+        recyclerViewGallery.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewGallery.setAdapter(galleryAdapter);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewGallery);
+        return view;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.gallery_menu, menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.gallery_menu, menu);
+        getActivity().setTitle("Gallery");
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -98,13 +115,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        setTitle(getString(R.string.gallery));
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_IMAGE_CAPTURE:
                 if (resultCode == RESULT_OK)
@@ -115,7 +126,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
                     final Uri resultUri = UCrop.getOutput(data);
                     PhotoGallery photoGallery = new PhotoGallery();
                     photoGallery.setUriPhoto(resultUri);
-                    photoGallery.setUserName(PreferenceUtils.getCurrentUserName(this));
+                    photoGallery.setUserName(PreferenceUtils.getCurrentUserName(getContext()));
                     photoGallery.setDateMillis(System.currentTimeMillis());
                     databaseControlListener.addToGallery(photoGallery);
                     galleryAdapter.addItemPhoto(photoGallery);
@@ -126,10 +137,10 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
 
     private void dispatchTakePictureIntent() {  // запуск камеры для снятия фотографии
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+        if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             File imageFile = createImageFile();
             if (imageFile != null) {
-                photoUri = FileProvider.getUriForFile(this, "com.akrivonos.app_standart_java.provider", imageFile);
+                photoUri = FileProvider.getUriForFile(getContext(), "com.akrivonos.app_standart_java.provider", imageFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
             }
@@ -140,17 +151,17 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
     private File createImageFile() {//создание нового файла для фотографии
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_.jpg";
-        File storageDir = getFilesDir();
+        File storageDir = getContext().getFilesDir();
         File image = new File(storageDir, imageFileName);
         currentPhoto = image;
         return image;
     }
 
     private boolean checkPermissionsCamera() {//проверка разрешений
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, MY_CAMERA_PERMISSION_CODE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(PERMISSIONS_STORAGE, MY_CAMERA_PERMISSION_CODE);
         } else {
             return true;
         }
@@ -172,9 +183,9 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
     private void showUCropDialog() {//показать диалог выбора использования uCrop
         PhotoGallery photoGallery = new PhotoGallery();
         photoGallery.setUriPhoto(photoUri);
-        photoGallery.setUserName(PreferenceUtils.getCurrentUserName(this));
+        photoGallery.setUserName(PreferenceUtils.getCurrentUserName(getContext()));
         photoGallery.setDateMillis(System.currentTimeMillis());
-        UCropDialog cdd = new UCropDialog(this, this, this, photoGallery);
+        UCropDialog cdd = new UCropDialog(getContext(), this, this, photoGallery);
         Objects.requireNonNull(cdd.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         cdd.show();
     }
@@ -186,7 +197,7 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
         uCrop.withAspectRatio(3, 4);
         uCrop.withMaxResultSize(480, 720);
         uCrop.withOptions(new UCrop.Options());
-        uCrop.start(GalleryActivity.this);
+        uCrop.start(getActivity());
     }
 
     @Override
@@ -195,10 +206,10 @@ public class GalleryActivity extends AppCompatActivity implements StartUCropList
     }
 
     private void deleteFileFromDevice(String fileName) {
-        if (getApplicationContext().deleteFile(fileName)) {
-            Toast.makeText(getApplicationContext(), "File Deleted", Toast.LENGTH_SHORT).show();
+        if (getContext().deleteFile(fileName)) {
+            Toast.makeText(getContext(), "File Deleted", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getApplicationContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
         }
     }
 }

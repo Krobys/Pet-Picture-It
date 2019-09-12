@@ -24,8 +24,7 @@
 
             android:id="@+id/flContent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
@@ -35,7 +34,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/white"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_main_view" />
 
