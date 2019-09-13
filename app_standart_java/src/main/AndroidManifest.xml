@@ -39,7 +39,6 @@
             </intent-filter>
         </receiver>
 
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.akrivonos.app_standart_java.provider"
@@ -70,6 +69,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
