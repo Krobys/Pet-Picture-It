@@ -16,6 +16,10 @@ public class Values {
     public static final String FAVORITE_TABLE = "picture_table";
     public static final String HISTORY_TABLE = "history_table";
     public static final String GALLERY_TABLE = "gallery_table";
+    public static final String EXPANDABLE_VALUE = "expandable_value";
+    public static final int ARGUMENT_SINGLE_FRAG = 1;
+    public static final int ARGUMENT_EXPANABLE_FRAG = 2;
+    public static final String TYPE_FRAG = "type_fragment";
     public static final int RESULT_MAP_COORDINATES = 1;
     public static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final String LAT_LNG = "lat_lng";

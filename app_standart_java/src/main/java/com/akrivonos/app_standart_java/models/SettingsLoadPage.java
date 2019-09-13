@@ -2,9 +2,9 @@ package com.akrivonos.app_standart_java.models;
 
 public class SettingsLoadPage {
 
-    private int currentPage;
-    private int pagesAmount;
-    private int typeLoadPage;
+    private final int currentPage;
+    private final int pagesAmount;
+    private final int typeLoadPage;
 
     public SettingsLoadPage(int currentPage, int pagesAmount, int typeLoadPage) {
         this.currentPage = currentPage;

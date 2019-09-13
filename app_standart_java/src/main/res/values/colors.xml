@@ -3,11 +3,9 @@
     <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#1565C0</color>
     <color name="colorAccent">#2962FF</color>
-    <color name="grey_light">#E9E9E9</color>
     <color name="colorDeepPurple50">#EDE7F6</color>
     <color name="colorDeepPurple100">#D1C4E9</color>
     <color name="colorBlack">#030303</color>
     <color name="colorCardBackground">#EDE7F6</color>
-    <color name="colorWhite">#FFFFFF</color>
     <color name="colorBlueText">#0D47A1</color>
 </resources>

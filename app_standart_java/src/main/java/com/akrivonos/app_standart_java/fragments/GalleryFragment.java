@@ -2,6 +2,7 @@ package com.akrivonos.app_standart_java.fragments;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -99,7 +100,9 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.gallery_menu, menu);
-        getActivity().setTitle("Gallery");
+        Activity activity = getActivity();
+        if(activity != null)
+        activity.setTitle("Gallery");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -135,7 +138,8 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
         }
     }
 
-    private void dispatchTakePictureIntent() {  // запуск камеры для снятия фотографии
+    private void dispatchTakePictureIntent() {
+        if (getActivity() == null || getActivity().getPackageManager() == null || getContext() == null) return;// запуск камеры для снятия фотографии
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             File imageFile = createImageFile();

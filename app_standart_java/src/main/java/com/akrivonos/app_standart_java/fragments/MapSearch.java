@@ -33,7 +33,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
  */
 public class MapSearch extends Fragment implements OnMapReadyCallback {
     private GoogleMap map;
-    private View.OnClickListener chooseClickListener;
     private MapCoordinatesPhotoListener mapCoordinatesPhotoListener;
     private FusedLocationProviderClient fusedLocationClient;
     private Button chooseButton;
@@ -64,7 +63,7 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         map = googleMap;
-        chooseClickListener = new View.OnClickListener() {
+        View.OnClickListener chooseClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LatLng latLng = googleMap.getCameraPosition().target;

@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.akrivonos.app_standart_java.R;
@@ -24,12 +25,11 @@ import com.akrivonos.app_standart_java.database.DatabaseControl;
 import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
+import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 import static com.akrivonos.app_standart_java.constants.Values.MY_DOWNLOAD_PERMISSION_CODE;
+import static com.akrivonos.app_standart_java.constants.Values.TYPE_FRAG;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class LinkContentFragment extends Fragment {
 
     private static final String[] PERMISSIONS_STORAGE = {
@@ -37,17 +37,18 @@ public class LinkContentFragment extends Fragment {
             Manifest.permission.READ_EXTERNAL_STORAGE};
     private PhotoInfo photoInfo;
     private DatabaseControlListener databaseControlListener;
-    public LinkContentFragment() {
-        // Required empty public constructor
-    }
+    private boolean isExpandable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_link_content, container, false);
-        setHasOptionsMenu(true);
         databaseControlListener = new DatabaseControl(getContext());
-        setPhotoInfo();
+        getArgumentsFragment();
+        setUpFragmentButtonsNotExpandable(view);
+
+        setHasOptionsMenu(true);
+
         databaseControlListener.addToHistoryConvention(photoInfo);
         WebView webView = view.findViewById(R.id.web_view);
 
@@ -57,11 +58,14 @@ public class LinkContentFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.link_content_menu, menu);
-        int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
-                ? R.drawable.ic_favorite_black_active
-                : R.drawable.ic_favorite_border_black_unactive;
-        menu.findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
+        if(!isExpandable){
+            inflater.inflate(R.menu.link_content_menu, menu);
+            int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
+                    ? R.drawable.ic_favorite_black_active
+                    : R.drawable.ic_favorite_border_black_unactive;
+            menu.findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
+        }
+
         getActivity().setTitle(photoInfo.getRequestText());
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -86,9 +90,33 @@ public class LinkContentFragment extends Fragment {
         return false;
     }
 
-    private void setPhotoInfo() {
-        Bundle bundle = getArguments(); //TODO передача из активити
-        photoInfo = bundle.getParcelable(BUNDLE_PHOTO_INFO);
+    private final View.OnClickListener favoriteButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
+                databaseControlListener.setPhotoNotFavorite(photoInfo);
+                v.setBackgroundResource(R.drawable.ic_favorite_border_black_unactive);
+            } else {
+                databaseControlListener.setPhotoFavorite(photoInfo);
+                v.setBackgroundResource(R.drawable.ic_favorite_black_active);
+            }
+        }
+    };
+
+    private final View.OnClickListener downloadButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            checkPermissionsDownload();
+        }
+    };
+
+    private void getArgumentsFragment(){
+        Bundle bundle = getArguments();
+        if(bundle != null) {
+            photoInfo = bundle.getParcelable(BUNDLE_PHOTO_INFO);
+            int typeFragment = bundle.getInt(TYPE_FRAG);
+            isExpandable = (typeFragment == ARGUMENT_EXPANABLE_FRAG);
+        }
     }
 
     private void downloadPhotoWithDownloadManager(String url) {
@@ -113,6 +141,20 @@ public class LinkContentFragment extends Fragment {
             requestPermissions(PERMISSIONS_STORAGE, MY_DOWNLOAD_PERMISSION_CODE);
         } else {
             downloadPhotoWithDownloadManager(photoInfo.getUrlText());
+        }
+    }
+
+    private void setUpFragmentButtonsNotExpandable(View view){
+        if (isExpandable){
+            ImageButton favoriteButton = view.findViewById(R.id.like_button);
+            ImageButton downloadButton = view.findViewById(R.id.download_button);
+            favoriteButton.setOnClickListener(favoriteButtonClick);
+            downloadButton.setOnClickListener(downloadButtonClick);
+
+            int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
+                    ? R.drawable.ic_favorite_black_active
+                    : R.drawable.ic_favorite_border_black_unactive;
+            favoriteButton.setBackgroundResource(iconIsFavorite);
         }
     }
 

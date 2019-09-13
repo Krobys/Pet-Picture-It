@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/settings_app_theme"
-        android:icon="@drawable/ic_day_mode_icon"
-        android:title="@string/mode_app_theme"
-        app:showAsAction="always"/>
-</menu>

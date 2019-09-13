@@ -1,6 +1,7 @@
 package com.akrivonos.app_standart_java.fragments;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.akrivonos.app_standart_java.MainActivity;
 import com.akrivonos.app_standart_java.R;
 
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
@@ -23,13 +25,14 @@ import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static android.support.v7.app.AppCompatDelegate.getDefaultNightMode;
 import static com.akrivonos.app_standart_java.constants.TagsFragments.SETTINGS_FRAGMENT;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
+import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SettingsFragment extends Fragment {
-    CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+    private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             changeAppThemeStyle(isChecked);
@@ -69,7 +72,9 @@ public class SettingsFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().setTitle("Settings");
+        Activity activity = getActivity();
+        if(activity != null)
+        activity.setTitle("Settings");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -92,7 +97,9 @@ public class SettingsFragment extends Fragment {
                 getActivity().finish();
 
                 getActivity().overridePendingTransition(0, 0);
-                startActivity(intent.putExtra(SETTINGS_FRAGMENT, "settings" ));
+                intent.putExtra(SETTINGS_FRAGMENT, "settings" );
+                intent.putExtra(EXPANDABLE_VALUE, ((MainActivity)getActivity()).getExpandable());
+                startActivity(intent);
             }
         });
     }

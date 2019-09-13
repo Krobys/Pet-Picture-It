@@ -1,6 +1,7 @@
 package com.akrivonos.app_standart_java.fragments;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,7 +53,6 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
     private String searchText;
     private ProgressBar progressBar;
     private String currentUser;
-    private RecyclerView recyclerViewPictures;
     private LinearLayoutManager linearLayoutManager;
     private PictureAdapter pictureAdapter;
     private final View.OnClickListener startSearch = new View.OnClickListener() {
@@ -98,7 +97,6 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d("test", "onCreate: ");
         ControlBorderDownloaderListener controlBorderDownloaderListener = this;
         OpenListItemLinkListener openListItemLinkListener = (OpenListItemLinkListener) getActivity();
         pictureAdapter = new PictureAdapter(openListItemLinkListener,
@@ -114,7 +112,7 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
 
             setRetainInstance(true);
             linearLayoutManager = new LinearLayoutManager(getContext());
-            recyclerViewPictures = layoutView.findViewById(R.id.rec_view_picture);
+        RecyclerView recyclerViewPictures = layoutView.findViewById(R.id.rec_view_picture);
             recyclerViewPictures.setLayoutManager(linearLayoutManager);
             recyclerViewPictures.setAdapter(pictureAdapter);
             new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerViewPictures);
@@ -188,7 +186,9 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().setTitle("PICTURE IT");
+        Activity activity = getActivity();
+        if(activity != null)
+        activity.setTitle("PICTURE IT");
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -1,6 +1,7 @@
 package com.akrivonos.app_standart_java.fragments;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,7 +51,9 @@ public class HistoryFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().setTitle("History");
+        Activity activity = getActivity();
+        if(activity != null)
+        activity.setTitle("History");
         super.onCreateOptionsMenu(menu, inflater);
     }
 }

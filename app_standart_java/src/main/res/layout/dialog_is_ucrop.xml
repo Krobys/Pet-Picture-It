@@ -43,7 +43,6 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
-            android:id="@+id/textViewD"
             android:layout_width="0dp"
             android:layout_height="103dp"
             android:gravity="center_horizontal|center_vertical"

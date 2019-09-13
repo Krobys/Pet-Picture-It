@@ -2,6 +2,8 @@ package com.akrivonos.app_standart_java;
 
 
 import android.Manifest;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,7 +16,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -30,6 +31,7 @@ import com.akrivonos.app_standart_java.listeners.MapCoordinatesPhotoListener;
 import com.akrivonos.app_standart_java.listeners.OnResultCoordinatesPictureListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.receivers.BatteryChangeReceiver;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -41,8 +43,12 @@ import static com.akrivonos.app_standart_java.constants.TagsFragments.HISTORY_FR
 import static com.akrivonos.app_standart_java.constants.TagsFragments.MAP_SEARCH_FRAGMENT;
 import static com.akrivonos.app_standart_java.constants.TagsFragments.SEARCH_PICTURE_FRAGMENT;
 import static com.akrivonos.app_standart_java.constants.TagsFragments.SETTINGS_FRAGMENT;
+import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABLE_FRAG;
+import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_SINGLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
+import static com.akrivonos.app_standart_java.constants.Values.TYPE_FRAG;
 
 public class MainActivity extends AppCompatActivity implements OpenListItemLinkListener,
         MapCoordinatesPhotoListener{
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     private DrawerLayout drawer;
     private Toolbar toolbar;
     private ActionBarDrawerToggle toggle;
+    private boolean isExpandable;
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -76,6 +83,15 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
         ((TextView)header.findViewById(R.id.name_user)).setText(PreferenceUtils.getCurrentUserName(this));
         setUpDefaultPage();
+
+        IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(new BatteryChangeReceiver(), batteryLevelFilter);
+    }
+
+    @Override
+    protected void onResume() {
+        isViewExpandable();
+        super.onResume();
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -93,25 +109,21 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         toggle = new ActionBarDrawerToggle(this,
                 drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
     }
-    public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
+    private void selectDrawerItem(MenuItem menuItem) {
         Fragment fragment = null;
         String TAG_FRAGMENT = SEARCH_PICTURE_FRAGMENT;
         switch (menuItem.getItemId()) {
             case R.id.search_pictures:
                 setUpToggleDrawer();
                 fragment = new SearchPictureFragment();
-                //fragmentClass = SearchPictureFragment.class;
                 TAG_FRAGMENT = SEARCH_PICTURE_FRAGMENT;
                 break;
             case R.id.history:
                 fragment = new HistoryFragment();
-               // fragmentClass = HistoryFragment.class;
                 TAG_FRAGMENT = HISTORY_FRAGMENT;
                 break;
             case R.id.favorire_pick:
                 fragment = new FavoritesFragment();
-                //fragmentClass = FavoritesFragment.class;
                 TAG_FRAGMENT = FAVORITES_FRAGMENT;
                 break;
             case R.id.find_on_map:
@@ -125,12 +137,10 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
                 break;
             case R.id.settings:
                 fragment = new SettingsFragment();
-                //fragmentClass = SettingsFragment.class;
                 TAG_FRAGMENT = SETTINGS_FRAGMENT;
                 break;
             default:
                 fragment = new SearchPictureFragment();
-                //fragmentClass = SearchPictureFragment.class;
         }
         if(fragment != null){
 
@@ -153,20 +163,44 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     private void setUpDefaultPage() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if(getIntent().hasExtra(SETTINGS_FRAGMENT)){
+        Intent intent = getIntent();
+        if(intent.hasExtra(SETTINGS_FRAGMENT)){
             fragmentManager.beginTransaction().add(R.id.flContent, new SettingsFragment(), SETTINGS_FRAGMENT).commit();
-            getIntent().removeExtra(SETTINGS_FRAGMENT);
+            intent.removeExtra(SETTINGS_FRAGMENT);
         }else{
-            Log.d("test", "not has extra");
             fragmentManager.beginTransaction().add(R.id.flContent, new SearchPictureFragment(), SEARCH_PICTURE_FRAGMENT).commit();
         }
+    }
 
+    public boolean getExpandable(){
+        return isExpandable;
+    }
+
+    private void isViewExpandable(){
+        Intent intent = getIntent();
+        if(intent.hasExtra(EXPANDABLE_VALUE)){
+            isExpandable = intent.getBooleanExtra(EXPANDABLE_VALUE, false);
+            intent.removeExtra(EXPANDABLE_VALUE);
+        }else{
+            Fragment fragment = getLastFragment();
+            if(fragment != null){
+                View isExpandableView = getLastFragment().getView();
+                if(isExpandableView != null){
+                    View containerContentMore = isExpandableView.findViewById(R.id.details_picture_container);
+                    isExpandable = (containerContentMore != null);
+                }
+            }
+        }
     }
 
     private Fragment getLastFragment(){
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        if (fragments.size() > 0)
         return fragments.get(fragments.size() - 1);
+        else
+            return null;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -181,17 +215,17 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         Fragment fragLinkContent = new LinkContentFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(BUNDLE_PHOTO_INFO, photoInfo);
-        fragLinkContent.setArguments(bundle);
-        View containerContentMore = getLastFragment().getView().findViewById(R.id.details_picture_container);
-        boolean mDualPane = (containerContentMore != null) && (containerContentMore.getVisibility() == View.VISIBLE);
-        if (mDualPane) {
-                        FragmentManager fragmentManager = getSupportFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.details_picture_container, fragLinkContent).commit();
-        } else {
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.flContent, fragLinkContent).addToBackStack(null).commit();
-        }
+            if (isExpandable) {
+                bundle.putInt(TYPE_FRAG, ARGUMENT_EXPANABLE_FRAG);
+                            fragLinkContent.setArguments(bundle);
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            fragmentManager.beginTransaction().replace(R.id.details_picture_container, fragLinkContent).commit();
+            } else {
+                bundle.putInt(TYPE_FRAG, ARGUMENT_SINGLE_FRAG);
+                fragLinkContent.setArguments(bundle);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.flContent, fragLinkContent).addToBackStack(null).commit();
+            }
     }
 
     private boolean checkPermissionsMap() {

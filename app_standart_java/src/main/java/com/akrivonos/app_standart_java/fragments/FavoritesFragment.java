@@ -1,6 +1,6 @@
 package com.akrivonos.app_standart_java.fragments;
 
-
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -25,9 +25,6 @@ import java.util.ArrayList;
 
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class FavoritesFragment extends Fragment {
     private DatabaseControlListener databaseControlListener;
     private String userName;
@@ -51,7 +48,6 @@ public class FavoritesFragment extends Fragment {
     };
 
     public FavoritesFragment() {
-        // Required empty public constructor
     }
 
 
@@ -79,7 +75,9 @@ public class FavoritesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().setTitle("Favorite");
+        Activity activity = getActivity();
+        if(activity != null)
+        activity.setTitle("Favorite");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
