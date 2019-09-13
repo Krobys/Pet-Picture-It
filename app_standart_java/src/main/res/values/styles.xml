@@ -26,8 +26,4 @@
         <item name="android:background">@drawable/shape_edittext</item>
     </style>
 
-    <style name="ProgressBarCustom" parent="Widget.AppCompat.ProgressBar">
-        <item name="android:foreground">@color/colorPrimary</item>
-    </style>
-
 </resources>
