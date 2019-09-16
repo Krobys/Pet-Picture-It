@@ -2,7 +2,6 @@ package com.akrivonos.app_standart_java.constants;
 
 public class Values {
     public static final String API_KEY_FLICKR = "f1f543c896dde585da3d2e49e7df3c52";
-    public static final String API_KEY_FLICKR_PRIVATE = "e139f14f228198f8";
     public static final String SEARCH_FIELD_TEXT = "search_field_text";
     public static final String BUNDLE_PHOTO_INFO = "bundle_photo_info";
     public static final String DEFAULT_MODE_NIGHT = "default_mode_night";
@@ -20,9 +19,7 @@ public class Values {
     public static final int ARGUMENT_SINGLE_FRAG = 1;
     public static final int ARGUMENT_EXPANABLE_FRAG = 2;
     public static final String TYPE_FRAG = "type_fragment";
-    public static final int RESULT_MAP_COORDINATES = 1;
     public static final int REQUEST_IMAGE_CAPTURE = 1;
-    public static final String LAT_LNG = "lat_lng";
     public static final int PAGE_DEF_PIC = 1;
     public static final int PAGE_MAP_PIC = 2;
     public static final int VIEW_TYPE_TITLE = 1;

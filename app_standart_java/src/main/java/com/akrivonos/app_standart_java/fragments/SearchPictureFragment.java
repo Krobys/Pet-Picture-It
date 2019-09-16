@@ -106,7 +106,7 @@ public class SearchPictureFragment extends Fragment implements LoaderListener,
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View layoutView = inflater.inflate(R.layout.fragment_search_picture, container, false);
 

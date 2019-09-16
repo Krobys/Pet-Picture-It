@@ -2,10 +2,12 @@ package com.akrivonos.app_standart_java.fragments;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,7 +47,7 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map_search, container, false);
         setHasOptionsMenu(true);
@@ -55,7 +57,9 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
         if (supportMapFragment != null) {
             supportMapFragment.getMapAsync(this);
         }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+        Context context = getContext();
+        if(context != null)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         return view;
     }
 
@@ -77,7 +81,9 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Activity activity = getActivity();
+        if(activity == null) return;
+        LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (enabled) {
@@ -99,7 +105,9 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().setTitle("Find on the Map");
+        Activity activity = getActivity();
+        if(activity == null) return;
+        activity.setTitle("Find on the Map");
         super.onCreateOptionsMenu(menu, inflater);
     }
 }

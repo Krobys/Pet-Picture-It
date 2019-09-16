@@ -2,12 +2,14 @@ package com.akrivonos.app_standart_java.fragments;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -40,7 +42,7 @@ public class LinkContentFragment extends Fragment {
     private boolean isExpandable;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_link_content, container, false);
         databaseControlListener = new DatabaseControl(getContext());
@@ -65,8 +67,9 @@ public class LinkContentFragment extends Fragment {
                     : R.drawable.ic_favorite_border_black_unactive;
             menu.findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
         }
-
-        getActivity().setTitle(photoInfo.getRequestText());
+        Activity activity = getActivity();
+        if(activity == null) return;
+        activity.setTitle(photoInfo.getRequestText());
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -128,16 +131,19 @@ public class LinkContentFragment extends Fragment {
         request.allowScanningByMediaScanner();
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, requestText + ".png");
-
-        DownloadManager manager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+        Activity activity = getActivity();
+        if(activity == null) return;
+        DownloadManager manager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
-        Toast.makeText(getContext(), "Starting Download", Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "Starting Download", Toast.LENGTH_SHORT).show();
     }
 
     private void checkPermissionsDownload() {//проверка разрешений
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        Context context = getContext();
+        if(context == null) return;
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_STORAGE, MY_DOWNLOAD_PERMISSION_CODE);
         } else {
             downloadPhotoWithDownloadManager(photoInfo.getUrlText());

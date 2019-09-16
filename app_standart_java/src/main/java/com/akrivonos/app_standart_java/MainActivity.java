@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         selectDrawerItem(menuItem);
                         return true;
                     }
@@ -143,13 +143,9 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
                 fragment = new SearchPictureFragment();
         }
         if(fragment != null){
-
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment, TAG_FRAGMENT).addToBackStack(null).commit();
-
             menuItem.setChecked(true);
-
-            setTitle(menuItem.getTitle());
         }
         drawer.closeDrawers();
     }

@@ -3,6 +3,7 @@ package com.akrivonos.app_standart_java.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -81,7 +82,7 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
@@ -155,16 +156,20 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
     private File createImageFile() {//создание нового файла для фотографии
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_.jpg";
-        File storageDir = getContext().getFilesDir();
+        Context context = getContext();
+        if(context == null) return null;
+        File storageDir = context.getFilesDir();
         File image = new File(storageDir, imageFileName);
         currentPhoto = image;
         return image;
     }
 
     private boolean checkPermissionsCamera() {//проверка разрешений
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        Context context = getContext();
+        if(context == null) return false;
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_STORAGE, MY_CAMERA_PERMISSION_CODE);
         } else {
             return true;
@@ -201,7 +206,9 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
         uCrop.withAspectRatio(3, 4);
         uCrop.withMaxResultSize(480, 720);
         uCrop.withOptions(new UCrop.Options());
-        uCrop.start(getActivity());
+        Activity activity = getActivity();
+        if(activity == null) return;
+        uCrop.start(activity);
     }
 
     @Override
@@ -210,7 +217,9 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
     }
 
     private void deleteFileFromDevice(String fileName) {
-        if (getContext().deleteFile(fileName)) {
+        Context context = getContext();
+        if(context == null) return;
+        if (context.deleteFile(fileName)) {
             Toast.makeText(getContext(), "File Deleted", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
