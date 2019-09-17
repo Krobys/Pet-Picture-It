@@ -28,7 +28,6 @@ import com.akrivonos.app_standart_java.fragments.MapSearch;
 import com.akrivonos.app_standart_java.fragments.SearchPictureFragment;
 import com.akrivonos.app_standart_java.fragments.SettingsFragment;
 import com.akrivonos.app_standart_java.listeners.MapCoordinatesPhotoListener;
-import com.akrivonos.app_standart_java.listeners.OnResultCoordinatesPictureListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.receivers.BatteryChangeReceiver;
@@ -47,6 +46,7 @@ import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABL
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_SINGLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
+import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.TYPE_FRAG;
 
@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -239,15 +238,19 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         SearchPictureFragment searchPictureFragment;
         clearStackFragments();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        searchPictureFragment = (SearchPictureFragment) fragmentManager.findFragmentByTag(SEARCH_PICTURE_FRAGMENT);
-        if(searchPictureFragment != null){
+        try {
+            searchPictureFragment = SearchPictureFragment.class.newInstance();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(LATTITUDE_LONGITUDE, latLng);
+            searchPictureFragment.setArguments(bundle);
             fragmentManager.beginTransaction().replace(R.id.flContent, searchPictureFragment, SEARCH_PICTURE_FRAGMENT).commit();
-            ((OnResultCoordinatesPictureListener) searchPictureFragment).startCoordinatesSearch(latLng);
-        }else {
-            searchPictureFragment = new SearchPictureFragment();
-            fragmentManager.beginTransaction().replace(R.id.flContent, searchPictureFragment, SEARCH_PICTURE_FRAGMENT).commit();
-            ((OnResultCoordinatesPictureListener) searchPictureFragment).startCoordinatesSearch(latLng);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     @Override

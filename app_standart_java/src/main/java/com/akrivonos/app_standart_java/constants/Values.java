@@ -16,7 +16,11 @@ public class Values {
     public static final String HISTORY_TABLE = "history_table";
     public static final String GALLERY_TABLE = "gallery_table";
     public static final String EXPANDABLE_VALUE = "expandable_value";
+    public static final String METHOD_SEARCH_BY_TEXT = "flickr.photos.search";
+    public static final String METHOD_SEARCH_BY_GEO = "flickr.photos.getRecent";
+    public static final String LATTITUDE_LONGITUDE = "lat_lng_fragment_search";
     public static final int ARGUMENT_SINGLE_FRAG = 1;
+    public static final String ARGUMENT_FRAGMENT_CREATED_CALLBACK = "callback_created_frag";
     public static final int ARGUMENT_EXPANABLE_FRAG = 2;
     public static final String TYPE_FRAG = "type_fragment";
     public static final int REQUEST_IMAGE_CAPTURE = 1;
