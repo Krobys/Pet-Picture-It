@@ -15,7 +15,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -111,12 +110,6 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
 
     public SearchPictureFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d("test", "onCreate: ");
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -217,7 +210,6 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     }
 
     public void startCoordinatesSearch(LatLng latLng) {
-        Log.d("test", "startCoordinatesSearch: ");
         coordinatesToFindPics = latLng;
         pictureAdapter.throwOffData();
         RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, 1);

@@ -64,7 +64,6 @@ public class RetrofitSearchDownload {
         this.searchText = searchText;
         this.userName = userName;
         Call<Rsp> RspCall = apiService.searchPhotosByName(METHOD_SEARCH_BY_TEXT, API_KEY, searchText, pageToLoad);
-        Log.d("test", String.valueOf(RspCall.request()));
         RspCall.enqueue(new Callback<Rsp>() {
             @Override
             public void onResponse(@NonNull Call<Rsp> call,@NonNull Response<Rsp> response) {
@@ -95,7 +94,6 @@ public class RetrofitSearchDownload {
         typeLoadPageTask = PAGE_MAP_PIC;
         this.userName = userName;
         final Call<Rsp> RspCall = apiService.searchPhotosByGeo(METHOD_SEARCH_BY_GEO, API_KEY, latLng.latitude, latLng.longitude, pageToLoad);
-        Log.d("test", String.valueOf(RspCall.request()));
         RspCall.enqueue(new Callback<Rsp>() {
             @Override
             public void onResponse(Call<Rsp> call, Response<Rsp> response) {

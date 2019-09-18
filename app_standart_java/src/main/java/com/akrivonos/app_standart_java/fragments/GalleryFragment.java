@@ -78,7 +78,7 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
     };
 
     public GalleryFragment() {
-        // Required empty public constructor
+
     }
 
 
