@@ -21,6 +21,7 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class HistoryFragment extends Fragment {
@@ -47,6 +48,7 @@ public class HistoryFragment extends Fragment {
             ArrayList<PhotoInfo> historyPhotos = new ArrayList<PhotoInfo>(mainActivity.getDatabase()
                     .historyPhotoDao()
                     .getHistoryConvention(PreferenceUtils.getCurrentUserName(getContext())));
+            Collections.reverse(historyPhotos);
             historyPictureAdapter.setData(historyPhotos);
             historyPictureAdapter.notifyDataSetChanged();
         }

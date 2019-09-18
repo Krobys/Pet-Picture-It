@@ -15,6 +15,6 @@ public interface HistoryPhotoDao {
     @Insert
     void addToHistoryConvention(HistoryPhoto historyPhoto);
 
-    @Query("DELETE FROM historyphoto WHERE id NOT IN (SELECT id from historyphoto ORDER BY id DESC LIMIT 20)")
+    @Query("DELETE FROM historyphoto WHERE id NOT IN (SELECT id from historyphoto ORDER BY id LIMIT 20)")
     void deleteOverLimitHistory();
 }

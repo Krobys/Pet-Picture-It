@@ -25,7 +25,7 @@ public class PhotoGallery {
         return uriPhoto;
     }
 
-    protected void setUriPhoto(String uriPhoto) {
+    public void setUriPhoto(String uriPhoto) {
         this.uriPhoto = uriPhoto;
     }
 
@@ -41,7 +41,7 @@ public class PhotoGallery {
         return id;
     }
 
-    protected void setId(long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
