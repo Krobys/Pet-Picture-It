@@ -8,27 +8,27 @@ import android.view.Window;
 import android.widget.TextView;
 
 import com.akrivonos.app_standart_java.R;
-import com.akrivonos.app_standart_java.database.DatabaseControl;
-import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.listeners.NotifyGalleryAdapterListener;
 import com.akrivonos.app_standart_java.listeners.StartUCropListener;
 import com.akrivonos.app_standart_java.models.PhotoGallery;
+import com.akrivonos.app_standart_java.room.GalleryPhoto;
+import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 
 public class UCropDialog extends Dialog implements View.OnClickListener {
     private final PhotoGallery photoGallery;
-    private final DatabaseControlListener databaseControl;
     private final StartUCropListener startUCropListener;
     private final NotifyGalleryAdapterListener notifyGalleryAdapterListener;
-
+    private final RoomAppDatabase appDatabase;
     public UCropDialog(Context context,
                        StartUCropListener startUCropListener,
                        NotifyGalleryAdapterListener notifyGalleryAdapterListener,
-                       PhotoGallery photoGallery) {
+                       PhotoGallery photoGallery,
+                       RoomAppDatabase roomAppDatabase) {
         super(context);
         this.photoGallery = photoGallery;
         this.startUCropListener = startUCropListener;
         this.notifyGalleryAdapterListener = notifyGalleryAdapterListener;
-        databaseControl = new DatabaseControl(context);
+        appDatabase = roomAppDatabase;
     }
 
     @Override
@@ -47,7 +47,8 @@ public class UCropDialog extends Dialog implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_save:
-                databaseControl.addToGallery(photoGallery);
+                GalleryPhoto galleryPhoto = new GalleryPhoto(photoGallery);
+                appDatabase.galleryPhotoDao().addToGallery(galleryPhoto);
                 notifyGalleryAdapterListener.addToAdapter(photoGallery);
                 dismiss();
                 break;

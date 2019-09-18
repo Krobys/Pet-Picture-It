@@ -7,6 +7,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -22,10 +23,15 @@ import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.akrivonos.app_standart_java.MainActivity;
 import com.akrivonos.app_standart_java.R;
-import com.akrivonos.app_standart_java.database.DatabaseControl;
-import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
+import com.akrivonos.app_standart_java.room.FavoritePhoto;
+import com.akrivonos.app_standart_java.room.HistoryPhoto;
+import com.akrivonos.app_standart_java.room.RoomAppDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
@@ -38,20 +44,30 @@ public class LinkContentFragment extends Fragment {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE};
     private PhotoInfo photoInfo;
-    private DatabaseControlListener databaseControlListener;
+    private RoomAppDatabase appDatabase;
     private boolean isExpandable;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_link_content, container, false);
-        databaseControlListener = new DatabaseControl(getContext());
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if(mainActivity != null) appDatabase = mainActivity.getDatabase();
+
         getArgumentsFragment();
         setUpFragmentButtonsNotExpandable(view);
 
         setHasOptionsMenu(true);
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                HistoryPhoto historyPhoto = new HistoryPhoto(photoInfo);
+                appDatabase.historyPhotoDao().addToHistoryConvention(historyPhoto);
+                appDatabase.historyPhotoDao().deleteOverLimitHistory();
+            }
+        });
 
-        databaseControlListener.addToHistoryConvention(photoInfo);
         WebView webView = view.findViewById(R.id.web_view);
 
         webView.loadUrl(photoInfo.getUrlText());
@@ -62,7 +78,7 @@ public class LinkContentFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if(!isExpandable){
             inflater.inflate(R.menu.link_content_menu, menu);
-            int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
+            int iconIsFavorite = (checkIsFavorite())
                     ? R.drawable.ic_favorite_black_active
                     : R.drawable.ic_favorite_border_black_unactive;
             menu.findItem(R.id.favorire_pick).setIcon(iconIsFavorite);
@@ -73,15 +89,20 @@ public class LinkContentFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    private boolean checkIsFavorite(){
+        List<PhotoInfo> photoInfos = new ArrayList<PhotoInfo>(appDatabase.favoritePhotoDao().checkIsFavorite(photoInfo.getUrlText()));
+        return photoInfos.size() != 0;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.favorire_pick:
-                if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
-                    databaseControlListener.setPhotoNotFavorite(photoInfo);
+                if (checkIsFavorite()) {
+                    appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photoInfo));
                     item.setIcon(R.drawable.ic_favorite_border_black_unactive);
                 } else {
-                    databaseControlListener.setPhotoFavorite(photoInfo);
+                    appDatabase.favoritePhotoDao().setPhotoFavorite(new FavoritePhoto(photoInfo));
                     item.setIcon(R.drawable.ic_favorite_black_active);
                 }
                 return true;
@@ -96,11 +117,11 @@ public class LinkContentFragment extends Fragment {
     private final View.OnClickListener favoriteButtonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (databaseControlListener.checkIsFavorite(photoInfo.getUrlText())) {
-                databaseControlListener.setPhotoNotFavorite(photoInfo);
+            if (checkIsFavorite()) {
+                appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photoInfo));
                 v.setBackgroundResource(R.drawable.ic_favorite_border_black_unactive);
             } else {
-                databaseControlListener.setPhotoFavorite(photoInfo);
+                appDatabase.favoritePhotoDao().setPhotoFavorite(new FavoritePhoto(photoInfo));
                 v.setBackgroundResource(R.drawable.ic_favorite_black_active);
             }
         }
@@ -157,7 +178,7 @@ public class LinkContentFragment extends Fragment {
             favoriteButton.setOnClickListener(favoriteButtonClick);
             downloadButton.setOnClickListener(downloadButtonClick);
 
-            int iconIsFavorite = (databaseControlListener.checkIsFavorite(photoInfo.getUrlText()))
+            int iconIsFavorite = (checkIsFavorite())
                     ? R.drawable.ic_favorite_black_active
                     : R.drawable.ic_favorite_border_black_unactive;
             favoriteButton.setBackgroundResource(iconIsFavorite);

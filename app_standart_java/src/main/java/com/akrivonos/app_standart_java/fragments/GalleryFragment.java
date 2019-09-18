@@ -26,14 +26,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.akrivonos.app_standart_java.MainActivity;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.GalleryAdapter;
-import com.akrivonos.app_standart_java.database.DatabaseControl;
-import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.dialogs.UCropDialog;
 import com.akrivonos.app_standart_java.listeners.NotifyGalleryAdapterListener;
 import com.akrivonos.app_standart_java.listeners.StartUCropListener;
 import com.akrivonos.app_standart_java.models.PhotoGallery;
+import com.akrivonos.app_standart_java.room.GalleryPhoto;
+import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.yalantis.ucrop.UCrop;
 
@@ -54,7 +55,7 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
     private File currentPhoto;
     private Uri photoUri;
     private GalleryAdapter galleryAdapter;
-    private DatabaseControlListener databaseControlListener;
+    private RoomAppDatabase appDatabase;
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -69,9 +70,9 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
             int position = viewHolder.getAdapterPosition();
-            Uri uriPhoto = galleryAdapter.getData().get(position).getUriPhoto();
+            Uri uriPhoto = galleryAdapter.getData().get(position).getUriPhotoU();
             deleteFileFromDevice(new File(uriPhoto.toString()).getName());
-            databaseControlListener.deleteFromGallery(uriPhoto);
+            appDatabase.galleryPhotoDao().deleteFromGallery(uriPhoto);
             galleryAdapter.deleteFromGallery(position);
         }
     };
@@ -86,10 +87,14 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
-        databaseControlListener = new DatabaseControl(getContext());
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null){
+            appDatabase = mainActivity.getDatabase();
+        }
 
         galleryAdapter = new GalleryAdapter(getContext());
-        galleryAdapter.setDataGallery(databaseControlListener.getPhotosFromGallery(PreferenceUtils.getCurrentUserName(getContext())));
+        galleryAdapter.setDataGallery(appDatabase.galleryPhotoDao().getPhotosFromGallery(PreferenceUtils.getCurrentUserName(getContext())));
 
         RecyclerView recyclerViewGallery = view.findViewById(R.id.recycler_view_gallery);
         recyclerViewGallery.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -132,7 +137,7 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
                     photoGallery.setUriPhoto(resultUri);
                     photoGallery.setUserName(PreferenceUtils.getCurrentUserName(getContext()));
                     photoGallery.setDateMillis(System.currentTimeMillis());
-                    databaseControlListener.addToGallery(photoGallery);
+                    appDatabase.galleryPhotoDao().addToGallery(new GalleryPhoto(photoGallery));
                     galleryAdapter.addItemPhoto(photoGallery);
                 }
                 break;
@@ -194,7 +199,7 @@ public class GalleryFragment extends Fragment implements StartUCropListener, Not
         photoGallery.setUriPhoto(photoUri);
         photoGallery.setUserName(PreferenceUtils.getCurrentUserName(getContext()));
         photoGallery.setDateMillis(System.currentTimeMillis());
-        UCropDialog cdd = new UCropDialog(getContext(), this, this, photoGallery);
+        UCropDialog cdd = new UCropDialog(getContext(), this, this, photoGallery, appDatabase);
         Objects.requireNonNull(cdd.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         cdd.show();
     }

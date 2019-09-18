@@ -34,7 +34,7 @@ public class RetrofitSearchDownload {
     private final static String API_KEY = "c67772a7cb8e4c8be058a309f88f62cf";
     private static RetrofitSearchDownload retrofitSearchDownload;
     private MutableLiveData<PostDownloadPicturePack> transData;
-    private ApiRetrofitInterface apiService;
+    private final ApiRetrofitInterface apiService;
 
     private RetrofitSearchDownload() {
         Retrofit retrofit = new Retrofit.Builder()

@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface ApiRetrofitInterface {
+interface ApiRetrofitInterface {
     @GET("rest/")
     Call<Rsp> searchPhotosByName(@Query("method") String method, @Query("api_key") String api_key, @Query("text") String searchText, @Query("page") int page);
     @GET("rest/")

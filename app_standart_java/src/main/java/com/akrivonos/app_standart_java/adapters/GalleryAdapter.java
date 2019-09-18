@@ -52,7 +52,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public void onBindViewHolder(@NonNull PhotoViewHolder photoViewHolder, int position) {
-        Uri uriPhoto = photos.get(position).getUriPhoto();
+        Uri uriPhoto = photos.get(position).getUriPhotoU();
         photoViewHolder.photoImageView.setImageURI(uriPhoto);
     }
 

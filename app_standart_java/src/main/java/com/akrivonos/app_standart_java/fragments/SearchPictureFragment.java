@@ -58,7 +58,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     private String currentUser;
     private LinearLayoutManager linearLayoutManager;
     private PictureAdapter pictureAdapter;
-    LiveData<PostDownloadPicturePack> liveDataPhoto;
+    private LiveData<PostDownloadPicturePack> liveDataPhoto;
     private final View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
         public void onClick(View v) { // Кнопка начала скачивания
@@ -79,19 +79,19 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
         }
     };
 
-    Observer<PostDownloadPicturePack> downloadPicturesObserverDuo = new Observer<PostDownloadPicturePack>() {
+    private final Observer<PostDownloadPicturePack> downloadPicturesObserverDuo = new Observer<PostDownloadPicturePack>() {
         @Override
         public void onChanged(@Nullable PostDownloadPicturePack postDownloadPicturePack) {
             if (postDownloadPicturePack != null) {
                 SettingsLoadPage settingsLoadPage = postDownloadPicturePack.getSettingsLoadPage();
-                progressBar.setVisibility(View.GONE);
                 pictureAdapter.setTypeLoadingPage(settingsLoadPage.getTypeLoadPage());
                 pictureAdapter.setData(postDownloadPicturePack.getPhotos());
-                searchButton.setClickable(true);
                 pictureAdapter.setPageSettings(settingsLoadPage.getCurrentPage(), settingsLoadPage.getPagesAmount());
             }else{
                 Toast.makeText(getContext(), "Error while downloading", Toast.LENGTH_SHORT).show();
             }
+            progressBar.setVisibility(View.GONE);
+            searchButton.setClickable(true);
         }
     };
 

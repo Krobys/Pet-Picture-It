@@ -13,10 +13,9 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.akrivonos.app_standart_java.MainActivity;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.PictureAdapter;
-import com.akrivonos.app_standart_java.database.DatabaseControl;
-import com.akrivonos.app_standart_java.database.DatabaseControlListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
@@ -43,10 +42,14 @@ public class HistoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(historyPictureAdapter);
 
-        DatabaseControlListener databaseControlListener = new DatabaseControl(getContext());
-        ArrayList<PhotoInfo> historyPhotos = databaseControlListener.getHistoryConvention(PreferenceUtils.getCurrentUserName(getContext()));
-        historyPictureAdapter.setData(historyPhotos);
-        historyPictureAdapter.notifyDataSetChanged();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if(mainActivity != null){
+            ArrayList<PhotoInfo> historyPhotos = new ArrayList<PhotoInfo>(mainActivity.getDatabase()
+                    .historyPhotoDao()
+                    .getHistoryConvention(PreferenceUtils.getCurrentUserName(getContext())));
+            historyPictureAdapter.setData(historyPhotos);
+            historyPictureAdapter.notifyDataSetChanged();
+        }
         return view;
     }
 

@@ -2,6 +2,7 @@ package com.akrivonos.app_standart_java;
 
 
 import android.Manifest;
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -31,6 +32,7 @@ import com.akrivonos.app_standart_java.listeners.MapCoordinatesPhotoListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.receivers.BatteryChangeReceiver;
+import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -45,6 +47,7 @@ import static com.akrivonos.app_standart_java.constants.TagsFragments.SETTINGS_F
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_SINGLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
+import static com.akrivonos.app_standart_java.constants.Values.DATABASE_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     private Toolbar toolbar;
     private ActionBarDrawerToggle toggle;
     private boolean isExpandable;
+    private RoomAppDatabase roomAppDatabase;
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -270,5 +274,15 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
         }
+    }
+
+    public RoomAppDatabase getDatabase(){
+       if(roomAppDatabase == null){
+           roomAppDatabase = Room.databaseBuilder(this, RoomAppDatabase.class, DATABASE_NAME)
+                   .allowMainThreadQueries()
+                   .fallbackToDestructiveMigration()
+                   .build();
+       }
+       return roomAppDatabase;
     }
 }

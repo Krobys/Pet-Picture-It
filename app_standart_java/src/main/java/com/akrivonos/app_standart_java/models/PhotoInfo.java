@@ -1,11 +1,21 @@
 package com.akrivonos.app_standart_java.models;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+@Entity
 public class PhotoInfo implements Parcelable {
+
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+    @ColumnInfo(name = "user")
     private String userName = null;
+    @ColumnInfo(name = "request")
     private String requestText = null;
+    @ColumnInfo(name = "url")
     private String urlText = null;
 
     public PhotoInfo() {
@@ -34,8 +44,16 @@ public class PhotoInfo implements Parcelable {
         return userName;
     }
 
+    public long getId() {
+        return id;
+    }
+
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getRequestText() {
