@@ -3,7 +3,6 @@ package com.akrivonos.app_standart_java.fragments;
 
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -37,8 +36,12 @@ import com.akrivonos.app_standart_java.retrofit.RetrofitSearchDownload;
 import com.akrivonos.app_standart_java.utils.InternetUtils;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
+import com.jakewharton.rxbinding3.widget.RxTextView;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.disposables.Disposable;
 
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_LAYOUT;
@@ -49,7 +52,7 @@ import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT
 
 public class SearchPictureFragment extends Fragment implements ControlBorderDownloaderListener,
         OnResultCoordinatesPictureListener {
-
+    public static final String SEARCH_PICTURE_FRAGMENT = "search_picture_fragment";
     private EditText searchRequestEditText;
     private Button searchButton;
     private String searchText;
@@ -57,7 +60,23 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     private String currentUser;
     private LinearLayoutManager linearLayoutManager;
     private PictureAdapter pictureAdapter;
-    private LiveData<PostDownloadPicturePack> liveDataPhoto;
+    private final android.arch.lifecycle.Observer<PostDownloadPicturePack> downloadPicturesObserverDuo = new android.arch.lifecycle.Observer<PostDownloadPicturePack>() {
+        @Override
+        public void onChanged(@Nullable PostDownloadPicturePack postDownloadPicturePack) {
+            if (postDownloadPicturePack != null) {
+                SettingsLoadPage settingsLoadPage = postDownloadPicturePack.getSettingsLoadPage();
+                if (settingsLoadPage.getCurrentPage() == 1) pictureAdapter.throwOffData();
+                pictureAdapter.setTypeLoadingPage(settingsLoadPage.getTypeLoadPage());
+                pictureAdapter.setData(postDownloadPicturePack.getPhotos());
+                pictureAdapter.setPageSettings(settingsLoadPage.getCurrentPage(), settingsLoadPage.getPagesAmount());
+            } else {
+                Toast.makeText(getContext(), "Error while downloading", Toast.LENGTH_SHORT).show();
+            }
+            progressBar.setVisibility(View.GONE);
+            searchButton.setClickable(true);
+        }
+    };
+
     private final View.OnClickListener startSearch = new View.OnClickListener() {
         @Override
         public void onClick(View v) { // Кнопка начала скачивания
@@ -68,7 +87,6 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
                     RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
                     progressBar.setVisibility(View.VISIBLE);
                     searchButton.setClickable(false);
-                    //new PicturesDownloadTask(SearchPictureFragment.this).startLoadPictures(searchText, currentUser, 1);
                 } else {
                     Toast.makeText(getContext(), getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
                 }
@@ -77,22 +95,8 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
             }
         }
     };
-
-    private final Observer<PostDownloadPicturePack> downloadPicturesObserverDuo = new Observer<PostDownloadPicturePack>() {
-        @Override
-        public void onChanged(@Nullable PostDownloadPicturePack postDownloadPicturePack) {
-            if (postDownloadPicturePack != null) {
-                SettingsLoadPage settingsLoadPage = postDownloadPicturePack.getSettingsLoadPage();
-                pictureAdapter.setTypeLoadingPage(settingsLoadPage.getTypeLoadPage());
-                pictureAdapter.setData(postDownloadPicturePack.getPhotos());
-                pictureAdapter.setPageSettings(settingsLoadPage.getCurrentPage(), settingsLoadPage.getPagesAmount());
-            }else{
-                Toast.makeText(getContext(), "Error while downloading", Toast.LENGTH_SHORT).show();
-            }
-            progressBar.setVisibility(View.GONE);
-            searchButton.setClickable(true);
-        }
-    };
+    //private Disposable buttonSearchDis;
+    private Disposable editTextDis;
 
     private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
         @Override
@@ -119,7 +123,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
         pictureAdapter = new PictureAdapter(openListItemLinkListener,
                 controlBorderDownloaderListener,
                 getContext()); //создаем адаптер
-        liveDataPhoto = RetrofitSearchDownload.getInstance().getDataBinder();
+        LiveData<PostDownloadPicturePack> liveDataPhoto = RetrofitSearchDownload.getInstance().getDataBinder();
         liveDataPhoto.observe(this, downloadPicturesObserverDuo);
         super.onAttach(context);
     }
@@ -140,7 +144,25 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
             searchRequestEditText = layoutView.findViewById(R.id.search_request);
             searchButton = layoutView.findViewById(R.id.search_button);
             searchButton.setOnClickListener(startSearch);
+
+        editTextDis = RxTextView.textChanges(searchRequestEditText)
+                .debounce(350, TimeUnit.MILLISECONDS)
+                .filter(textSearch -> textSearch.length() >= 3 && textSearch.length() < 10)
+                .subscribe(textSearch -> RetrofitSearchDownload.getInstance().startDownloadPictures(textSearch.toString(), currentUser, 1));
+
+//            buttonSearchDis = RxView.clicks(searchButton)
+//                    .filter(unit -> TextUtils.isEmpty(searchRequestEditText.getText()))
+//                    .filter(unit -> InternetUtils.isInternetConnectionEnable(getContext()))
+//                    .subscribe(test -> {
+//                        RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
+//                        pictureAdapter.throwOffData();
+//                        progressBar.setVisibility(View.VISIBLE);
+//                        searchButton.setClickable(false);
+//                    }
+//            );
+
             currentUser = PreferenceUtils.getCurrentUserName(getContext());
+
         restoreSearchField();
         return layoutView;
     }
@@ -188,6 +210,8 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     @Override
     public void onDestroyView() {
         saveSearchField();
+        editTextDis.dispose();
+        //buttonSearchDis.dispose();
         super.onDestroyView();
     }
 

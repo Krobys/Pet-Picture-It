@@ -48,10 +48,8 @@ import static android.app.Activity.RESULT_OK;
 import static com.akrivonos.app_standart_java.constants.Values.MY_CAMERA_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_IMAGE_CAPTURE;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class GalleryFragment extends Fragment implements StartUCropListener, NotifyGalleryAdapterListener {
+    public static final String GALLERY_FRAGMENT = "gallery_fragment";
     private File currentPhoto;
     private Uri photoUri;
     private GalleryAdapter galleryAdapter;

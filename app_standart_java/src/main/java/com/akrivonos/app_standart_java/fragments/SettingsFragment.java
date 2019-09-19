@@ -24,7 +24,6 @@ import com.akrivonos.app_standart_java.R;
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static android.support.v7.app.AppCompatDelegate.getDefaultNightMode;
-import static com.akrivonos.app_standart_java.constants.TagsFragments.SETTINGS_FRAGMENT;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 
@@ -33,6 +32,7 @@ import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
  * A simple {@link Fragment} subclass.
  */
 public class SettingsFragment extends Fragment {
+    public static final String SETTINGS_FRAGMENT = "settings_fragment";
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -101,7 +101,7 @@ public class SettingsFragment extends Fragment {
 
                 getActivity().overridePendingTransition(0, 0);
                 intent.putExtra(SETTINGS_FRAGMENT, "settings" );
-                intent.putExtra(EXPANDABLE_VALUE, ((MainActivity)getActivity()).getExpandable());
+                intent.putExtra(EXPANDABLE_VALUE, ((MainActivity) activity).getExpandable());
                 startActivity(intent);
             }
         });

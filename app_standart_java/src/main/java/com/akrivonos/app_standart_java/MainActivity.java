@@ -38,12 +38,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-import static com.akrivonos.app_standart_java.constants.TagsFragments.FAVORITES_FRAGMENT;
-import static com.akrivonos.app_standart_java.constants.TagsFragments.GALLERY_FRAGMENT;
-import static com.akrivonos.app_standart_java.constants.TagsFragments.HISTORY_FRAGMENT;
-import static com.akrivonos.app_standart_java.constants.TagsFragments.MAP_SEARCH_FRAGMENT;
-import static com.akrivonos.app_standart_java.constants.TagsFragments.SEARCH_PICTURE_FRAGMENT;
-import static com.akrivonos.app_standart_java.constants.TagsFragments.SETTINGS_FRAGMENT;
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_SINGLE_FRAG;
 import static com.akrivonos.app_standart_java.constants.Values.BUNDLE_PHOTO_INFO;
@@ -52,6 +46,12 @@ import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
 import static com.akrivonos.app_standart_java.constants.Values.TYPE_FRAG;
+import static com.akrivonos.app_standart_java.fragments.FavoritesFragment.FAVORITES_FRAGMENT;
+import static com.akrivonos.app_standart_java.fragments.GalleryFragment.GALLERY_FRAGMENT;
+import static com.akrivonos.app_standart_java.fragments.HistoryFragment.HISTORY_FRAGMENT;
+import static com.akrivonos.app_standart_java.fragments.MapSearch.MAP_SEARCH_FRAGMENT;
+import static com.akrivonos.app_standart_java.fragments.SearchPictureFragment.SEARCH_PICTURE_FRAGMENT;
+import static com.akrivonos.app_standart_java.fragments.SettingsFragment.SETTINGS_FRAGMENT;
 
 public class MainActivity extends AppCompatActivity implements OpenListItemLinkListener,
         MapCoordinatesPhotoListener{
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     private ActionBarDrawerToggle toggle;
     private boolean isExpandable;
     private RoomAppDatabase roomAppDatabase;
+    private BatteryChangeReceiver batteryChangeReceiver;
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -88,7 +89,8 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         setUpDefaultPage();
 
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(new BatteryChangeReceiver(), batteryLevelFilter);
+        batteryChangeReceiver = new BatteryChangeReceiver();
+        registerReceiver(batteryChangeReceiver, batteryLevelFilter);
     }
 
     @Override
@@ -99,12 +101,9 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
+                menuItem -> {
+                    selectDrawerItem(menuItem);
+                    return true;
                 });
     }
 
@@ -284,5 +283,11 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
                    .build();
        }
        return roomAppDatabase;
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(batteryChangeReceiver);
+        super.onDestroy();
     }
 }

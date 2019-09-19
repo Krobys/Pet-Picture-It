@@ -30,10 +30,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class MapSearch extends Fragment implements OnMapReadyCallback {
+    public static final String MAP_SEARCH_FRAGMENT = "map_search_fragment";
     private GoogleMap map;
     private MapCoordinatesPhotoListener mapCoordinatesPhotoListener;
     private FusedLocationProviderClient fusedLocationClient;

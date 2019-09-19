@@ -29,6 +29,7 @@ import java.util.Map;
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
 
 public class FavoritesFragment extends Fragment {
+    public static final String FAVORITES_FRAGMENT = "favorites_fragment";
     private String userName;
     private RoomAppDatabase appDatabase;
     private PictureAdapter favoritesPictureAdapter;

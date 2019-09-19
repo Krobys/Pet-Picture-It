@@ -25,7 +25,7 @@ import java.util.Collections;
 
 
 public class HistoryFragment extends Fragment {
-
+    public static final String HISTORY_FRAGMENT = "history_fragment";
     public HistoryFragment() {
         // Required empty public constructor
     }
