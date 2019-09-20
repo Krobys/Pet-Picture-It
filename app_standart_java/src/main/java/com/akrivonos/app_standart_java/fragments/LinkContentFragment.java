@@ -29,8 +29,8 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.room.FavoritePhoto;
 import com.akrivonos.app_standart_java.room.HistoryPhoto;
 import com.akrivonos.app_standart_java.room.RoomAppDatabase;
+import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.akrivonos.app_standart_java.constants.Values.ARGUMENT_EXPANABLE_FRAG;
@@ -59,13 +59,10 @@ public class LinkContentFragment extends Fragment {
         setUpFragmentButtonsNotExpandable(view);
 
         setHasOptionsMenu(true);
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                HistoryPhoto historyPhoto = new HistoryPhoto(photoInfo);
-                appDatabase.historyPhotoDao().addToHistoryConvention(historyPhoto);
-                appDatabase.historyPhotoDao().deleteOverLimitHistory();
-            }
+        AsyncTask.execute(() -> {
+            HistoryPhoto historyPhoto = new HistoryPhoto(photoInfo);
+            appDatabase.historyPhotoDao().addToHistoryConvention(historyPhoto);
+            appDatabase.historyPhotoDao().deleteOverLimitHistory();
         });
 
         WebView webView = view.findViewById(R.id.web_view);
@@ -125,7 +122,8 @@ public class LinkContentFragment extends Fragment {
     };
 
     private boolean checkIsFavorite() {
-        List<PhotoInfo> photoInfos = new ArrayList<>(appDatabase.favoritePhotoDao().checkIsFavorite(photoInfo.getUrlText()));
+        List<PhotoInfo> photoInfos = appDatabase.favoritePhotoDao()
+                .checkIsFavorite(photoInfo.getUrlText(), PreferenceUtils.getCurrentUserName(getContext()));
         return photoInfos.size() != 0;
     }
 

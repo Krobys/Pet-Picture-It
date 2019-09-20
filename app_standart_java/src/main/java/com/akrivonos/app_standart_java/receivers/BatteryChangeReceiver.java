@@ -7,14 +7,17 @@ import android.os.BatteryManager;
 import android.widget.Toast;
 
 public class BatteryChangeReceiver extends BroadcastReceiver {
+    private int currentBatteryStatus = 100;
         public void onReceive(Context context, Intent intent) {
-            context.unregisterReceiver(this);
             int rawlevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             int level = -1;
             if (rawlevel >= 0 && scale > 0) {
                 level = (rawlevel * 100) / scale;
             }
-            Toast.makeText(context, "Change battery lvl: "+level, Toast.LENGTH_SHORT).show();
+            if (currentBatteryStatus != level) {
+                Toast.makeText(context, "Change battery lvl: " + level, Toast.LENGTH_SHORT).show();
+                currentBatteryStatus = level;
+            }
         }
 }

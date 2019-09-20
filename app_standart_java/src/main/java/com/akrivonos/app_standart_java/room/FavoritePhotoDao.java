@@ -21,7 +21,7 @@ public interface FavoritePhotoDao{
     @Delete
     void setPhotoNotFavorite(FavoritePhoto favoritePhoto);
 
-    @Query("SELECT * FROM favoritephoto WHERE url = (:photoUrl)")
-    List<FavoritePhoto> checkIsFavorite(String photoUrl);
+    @Query("SELECT * FROM favoritephoto WHERE url = (:photoUrl) AND user = (:user)")
+    List<PhotoInfo> checkIsFavorite(String photoUrl, String user);
 
 }

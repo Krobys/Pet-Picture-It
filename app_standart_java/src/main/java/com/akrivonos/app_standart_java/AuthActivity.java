@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding3.view.RxView;
+
+import io.reactivex.disposables.Disposable;
+
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
@@ -19,6 +23,7 @@ import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGH
 public class AuthActivity extends AppCompatActivity {
 
     private EditText userNameField;
+    private Disposable loginButDis;
     private final View.OnClickListener checkUser = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -42,7 +47,15 @@ public class AuthActivity extends AppCompatActivity {
         restoreDefaultNightMode();
         userNameField = findViewById(R.id.nameOfUserField);
         Button logInButton = findViewById(R.id.logInButton);
-        logInButton.setOnClickListener(checkUser);
+        //logInButton.setOnClickListener(checkUser);
+        loginButDis = RxView.clicks(logInButton)
+                .map(unit -> userNameField.getText().toString().toLowerCase())
+                .filter(userName -> !TextUtils.isEmpty(userName))
+                .subscribe(userName -> {
+                    saveCurrentUser(userName);
+                    startActivity(new Intent(AuthActivity.this, MainActivity.class));
+                    finish();
+                });
     }
 
     private void saveCurrentUser(String currentUserName) { //сохранение состояния поля для ввода
@@ -58,5 +71,11 @@ public class AuthActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(nightMode);
             recreate();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        loginButDis.dispose();
+        super.onDestroy();
     }
 }

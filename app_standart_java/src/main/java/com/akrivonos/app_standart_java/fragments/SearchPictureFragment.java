@@ -4,9 +4,7 @@ package com.akrivonos.app_standart_java.fragments;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -49,7 +47,6 @@ import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_
 import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
-import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT;
 
 public class SearchPictureFragment extends Fragment implements ControlBorderDownloaderListener,
         OnResultCoordinatesPictureListener {
@@ -147,13 +144,18 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
 
         editTextDis = RxTextView.textChanges(searchRequestEditText)
                 .debounce(350, TimeUnit.MILLISECONDS)
-                .filter(textSearch -> textSearch.length() >= 3 && textSearch.length() < 10)
-                .subscribe(textSearch -> RetrofitSearchDownload.getInstance().startDownloadPictures(textSearch.toString(), currentUser, 1));
+                .filter(searchText -> searchText.length() >= 3 && searchText.length() < 10)
+                .map(CharSequence::toString)
+                .subscribe(searchText -> {
+                    this.searchText = searchText;
+                    RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
+                });
 
         buttonSearchDis = RxView.clicks(searchButton)
                 .map(unit -> searchRequestEditText.getText().toString())
                 .filter(searchText -> !TextUtils.isEmpty(searchText) && InternetUtils.isInternetConnectionEnable(getContext()))
                 .subscribe(searchText -> {
+                    this.searchText = searchText;
                             RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
                             pictureAdapter.throwOffData();
                             progressBar.setVisibility(View.VISIBLE);
@@ -163,7 +165,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
 
             currentUser = PreferenceUtils.getCurrentUserName(getContext());
 
-        restoreSearchField();
+        PreferenceUtils.restoreSearchField(getContext());
         return layoutView;
     }
 
@@ -180,19 +182,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
             startCoordinatesSearch(latLng);
         }
     }
-    private void saveSearchField() { //сохранение состояния поля для ввода
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String searchFieldText = searchRequestEditText.getText().toString();
-        sharedPreferences.edit().putString(SEARCH_FIELD_TEXT, searchFieldText).apply();
-    }
 
-    private void restoreSearchField() { //востановление состояния поля для ввода
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (sharedPreferences.contains(SEARCH_FIELD_TEXT)) {
-            String searchFieldText = sharedPreferences.getString(SEARCH_FIELD_TEXT, "");
-            searchRequestEditText.setText(searchFieldText);
-        }
-    }
 
 
     @Override
@@ -205,11 +195,12 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
                 RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, pageToLoad);
                 break;
         }
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDestroyView() {
-        saveSearchField();
+        PreferenceUtils.saveSearchField(getContext(), searchRequestEditText.getText().toString());
         editTextDis.dispose();
         buttonSearchDis.dispose();
         super.onDestroyView();

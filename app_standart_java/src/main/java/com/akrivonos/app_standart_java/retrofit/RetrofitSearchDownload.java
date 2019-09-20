@@ -19,6 +19,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
+import static com.akrivonos.app_standart_java.constants.Values.API_KEY_FLICKR;
 import static com.akrivonos.app_standart_java.constants.Values.METHOD_SEARCH_BY_GEO;
 import static com.akrivonos.app_standart_java.constants.Values.METHOD_SEARCH_BY_TEXT;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
@@ -31,7 +32,6 @@ public class RetrofitSearchDownload {
     private String userName;
 
     private final static String BASE_URL = "https://www.flickr.com/services/";
-    private final static String API_KEY = "c67772a7cb8e4c8be058a309f88f62cf";
     private static RetrofitSearchDownload retrofitSearchDownload;
     private MutableLiveData<PostDownloadPicturePack> transData;
     private final ApiRetrofitInterface apiService;
@@ -63,7 +63,7 @@ public class RetrofitSearchDownload {
         typeLoadPageTask = PAGE_DEF_PIC;
         this.searchText = searchText;
         this.userName = userName;
-        Call<Rsp> RspCall = apiService.searchPhotosByName(METHOD_SEARCH_BY_TEXT, API_KEY, searchText, pageToLoad);
+        Call<Rsp> RspCall = apiService.searchPhotosByName(METHOD_SEARCH_BY_TEXT, API_KEY_FLICKR, searchText, pageToLoad);
         RspCall.enqueue(new Callback<Rsp>() {
             @Override
             public void onResponse(@NonNull Call<Rsp> call,@NonNull Response<Rsp> response) {
@@ -93,10 +93,10 @@ public class RetrofitSearchDownload {
     public void startDownloadPictures(LatLng latLng, String userName, int pageToLoad) {
         typeLoadPageTask = PAGE_MAP_PIC;
         this.userName = userName;
-        final Call<Rsp> RspCall = apiService.searchPhotosByGeo(METHOD_SEARCH_BY_GEO, API_KEY, latLng.latitude, latLng.longitude, pageToLoad);
+        final Call<Rsp> RspCall = apiService.searchPhotosByGeo(METHOD_SEARCH_BY_GEO, API_KEY_FLICKR, latLng.latitude, latLng.longitude, pageToLoad);
         RspCall.enqueue(new Callback<Rsp>() {
             @Override
-            public void onResponse(Call<Rsp> call, Response<Rsp> response) {
+            public void onResponse(@NonNull Call<Rsp> call, @NonNull Response<Rsp> response) {
                 PostDownloadPicturePack postDownloadPicturePack;
                 Rsp rsp = response.body();
 
@@ -114,7 +114,7 @@ public class RetrofitSearchDownload {
             }
 
             @Override
-            public void onFailure(@NonNull Call<Rsp> call, Throwable t) {
+            public void onFailure(@NonNull Call<Rsp> call, @NonNull Throwable t) {
                 transData.setValue(null);
             }
         });

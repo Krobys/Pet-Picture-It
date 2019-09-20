@@ -45,7 +45,7 @@ public class HistoryFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         if(mainActivity != null){
-            ArrayList<PhotoInfo> historyPhotos = new ArrayList<PhotoInfo>(mainActivity.getDatabase()
+            ArrayList<PhotoInfo> historyPhotos = new ArrayList<>(mainActivity.getDatabase()
                     .historyPhotoDao()
                     .getHistoryConvention(PreferenceUtils.getCurrentUserName(getContext())));
             Collections.reverse(historyPhotos);
