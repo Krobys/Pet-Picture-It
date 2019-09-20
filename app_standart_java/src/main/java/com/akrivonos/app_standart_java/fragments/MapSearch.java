@@ -29,6 +29,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.jakewharton.rxbinding3.view.RxView;
+
+import io.reactivex.disposables.Disposable;
 
 public class MapSearch extends Fragment implements OnMapReadyCallback {
     public static final String MAP_SEARCH_FRAGMENT = "map_search_fragment";
@@ -36,6 +39,7 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
     private MapCoordinatesPhotoListener mapCoordinatesPhotoListener;
     private FusedLocationProviderClient fusedLocationClient;
     private Button chooseButton;
+    private Disposable searchOnMapDis;
     public MapSearch() {
         // Required empty public constructor
     }
@@ -65,14 +69,11 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         map = googleMap;
-        View.OnClickListener chooseClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LatLng latLng = googleMap.getCameraPosition().target;
-                mapCoordinatesPhotoListener.setResultCoordinatesPic(latLng);
-            }
-        };
-        chooseButton.setOnClickListener(chooseClickListener);
+        searchOnMapDis = RxView.clicks(chooseButton)
+                .subscribe(unit -> {
+                    LatLng latLng = googleMap.getCameraPosition().target;
+                    mapCoordinatesPhotoListener.setResultCoordinatesPic(latLng);
+                });
         map.setMyLocationEnabled(true);
         getCurrentLocation();
     }
@@ -99,6 +100,12 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
         } else {
             Toast.makeText(getContext(), "Please enable gps module", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        searchOnMapDis.dispose();
+        super.onDestroy();
     }
 
     @Override

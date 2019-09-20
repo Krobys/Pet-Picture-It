@@ -27,18 +27,9 @@ import static android.support.v7.app.AppCompatDelegate.getDefaultNightMode;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SettingsFragment extends Fragment {
     public static final String SETTINGS_FRAGMENT = "settings_fragment";
-    private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            changeAppThemeStyle(isChecked);
-        }
-    };
+    private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = (buttonView, isChecked) -> changeAppThemeStyle(isChecked);
     private Switch aSwitch;
 
     public SettingsFragment() {
@@ -85,25 +76,20 @@ public class SettingsFragment extends Fragment {
     }
 
     private void recreateActivity(){
-        new Handler().post(new Runnable() {
+        new Handler().post(() -> {
+            Activity activity = getActivity();
+            if (activity == null) return;
+            Intent intent = activity.getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    | Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            getActivity().overridePendingTransition(0, 0);
+            getActivity().finish();
 
-            @Override
-            public void run()
-            {
-                Activity activity = getActivity();
-                if(activity == null) return;
-                Intent intent = activity.getIntent();
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                getActivity().overridePendingTransition(0, 0);
-                getActivity().finish();
-
-                getActivity().overridePendingTransition(0, 0);
-                intent.putExtra(SETTINGS_FRAGMENT, "settings" );
-                intent.putExtra(EXPANDABLE_VALUE, ((MainActivity) activity).getExpandable());
-                startActivity(intent);
-            }
+            getActivity().overridePendingTransition(0, 0);
+            intent.putExtra(SETTINGS_FRAGMENT, "settings");
+            intent.putExtra(EXPANDABLE_VALUE, ((MainActivity) activity).getExpandable());
+            startActivity(intent);
         });
     }
 }

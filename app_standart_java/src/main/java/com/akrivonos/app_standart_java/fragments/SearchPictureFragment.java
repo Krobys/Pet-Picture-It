@@ -36,6 +36,7 @@ import com.akrivonos.app_standart_java.retrofit.RetrofitSearchDownload;
 import com.akrivonos.app_standart_java.utils.InternetUtils;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
+import com.jakewharton.rxbinding3.view.RxView;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
             }
         }
     };
-    //private Disposable buttonSearchDis;
+    private Disposable buttonSearchDis;
     private Disposable editTextDis;
 
     private final ItemTouchHelper.Callback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) { // Свайп для recycleView
@@ -143,23 +144,22 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
             progressBar = layoutView.findViewById(R.id.progressBar);
             searchRequestEditText = layoutView.findViewById(R.id.search_request);
             searchButton = layoutView.findViewById(R.id.search_button);
-            searchButton.setOnClickListener(startSearch);
 
         editTextDis = RxTextView.textChanges(searchRequestEditText)
                 .debounce(350, TimeUnit.MILLISECONDS)
                 .filter(textSearch -> textSearch.length() >= 3 && textSearch.length() < 10)
                 .subscribe(textSearch -> RetrofitSearchDownload.getInstance().startDownloadPictures(textSearch.toString(), currentUser, 1));
 
-//            buttonSearchDis = RxView.clicks(searchButton)
-//                    .filter(unit -> TextUtils.isEmpty(searchRequestEditText.getText()))
-//                    .filter(unit -> InternetUtils.isInternetConnectionEnable(getContext()))
-//                    .subscribe(test -> {
-//                        RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
-//                        pictureAdapter.throwOffData();
-//                        progressBar.setVisibility(View.VISIBLE);
-//                        searchButton.setClickable(false);
-//                    }
-//            );
+        buttonSearchDis = RxView.clicks(searchButton)
+                .map(unit -> searchRequestEditText.getText().toString())
+                .filter(searchText -> !TextUtils.isEmpty(searchText) && InternetUtils.isInternetConnectionEnable(getContext()))
+                .subscribe(searchText -> {
+                            RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
+                            pictureAdapter.throwOffData();
+                            progressBar.setVisibility(View.VISIBLE);
+                            searchButton.setClickable(false);
+                        }
+                );
 
             currentUser = PreferenceUtils.getCurrentUserName(getContext());
 
@@ -211,9 +211,10 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     public void onDestroyView() {
         saveSearchField();
         editTextDis.dispose();
-        //buttonSearchDis.dispose();
+        buttonSearchDis.dispose();
         super.onDestroyView();
     }
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {//сохранение списка загруженных картинок при пересоздании
@@ -231,6 +232,11 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
         if(activity != null)
         activity.setTitle("PICTURE IT");
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
     }
 
     public void startCoordinatesSearch(LatLng latLng) {

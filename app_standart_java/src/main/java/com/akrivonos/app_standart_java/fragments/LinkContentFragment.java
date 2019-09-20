@@ -89,10 +89,7 @@ public class LinkContentFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private boolean checkIsFavorite(){
-        List<PhotoInfo> photoInfos = new ArrayList<PhotoInfo>(appDatabase.favoritePhotoDao().checkIsFavorite(photoInfo.getUrlText()));
-        return photoInfos.size() != 0;
-    }
+    private final View.OnClickListener downloadButtonClick = v -> checkPermissionsDownload();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -127,12 +124,10 @@ public class LinkContentFragment extends Fragment {
         }
     };
 
-    private final View.OnClickListener downloadButtonClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            checkPermissionsDownload();
-        }
-    };
+    private boolean checkIsFavorite() {
+        List<PhotoInfo> photoInfos = new ArrayList<>(appDatabase.favoritePhotoDao().checkIsFavorite(photoInfo.getUrlText()));
+        return photoInfos.size() != 0;
+    }
 
     private void getArgumentsFragment(){
         Bundle bundle = getArguments();

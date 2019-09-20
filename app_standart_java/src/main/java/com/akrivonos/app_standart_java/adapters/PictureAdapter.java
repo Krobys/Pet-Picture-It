@@ -17,9 +17,12 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.room.FavoritePhoto;
 import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 import com.bumptech.glide.Glide;
+import com.jakewharton.rxbinding3.view.RxView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
 
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.VIEW_TYPE_PICTURE_CARD;
@@ -138,41 +141,54 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     @Override
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+        if (holder.getItemViewType() == VIEW_TYPE_PICTURE_CARD) {
+            ((PictureViewHolder) holder).disposeViews();
+        }
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
     public int getItemCount() {
         return photosPicture.size();
     }
 
-    class PictureViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener { // Холдер для карточки с картинкой
+    class PictureViewHolder extends RecyclerView.ViewHolder { // Холдер для карточки с картинкой
 
         private final ImageView picture;
         private final TextView requestText;
         private final ImageButton deleteButton;
+        private final Disposable cardViewDis;
+        private final Disposable deleteButtonDis;
         private PhotoInfo photoInfo;
 
         PictureViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            cardViewDis = RxView.clicks(itemView)
+                    .subscribe(unit -> activityControl.openLinkItem(photoInfo));
             deleteButton = itemView.findViewById(R.id.delete_button);
-            deleteButton.setOnClickListener(this);
             deleteButton.setVisibility((visibilityDeleteButton)
                     ? View.VISIBLE
                     : View.GONE);
+            deleteButtonDis = RxView.clicks(deleteButton)
+                    .filter(unit -> deleteButton.getVisibility() == View.VISIBLE)
+                    .map(unit -> getAdapterPosition())
+                    .subscribe(position -> {
+                        appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photosPicture.get(position)));
+                        deleteItem(position);
+                    });
+            //deleteButton.setOnClickListener(this);
+
             picture = itemView.findViewById(R.id.photo_from_camera);
             requestText = itemView.findViewById(R.id.request_text);
-            itemView.setOnClickListener(this);
-
+            //itemView.setOnClickListener(this);
         }
 
-        @Override
-        public void onClick(View v) {
-            int adapterPosition = getAdapterPosition();
-            if (v.getId() == R.id.delete_button) {
-                appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photosPicture.get(adapterPosition)));
-                deleteItem(adapterPosition);
-            } else {
-                activityControl.openLinkItem(photoInfo);
-            }
+        void disposeViews() {
+            cardViewDis.dispose();
+            deleteButtonDis.dispose();
         }
-
     }
 
     class TitleViewHolder extends RecyclerView.ViewHolder { // Холдер для заглавия
