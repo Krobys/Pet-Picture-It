@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -90,10 +91,11 @@ public class LinkContentFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("test", "Photoinfo id: "+photoInfo.getId());
         switch (item.getItemId()) {
             case R.id.favorire_pick:
                 if (checkIsFavorite()) {
-                    appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photoInfo));
+                    appDatabase.favoritePhotoDao().setPhotoNotFavorite(photoInfo.getUrlText(), photoInfo.getUserName());
                     item.setIcon(R.drawable.ic_favorite_border_black_unactive);
                 } else {
                     appDatabase.favoritePhotoDao().setPhotoFavorite(new FavoritePhoto(photoInfo));
@@ -112,7 +114,7 @@ public class LinkContentFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (checkIsFavorite()) {
-                appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photoInfo));
+                appDatabase.favoritePhotoDao().setPhotoNotFavorite(photoInfo.getUrlText(), photoInfo.getUserName());
                 v.setBackgroundResource(R.drawable.ic_favorite_border_black_unactive);
             } else {
                 appDatabase.favoritePhotoDao().setPhotoFavorite(new FavoritePhoto(photoInfo));

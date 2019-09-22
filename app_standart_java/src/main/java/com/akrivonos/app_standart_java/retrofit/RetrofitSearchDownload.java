@@ -115,6 +115,7 @@ public class RetrofitSearchDownload {
 
             @Override
             public void onFailure(@NonNull Call<Rsp> call, @NonNull Throwable t) {
+                Log.d("test", "onFailure: "+t.getMessage());
                 transData.setValue(null);
             }
         });

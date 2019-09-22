@@ -42,10 +42,11 @@ public class FavoritesFragment extends Fragment {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
             if (viewHolder.getItemViewType() == VIEW_TYPE_PICTURE_CARD) {
+                PhotoInfo photoInfo = favoritesPictureAdapter
+                        .getData()
+                        .get(viewHolder.getAdapterPosition());
                 appDatabase.favoritePhotoDao()
-                        .setPhotoNotFavorite(new FavoritePhoto(favoritesPictureAdapter
-                                .getData()
-                                .get(viewHolder.getAdapterPosition())));
+                        .setPhotoNotFavorite(photoInfo.getUrlText(), photoInfo.getUserName());
                 favoritesPictureAdapter.deleteItem(viewHolder.getAdapterPosition());
             }
         }

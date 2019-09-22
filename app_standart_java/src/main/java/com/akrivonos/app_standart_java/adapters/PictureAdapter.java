@@ -175,7 +175,7 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .filter(unit -> deleteButton.getVisibility() == View.VISIBLE)
                     .map(unit -> getAdapterPosition())
                     .subscribe(position -> {
-                        appDatabase.favoritePhotoDao().setPhotoNotFavorite(new FavoritePhoto(photosPicture.get(position)));
+                        appDatabase.favoritePhotoDao().setPhotoNotFavorite(photosPicture.get(position).getUrlText(), photosPicture.get(position).getUserName() );
                         deleteItem(position);
                     });
             //deleteButton.setOnClickListener(this);

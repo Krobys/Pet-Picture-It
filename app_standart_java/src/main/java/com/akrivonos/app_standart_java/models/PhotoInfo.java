@@ -10,7 +10,7 @@ import android.os.Parcelable;
 public class PhotoInfo implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
-    private long id;
+    private long id = 0;
     @ColumnInfo(name = "user")
     private String userName = null;
     @ColumnInfo(name = "request")
