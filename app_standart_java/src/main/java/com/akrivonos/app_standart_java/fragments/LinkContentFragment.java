@@ -126,7 +126,9 @@ public class LinkContentFragment extends Fragment {
     private boolean checkIsFavorite() {
         List<PhotoInfo> photoInfos = appDatabase.favoritePhotoDao()
                 .checkIsFavorite(photoInfo.getUrlText(), PreferenceUtils.getCurrentUserName(getContext()));
-        return photoInfos.size() != 0;
+        boolean isFavorite = photoInfos.size() != 0;
+        Log.d("test", "checkIsFavorite: "+isFavorite);
+        return isFavorite;
     }
 
     private void getArgumentsFragment(){
