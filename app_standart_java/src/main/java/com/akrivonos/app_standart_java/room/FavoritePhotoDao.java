@@ -1,14 +1,10 @@
 package com.akrivonos.app_standart_java.room;
 
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverters;
-import android.net.Uri;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
-import com.akrivonos.app_standart_java.room.converters.UriConverter;
 
 import java.util.List;
 

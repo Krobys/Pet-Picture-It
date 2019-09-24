@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.PictureAdapter;
 import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener;
-import com.akrivonos.app_standart_java.listeners.OnResultCoordinatesPictureListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.models.PostDownloadPicturePack;
@@ -48,8 +47,7 @@ import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITU
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
 
-public class SearchPictureFragment extends Fragment implements ControlBorderDownloaderListener,
-        OnResultCoordinatesPictureListener {
+public class SearchPictureFragment extends Fragment implements ControlBorderDownloaderListener {
     public static final String SEARCH_PICTURE_FRAGMENT = "search_picture_fragment";
     private EditText searchRequestEditText;
     private Button searchButton;
@@ -75,24 +73,6 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
         }
     };
 
-    private final View.OnClickListener startSearch = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) { // Кнопка начала скачивания
-            searchText = searchRequestEditText.getText().toString().toLowerCase();
-            if (!TextUtils.isEmpty(searchText)) {
-                if (InternetUtils.isInternetConnectionEnable(getContext())) {
-                    pictureAdapter.throwOffData();
-                    RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
-                    progressBar.setVisibility(View.VISIBLE);
-                    searchButton.setClickable(false);
-                } else {
-                    Toast.makeText(getContext(), getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(getContext(), getString(R.string.empty_field), Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
     private Disposable buttonSearchDis;
     private Disposable editTextDis;
 
@@ -165,7 +145,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
 
             currentUser = PreferenceUtils.getCurrentUserName(getContext());
 
-        PreferenceUtils.restoreSearchField(getContext());
+        searchRequestEditText.setText(PreferenceUtils.restoreSearchField(getContext()));
         return layoutView;
     }
 

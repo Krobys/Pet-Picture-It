@@ -26,4 +26,28 @@
         <item name="android:background">@drawable/shape_edittext</item>
     </style>
 
+    <style name="AnimationPopUpCustom">
+        <item name="android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_hide</item>
+    </style>
+
+    <style name="PopUpCustom">
+        <item name="android:background">@drawable/shape_dialog</item>
+        <item name="android:colorBackground">@color/colorDeepPurple50</item>
+    </style>
+
+    <style name="TitlePopUpCustom">
+        <item name="android:textColor">@color/colorActiveTextPopUp</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:lineSpacingExtra">1.24sp</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DescriptionPopUpCustom">
+        <item name="android:textColor">@color/colorActiveTextPopUp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:lineSpacingExtra">1.27sp</item>
+        <item name="android:letterSpacing">0.006</item>
+    </style>
 </resources>

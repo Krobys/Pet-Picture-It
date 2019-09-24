@@ -2,11 +2,8 @@
     <string name="app_name">PICTURE IT</string>
     <string name="text_for_search">Text for search </string>
     <string name="search">search</string>
-    <string name="empty_field">Request field is empty</string>
-    <string name="auth_field_empty_error">"The Auth Field is Empty"</string>
     <string name="user_name">user_name</string>
     <string name="history">History</string>
-    <string name="no_internet_connection">Mo Internet Connection</string>
     <string name="picture">picture</string>
     <string name="delete_button">delete button</string>
     <string name="name_of_user">Name of user</string>

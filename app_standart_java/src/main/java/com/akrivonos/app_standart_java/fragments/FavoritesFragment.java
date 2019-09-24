@@ -18,7 +18,6 @@ import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.PictureAdapter;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
-import com.akrivonos.app_standart_java.room.FavoritePhoto;
 import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 

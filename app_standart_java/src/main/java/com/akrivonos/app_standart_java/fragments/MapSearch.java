@@ -4,7 +4,6 @@ package com.akrivonos.app_standart_java.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,7 +27,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.jakewharton.rxbinding3.view.RxView;
 
 import io.reactivex.disposables.Disposable;
@@ -86,15 +84,12 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (enabled) {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(15).build();
-                        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-                        map.moveCamera(cameraUpdate);
-                    }
+            fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
+                if (location != null) {
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(15).build();
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+                    map.moveCamera(cameraUpdate);
                 }
             });
         } else {

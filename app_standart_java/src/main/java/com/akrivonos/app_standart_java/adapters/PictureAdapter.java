@@ -14,7 +14,6 @@ import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.listeners.ControlBorderDownloaderListener;
 import com.akrivonos.app_standart_java.listeners.OpenListItemLinkListener;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
-import com.akrivonos.app_standart_java.room.FavoritePhoto;
 import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding3.view.RxView;
@@ -178,11 +177,9 @@ public class PictureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         appDatabase.favoritePhotoDao().setPhotoNotFavorite(photosPicture.get(position).getUrlText(), photosPicture.get(position).getUserName() );
                         deleteItem(position);
                     });
-            //deleteButton.setOnClickListener(this);
 
             picture = itemView.findViewById(R.id.photo_from_camera);
             requestText = itemView.findViewById(R.id.request_text);
-            //itemView.setOnClickListener(this);
         }
 
         void disposeViews() {

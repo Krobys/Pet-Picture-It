@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.SEARCH_FIELD_TEXT;
+import static com.akrivonos.app_standart_java.constants.Values.STATE_MEET_VALUE;
 
 public class PreferenceUtils {
 
@@ -32,4 +33,14 @@ public class PreferenceUtils {
         return "";
     }
 
+    public static void saveStateMeetRequierments(Context context, Boolean state) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences.edit().putBoolean(STATE_MEET_VALUE, state).apply();
+    }
+
+    public static Boolean getStateMeetRequierments(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(STATE_MEET_VALUE, false);
+
+    }
 }

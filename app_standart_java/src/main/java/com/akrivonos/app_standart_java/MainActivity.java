@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -176,14 +177,14 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     private void isViewExpandable(){
         Intent intent = getIntent();
-        if(intent.hasExtra(EXPANDABLE_VALUE)){
+        if (intent.hasExtra(EXPANDABLE_VALUE)) {
             isExpandable = intent.getBooleanExtra(EXPANDABLE_VALUE, false);
             intent.removeExtra(EXPANDABLE_VALUE);
-        }else{
+        } else {
             Fragment fragment = getLastFragment();
-            if(fragment != null){
+            if (fragment != null) {
                 View isExpandableView = getLastFragment().getView();
-                if(isExpandableView != null){
+                if (isExpandableView != null) {
                     View containerContentMore = isExpandableView.findViewById(R.id.details_picture_container);
                     isExpandable = (containerContentMore != null);
                 }

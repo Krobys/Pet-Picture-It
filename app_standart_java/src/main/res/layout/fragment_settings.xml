@@ -5,10 +5,26 @@
     android:layout_height="match_parent"
     tools:context=".fragments.SettingsFragment">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <Switch
             android:id="@+id/switch1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:text="@string/night_mode" />
+
+        <Button
+            android:id="@+id/show_popup_button"
+            style="@style/ButtonMaterialCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="show popup" />
+
+    </LinearLayout>
+
 </FrameLayout>

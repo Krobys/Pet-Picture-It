@@ -7,10 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding3.view.RxView;
 
@@ -24,19 +22,6 @@ public class AuthActivity extends AppCompatActivity {
 
     private EditText userNameField;
     private Disposable loginButDis;
-    private final View.OnClickListener checkUser = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String userName = userNameField.getText().toString().toLowerCase();
-            if (!TextUtils.isEmpty(userName)) {
-                saveCurrentUser(userName);
-                startActivity(new Intent(AuthActivity.this, MainActivity.class));
-                finish();
-            } else {
-                Toast.makeText(AuthActivity.this, getString(R.string.auth_field_empty_error), Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +32,6 @@ public class AuthActivity extends AppCompatActivity {
         restoreDefaultNightMode();
         userNameField = findViewById(R.id.nameOfUserField);
         Button logInButton = findViewById(R.id.logInButton);
-        //logInButton.setOnClickListener(checkUser);
         loginButDis = RxView.clicks(logInButton)
                 .map(unit -> userNameField.getText().toString().toLowerCase())
                 .filter(userName -> !TextUtils.isEmpty(userName))
