@@ -32,6 +32,10 @@ import com.akrivonos.app_standart_java.MainActivity;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
+import org.jetbrains.annotations.NotNull;
+
+import io.ghyeok.stickyswitch.widget.StickySwitch;
+
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static android.support.v7.app.AppCompatDelegate.getDefaultNightMode;
@@ -56,7 +60,7 @@ public class SettingsFragment extends Fragment {
         popupWindow.showAsDropDown(v, 0, 0);
 
         Button acceptButton = popupView.findViewById(R.id.button_popup_accept);
-        Switch switchStateMeet = popupView.findViewById(R.id.switch_popup_custom);
+        StickySwitch switchStateMeet = popupView.findViewById(R.id.switch_popup_custom);
 
         TextView titleCloseMeet = popupView.findViewById(R.id.textViewTitleClose);
         TextView descCloseMeet = popupView.findViewById(R.id.textViewDescriptionClose);
@@ -72,7 +76,7 @@ public class SettingsFragment extends Fragment {
         ObjectAnimator valueAnimatorActivateDescFar = ObjectAnimator.ofObject(descFarMeet, "textColor", new ArgbEvaluator(), colorActive, colorNotActive);
 
         boolean switchChecked = PreferenceUtils.getStateMeetRequierments(getContext());
-        switchStateMeet.setChecked(switchChecked);
+        switchStateMeet.setDirection((switchChecked) ? StickySwitch.Direction.RIGHT : StickySwitch.Direction.LEFT);
         if (switchChecked) {
             titleCloseMeet.setTextColor(colorNotActive);
             descCloseMeet.setTextColor(colorNotActive);
@@ -82,24 +86,28 @@ public class SettingsFragment extends Fragment {
         }
 
         acceptButton.setOnClickListener(v1 -> {
-            PreferenceUtils.saveStateMeetRequierments(getContext(), switchStateMeet.isChecked());
+            boolean state;
+            state = switchStateMeet.getDirection() != StickySwitch.Direction.LEFT;
+            PreferenceUtils.saveStateMeetRequierments(getContext(), state);
             popupWindow.dismiss();
         });
 
-        switchStateMeet.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                valueAnimatorActivateTitleClose.setDuration(300).start();
-                valueAnimatorActivateDescClose.setDuration(300).start();
-                valueAnimatorActivateTitleFar.setDuration(300).reverse();
-                valueAnimatorActivateDescFar.setDuration(300).reverse();
-            } else {
-                valueAnimatorActivateTitleClose.setDuration(300).reverse();
-                valueAnimatorActivateDescClose.setDuration(300).reverse();
-                valueAnimatorActivateTitleFar.setDuration(300).start();
-                valueAnimatorActivateDescFar.setDuration(300).start();
+        switchStateMeet.setOnSelectedChangeListener(new StickySwitch.OnSelectedChangeListener() {
+            @Override
+            public void onSelectedChange(@NotNull StickySwitch.Direction direction, @NotNull String s) {
+                if (direction == StickySwitch.Direction.RIGHT) {
+                    valueAnimatorActivateTitleClose.setDuration(300).start();
+                    valueAnimatorActivateDescClose.setDuration(300).start();
+                    valueAnimatorActivateTitleFar.setDuration(300).reverse();
+                    valueAnimatorActivateDescFar.setDuration(300).reverse();
+                } else {
+                    valueAnimatorActivateTitleClose.setDuration(300).reverse();
+                    valueAnimatorActivateDescClose.setDuration(300).reverse();
+                    valueAnimatorActivateTitleFar.setDuration(300).start();
+                    valueAnimatorActivateDescFar.setDuration(300).start();
+                }
             }
         });
-
     };
 
     public SettingsFragment() {

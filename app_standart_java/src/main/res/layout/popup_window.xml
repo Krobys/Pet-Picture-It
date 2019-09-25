@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/PopUpCustom"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -47,10 +48,22 @@
                     android:text="Meet people\naround you" />
             </LinearLayout>
 
-            <Switch
+            <io.ghyeok.stickyswitch.widget.StickySwitch
                 android:id="@+id/switch_popup_custom"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ss_animationDuration="600"
+                app:ss_animationType="line"
+                app:ss_iconPadding="10dp"
+                app:ss_iconSize="15dp"
+                app:ss_leftIcon="@drawable/close_icon_meet"
+                app:ss_rightIcon="@drawable/far_icon_meet"
+                app:ss_selectedTextSize="14sp"
+                app:ss_sliderBackgroundColor="@color/colorDeepPurple50"
+                app:ss_switchColor="@color/colorPrimaryDark"
+                app:ss_textColor="@color/colorDeepPurple100"
+                app:ss_textSize="12sp"
+                app:ss_textVisibility="visible" />
 
             <LinearLayout
                 android:layout_width="match_parent"
