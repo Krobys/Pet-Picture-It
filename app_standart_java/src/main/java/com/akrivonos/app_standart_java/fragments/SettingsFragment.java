@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatDelegate;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,8 +32,6 @@ import android.widget.TextView;
 import com.akrivonos.app_standart_java.MainActivity;
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
-
-import org.jetbrains.annotations.NotNull;
 
 import io.ghyeok.stickyswitch.widget.StickySwitch;
 
@@ -57,7 +56,7 @@ public class SettingsFragment extends Fragment {
         popupWindow.setContentView(popupView);
         popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        popupWindow.showAsDropDown(v, 0, 0);
+        popupWindow.showAsDropDown(v, 15, 15, Gravity.CENTER_HORIZONTAL);
 
         Button acceptButton = popupView.findViewById(R.id.button_popup_accept);
         StickySwitch switchStateMeet = popupView.findViewById(R.id.switch_popup_custom);
@@ -76,7 +75,8 @@ public class SettingsFragment extends Fragment {
         ObjectAnimator valueAnimatorActivateDescFar = ObjectAnimator.ofObject(descFarMeet, "textColor", new ArgbEvaluator(), colorActive, colorNotActive);
 
         boolean switchChecked = PreferenceUtils.getStateMeetRequierments(getContext());
-        switchStateMeet.setDirection((switchChecked) ? StickySwitch.Direction.RIGHT : StickySwitch.Direction.LEFT);
+        switchStateMeet.setDirection((switchChecked) ? StickySwitch.Direction.RIGHT : StickySwitch.Direction.LEFT, false);
+
         if (switchChecked) {
             titleCloseMeet.setTextColor(colorNotActive);
             descCloseMeet.setTextColor(colorNotActive);
@@ -92,20 +92,17 @@ public class SettingsFragment extends Fragment {
             popupWindow.dismiss();
         });
 
-        switchStateMeet.setOnSelectedChangeListener(new StickySwitch.OnSelectedChangeListener() {
-            @Override
-            public void onSelectedChange(@NotNull StickySwitch.Direction direction, @NotNull String s) {
-                if (direction == StickySwitch.Direction.RIGHT) {
-                    valueAnimatorActivateTitleClose.setDuration(300).start();
-                    valueAnimatorActivateDescClose.setDuration(300).start();
-                    valueAnimatorActivateTitleFar.setDuration(300).reverse();
-                    valueAnimatorActivateDescFar.setDuration(300).reverse();
-                } else {
-                    valueAnimatorActivateTitleClose.setDuration(300).reverse();
-                    valueAnimatorActivateDescClose.setDuration(300).reverse();
-                    valueAnimatorActivateTitleFar.setDuration(300).start();
-                    valueAnimatorActivateDescFar.setDuration(300).start();
-                }
+        switchStateMeet.setOnSelectedChangeListener((direction, s) -> {
+            if (direction == StickySwitch.Direction.RIGHT) {
+                valueAnimatorActivateTitleClose.setDuration(300).start();
+                valueAnimatorActivateDescClose.setDuration(300).start();
+                valueAnimatorActivateTitleFar.setDuration(300).reverse();
+                valueAnimatorActivateDescFar.setDuration(300).reverse();
+            } else {
+                valueAnimatorActivateTitleClose.setDuration(300).reverse();
+                valueAnimatorActivateDescClose.setDuration(300).reverse();
+                valueAnimatorActivateTitleFar.setDuration(300).start();
+                valueAnimatorActivateDescFar.setDuration(300).start();
             }
         });
     };

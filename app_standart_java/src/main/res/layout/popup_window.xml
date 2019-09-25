@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:gravity="center_horizontal"
-            android:text="Two Modes - More Perks" />
+            android:text="@string/two_modes_more_perks" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="25dp"
                 android:layout_weight="1"
-                android:gravity="right"
+                android:gravity="end"
                 android:orientation="vertical">
 
                 <TextView
@@ -36,39 +36,38 @@
                     style="@style/TitlePopUpCustom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:text="CLOSE" />
+                    android:gravity="end"
+                    android:text="@string/close" />
 
                 <TextView
                     android:id="@+id/textViewDescriptionClose"
                     style="@style/DescriptionPopUpCustom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:text="Meet people\naround you" />
+                    android:gravity="end"
+                    android:text="@string/meet_people_naround_you" />
             </LinearLayout>
 
             <io.ghyeok.stickyswitch.widget.StickySwitch
                 android:id="@+id/switch_popup_custom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:ss_animationDuration="600"
+                app:ss_animationDuration="300"
                 app:ss_animationType="line"
-                app:ss_iconPadding="10dp"
-                app:ss_iconSize="15dp"
+                app:ss_iconPadding="8dp"
+                app:ss_iconSize="17dp"
                 app:ss_leftIcon="@drawable/close_icon_meet"
                 app:ss_rightIcon="@drawable/far_icon_meet"
                 app:ss_selectedTextSize="14sp"
                 app:ss_sliderBackgroundColor="@color/colorDeepPurple50"
-                app:ss_switchColor="@color/colorPrimaryDark"
-                app:ss_textColor="@color/colorDeepPurple100"
+                app:ss_switchColor="@color/colorPrimary"
                 app:ss_textSize="12sp"
                 app:ss_textVisibility="visible" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="25dp"
+                android:layout_marginStart="25dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -77,15 +76,15 @@
                     style="@style/TitlePopUpCustom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FAR" />
+                    android:text="@string/far" />
 
                 <TextView
                     android:id="@+id/textViewDescriptionFar"
                     style="@style/DescriptionPopUpCustom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Flirt with \nanyone widely" />
+                    android:gravity="start"
+                    android:text="@string/flirt_with_nanyone_widely" />
             </LinearLayout>
 
         </LinearLayout>
@@ -97,7 +96,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_margin="10dp"
             android:background="@drawable/button_state_popup_accept"
-            android:text="Ok, got it"
+            android:text="@string/ok_got_it"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

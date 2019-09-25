@@ -23,4 +23,10 @@
     <string name="search_pictures">Search Pictures</string>
     <string name="night_mode">Night mode</string>
     <string name="settings">Settings</string>
+    <string name="two_modes_more_perks">Two Modes - More Perks</string>
+    <string name="close">CLOSE</string>
+    <string name="meet_people_naround_you">Meet people around you</string>
+    <string name="far">FAR</string>
+    <string name="flirt_with_nanyone_widely">Flirt with  anyone widely</string>
+    <string name="ok_got_it">Ok, got it</string>
 </resources>
