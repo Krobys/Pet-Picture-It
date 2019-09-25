@@ -23,9 +23,12 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -45,6 +48,8 @@ public class SettingsFragment extends Fragment {
     public static final String SETTINGS_FRAGMENT = "settings_fragment";
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = (buttonView, isChecked) -> changeAppThemeStyle(isChecked);
     private Switch aSwitch;
+    private CheckBox checkBoxBackgroundTask;
+    private ImageButton backgroundTaskReconfigureButton;
 
     private final View.OnClickListener popupStartClickListener = v -> {
         Activity activity = getActivity();
@@ -107,8 +112,72 @@ public class SettingsFragment extends Fragment {
         });
     };
 
+    private CompoundButton.OnCheckedChangeListener checkedUpdateOnBackground = (buttonView, isChecked) -> {
+        if (isChecked) {
+            startPopUpSettingsBackgroundTask(buttonView, true);
+        } else {
+            //TODO stop service
+        }
+    };
+
+    private View.OnClickListener updateBackgroundServiceSettings = buttonView -> {
+        if (checkBoxBackgroundTask.isChecked()) {
+            //TODO popup с возможностью редактирования установленных настроек
+        }
+    };
+
     public SettingsFragment() {
         // Required empty public constructor
+    }
+
+    private void startPopUpSettingsBackgroundTask(View view, boolean isFirstSetUp) {
+        Button applySettings = view.findViewById(R.id.button_popup_accept);
+        RadioGroup radioGroupBackgroundVariants = view.findViewById(R.id.radioGroupBackgroundUpdate);
+        final int[] requestFrequency = new int[1];
+        Activity activity = getActivity();
+        if (activity == null) return;
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window_background_download_settings, null);
+        PopupWindow popupWindow = new PopupWindow(popupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setAnimationStyle(R.style.AnimationPopUpCustom);
+        popupWindow.setContentView(popupView);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupWindow.showAsDropDown(view, 15, 15, Gravity.CENTER_HORIZONTAL);
+
+        radioGroupBackgroundVariants.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.radioButton1:
+                        requestFrequency[0] = 15;
+                        break;
+                    case R.id.radioButton2:
+                        requestFrequency[0] = 30;
+                        break;
+                    case R.id.radioButton3:
+                        requestFrequency[0] = 60;
+                        break;
+                    case R.id.radioButton4:
+                        requestFrequency[0] = 360;
+                        break;
+                    case R.id.radioButton5:
+                        requestFrequency[0] = 720;
+                        break;
+                    case R.id.radioButton6:
+                        requestFrequency[0] = 1440;
+                        break;
+                }
+            }
+            //TODO при закрытии попапа не кнопкой подтверждения - возвращать чекбокс в состояние выключен
+        });
+
+        applySettings.setOnClickListener(v -> {
+            WorkManager workManager =
+                    //TODO стартовать сервис подгрузки
+                    popupWindow.dismiss();
+        });
     }
 
     @Override
@@ -119,6 +188,11 @@ public class SettingsFragment extends Fragment {
         aSwitch = view.findViewById(R.id.switch1);
         setSwitchDependsStyle();
         aSwitch.setOnCheckedChangeListener(onCheckedChangeListener);
+
+        checkBoxBackgroundTask = view.findViewById(R.id.check_box_allow_backgrounds_updates);
+        checkBoxBackgroundTask.setOnCheckedChangeListener(checkedUpdateOnBackground);
+        backgroundTaskReconfigureButton = view.findViewById(R.id.edit_background_updates_button);
+        backgroundTaskReconfigureButton.setOnClickListener(updateBackgroundServiceSettings);
 
         Button popupStartButton = view.findViewById(R.id.show_popup_button);
         popupStartButton.setOnClickListener(popupStartClickListener);
