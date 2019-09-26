@@ -1,7 +1,7 @@
 package com.akrivonos.app_standart_java.room;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
+import androidx.room.Entity;
+import androidx.room.Ignore;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 

@@ -1,8 +1,9 @@
 package com.akrivonos.app_standart_java.retrofit;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.models.PostDownloadPicturePack;
@@ -13,6 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,6 +26,8 @@ import static com.akrivonos.app_standart_java.constants.Values.METHOD_SEARCH_BY_
 import static com.akrivonos.app_standart_java.constants.Values.METHOD_SEARCH_BY_TEXT;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
+import static com.akrivonos.app_standart_java.models.PostDownloadPicturePack.TYPE_DOWNLOAD_CHEDULE;
+import static com.akrivonos.app_standart_java.models.PostDownloadPicturePack.TYPE_DOWNLOAD_STANDART;
 
 public class RetrofitSearchDownload {
 
@@ -35,7 +39,7 @@ public class RetrofitSearchDownload {
     private static RetrofitSearchDownload retrofitSearchDownload;
     private MutableLiveData<PostDownloadPicturePack> transData;
     private final ApiRetrofitInterface apiService;
-
+    private io.reactivex.Observable<ArrayList<PhotoInfo>> observableSheduledPhotos;
     private RetrofitSearchDownload() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -59,7 +63,11 @@ public class RetrofitSearchDownload {
         return transData;
     }
 
-    public void startDownloadPictures(String searchText, String userName, int pageToLoad) {
+    public void setObserverSheduled(io.reactivex.Observer<ArrayList<PhotoInfo>> observer) {
+        observableSheduledPhotos.subscribe(observer);
+    }
+
+    public void startDownloadPictures(String searchText, String userName, int pageToLoad, int typeDownload) {
         typeLoadPageTask = PAGE_DEF_PIC;
         this.searchText = searchText;
         this.userName = userName;
@@ -71,10 +79,17 @@ public class RetrofitSearchDownload {
                 Rsp rsp = response.body();
                 if(rsp != null){
                     if (response.code() == 200){
-                        postDownloadPicturePack = new PostDownloadPicturePack();
-                        postDownloadPicturePack.setPhotos(convertPhotoToPhotoInfo(rsp.getPhotos().getPhoto()));
-                        postDownloadPicturePack.setSettingsLoadPage(new SettingsLoadPage(rsp.getPhotos().getPage(), rsp.getPhotos().getPages(), typeLoadPageTask));
-                        transData.setValue(postDownloadPicturePack);
+                        switch (typeDownload) {
+                            case TYPE_DOWNLOAD_STANDART:
+                                postDownloadPicturePack = new PostDownloadPicturePack();
+                                postDownloadPicturePack.setPhotos(convertPhotoToPhotoInfo(rsp.getPhotos().getPhoto()));
+                                postDownloadPicturePack.setSettingsLoadPage(new SettingsLoadPage(rsp.getPhotos().getPage(), rsp.getPhotos().getPages(), typeLoadPageTask));
+                                transData.setValue(postDownloadPicturePack);
+                                break;
+                            case TYPE_DOWNLOAD_CHEDULE:
+                                observableSheduledPhotos = Observable.create(o -> o.onNext(convertPhotoToPhotoInfo(rsp.getPhotos().getPhoto())));
+                                break;
+                        }
                     }
                     else{
                         transData.setValue(null);
@@ -90,7 +105,7 @@ public class RetrofitSearchDownload {
         });
     }
 
-    public void startDownloadPictures(LatLng latLng, String userName, int pageToLoad) {
+    public void startDownloadPictures(LatLng latLng, String userName, int pageToLoad, int typeDownload) {
         typeLoadPageTask = PAGE_MAP_PIC;
         this.userName = userName;
         final Call<Rsp> RspCall = apiService.searchPhotosByGeo(METHOD_SEARCH_BY_GEO, API_KEY_FLICKR, latLng.latitude, latLng.longitude, pageToLoad);

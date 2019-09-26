@@ -3,6 +3,9 @@ package com.akrivonos.app_standart_java.models;
 import java.util.ArrayList;
 
 public class PostDownloadPicturePack {
+
+    public final static int TYPE_DOWNLOAD_STANDART = 1;
+    public final static int TYPE_DOWNLOAD_CHEDULE = 2;
     private ArrayList<PhotoInfo> photos;
     private SettingsLoadPage settingsLoadPage;
 

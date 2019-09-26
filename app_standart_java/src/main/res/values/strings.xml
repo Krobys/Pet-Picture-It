@@ -29,4 +29,8 @@
     <string name="far">FAR</string>
     <string name="flirt_with_nanyone_widely">Flirt with  anyone widely</string>
     <string name="ok_got_it">Ok, got it</string>
+    <string name="schedule_pictures">Schedule Pictures</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

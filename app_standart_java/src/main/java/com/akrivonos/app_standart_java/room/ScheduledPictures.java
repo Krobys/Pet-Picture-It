@@ -6,14 +6,14 @@ import androidx.room.Ignore;
 import com.akrivonos.app_standart_java.models.PhotoInfo;
 
 @Entity
-public class FavoritePhoto extends PhotoInfo {
+public class ScheduledPictures extends PhotoInfo {
 
-    FavoritePhoto(){
+    ScheduledPictures() {
 
     }
 
     @Ignore
-    public FavoritePhoto(PhotoInfo photoInfo){
+    public ScheduledPictures(PhotoInfo photoInfo) {
         this.setId(photoInfo.getId());
         this.setRequestText(photoInfo.getRequestText());
         this.setUrlText(photoInfo.getUrlText());

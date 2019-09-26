@@ -2,30 +2,31 @@ package com.akrivonos.app_standart_java;
 
 
 import android.Manifest;
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.room.Room;
 
 import com.akrivonos.app_standart_java.fragments.FavoritesFragment;
 import com.akrivonos.app_standart_java.fragments.GalleryFragment;
 import com.akrivonos.app_standart_java.fragments.HistoryFragment;
 import com.akrivonos.app_standart_java.fragments.LinkContentFragment;
 import com.akrivonos.app_standart_java.fragments.MapSearch;
+import com.akrivonos.app_standart_java.fragments.ScheduledPictureFragment;
 import com.akrivonos.app_standart_java.fragments.SearchPictureFragment;
 import com.akrivonos.app_standart_java.fragments.SettingsFragment;
 import com.akrivonos.app_standart_java.listeners.MapCoordinatesPhotoListener;
@@ -35,6 +36,7 @@ import com.akrivonos.app_standart_java.receivers.BatteryChangeReceiver;
 import com.akrivonos.app_standart_java.room.RoomAppDatabase;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
 
@@ -50,6 +52,7 @@ import static com.akrivonos.app_standart_java.fragments.FavoritesFragment.FAVORI
 import static com.akrivonos.app_standart_java.fragments.GalleryFragment.GALLERY_FRAGMENT;
 import static com.akrivonos.app_standart_java.fragments.HistoryFragment.HISTORY_FRAGMENT;
 import static com.akrivonos.app_standart_java.fragments.MapSearch.MAP_SEARCH_FRAGMENT;
+import static com.akrivonos.app_standart_java.fragments.ScheduledPictureFragment.SCHEDULE_FRAGMENT;
 import static com.akrivonos.app_standart_java.fragments.SearchPictureFragment.SEARCH_PICTURE_FRAGMENT;
 import static com.akrivonos.app_standart_java.fragments.SettingsFragment.SETTINGS_FRAGMENT;
 
@@ -141,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
             case R.id.settings:
                 fragment = new SettingsFragment();
                 TAG_FRAGMENT = SETTINGS_FRAGMENT;
+                break;
+            case R.id.scheduled_pictures:
+                fragment = new ScheduledPictureFragment();
+                TAG_FRAGMENT = SCHEDULE_FRAGMENT;
                 break;
             default:
                 fragment = new SearchPictureFragment();

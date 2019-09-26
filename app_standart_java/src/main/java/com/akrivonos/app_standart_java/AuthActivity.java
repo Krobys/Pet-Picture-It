@@ -4,17 +4,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.jakewharton.rxbinding3.view.RxView;
 
 import io.reactivex.disposables.Disposable;
 
-import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 

@@ -41,6 +41,5 @@ public class PreferenceUtils {
     public static Boolean getStateMeetRequierments(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(STATE_MEET_VALUE, false);
-
     }
 }

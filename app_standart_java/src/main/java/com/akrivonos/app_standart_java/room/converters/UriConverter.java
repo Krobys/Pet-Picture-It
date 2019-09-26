@@ -1,7 +1,8 @@
 package com.akrivonos.app_standart_java.room.converters;
 
-import android.arch.persistence.room.TypeConverter;
 import android.net.Uri;
+
+import androidx.room.TypeConverter;
 
 public class UriConverter {
 

@@ -12,7 +12,9 @@ public class Values {
     public static final String METHOD_SEARCH_BY_TEXT = "flickr.photos.search";
     public static final String METHOD_SEARCH_BY_GEO = "flickr.photos.getRecent";
     public static final String LATTITUDE_LONGITUDE = "lat_lng_fragment_search";
+    public static final String TAG_SCHEDULED_WORK = "tag_scheduled_work";
     public static final String STATE_MEET_VALUE = "state_meet_value";
+    public static final String REQUEST_TEXT_SCHEDULED = "request_Text_scheduled";
     public static final int ARGUMENT_SINGLE_FRAG = 1;
     public static final int ARGUMENT_EXPANABLE_FRAG = 2;
     public static final String TYPE_FRAG = "type_fragment";

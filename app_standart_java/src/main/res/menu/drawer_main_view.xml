@@ -31,5 +31,10 @@
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/settings" />
 
+        <item
+            android:id="@+id/scheduled_pictures"
+            android:icon="@drawable/ic_schedule_black_24dp"
+            android:title="@string/schedule_pictures" />
+
     </group>
 </menu>

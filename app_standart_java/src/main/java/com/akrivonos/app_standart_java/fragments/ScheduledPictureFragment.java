@@ -9,7 +9,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,36 +21,34 @@ import com.akrivonos.app_standart_java.models.PhotoInfo;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
+public class ScheduledPictureFragment extends Fragment {
+    public final static String SCHEDULE_FRAGMENT = "schedule_fragment";
 
-public class HistoryFragment extends Fragment {
-    public static final String HISTORY_FRAGMENT = "history_fragment";
-    public HistoryFragment() {
+    public ScheduledPictureFragment() {
         // Required empty public constructor
     }
 
-
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_history, container, false);
+        View view = inflater.inflate(R.layout.fragment_scheduled_picture, container, false);
+
         setHasOptionsMenu(true);
         OpenListItemLinkListener startActivityControlListener = (OpenListItemLinkListener) getActivity();
-        PictureAdapter historyPictureAdapter = new PictureAdapter(startActivityControlListener, getContext());
+        PictureAdapter schedulePictureAdapter = new PictureAdapter(startActivityControlListener, getContext());
 
-        RecyclerView recyclerView = view.findViewById(R.id.history_recycle_view);
+        RecyclerView recyclerView = view.findViewById(R.id.schedule_recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(historyPictureAdapter);
+        recyclerView.setAdapter(schedulePictureAdapter);
 
         MainActivity mainActivity = (MainActivity) getActivity();
-        if(mainActivity != null){
-            ArrayList<PhotoInfo> historyPhotos = new ArrayList<>(mainActivity.getDatabase()
-                    .historyPhotoDao()
-                    .getHistoryConvention(PreferenceUtils.getCurrentUserName(getContext())));
-            Collections.reverse(historyPhotos);
-            historyPictureAdapter.setData(historyPhotos);
-            historyPictureAdapter.notifyDataSetChanged();
+        if (mainActivity != null) {
+            ArrayList<PhotoInfo> schedulePhotos = new ArrayList<>(mainActivity.getDatabase()
+                    .scheduledPicturesDao()
+                    .getSchedulePictures(PreferenceUtils.getCurrentUserName(getContext())));
+            schedulePictureAdapter.setData(schedulePhotos);
+            schedulePictureAdapter.notifyDataSetChanged();
         }
         return view;
     }
@@ -59,8 +56,9 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Activity activity = getActivity();
-        if(activity != null)
-        activity.setTitle("History");
+        if (activity != null)
+            activity.setTitle("Scheduled Pictures");
         super.onCreateOptionsMenu(menu, inflater);
     }
+
 }

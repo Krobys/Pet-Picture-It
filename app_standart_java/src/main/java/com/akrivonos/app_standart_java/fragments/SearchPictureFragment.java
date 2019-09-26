@@ -2,15 +2,8 @@ package com.akrivonos.app_standart_java.fragments;
 
 
 import android.app.Activity;
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +14,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.adapters.PictureAdapter;
@@ -46,6 +47,7 @@ import static com.akrivonos.app_standart_java.constants.Values.CURRENT_POSITION_
 import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_DEF_PIC;
 import static com.akrivonos.app_standart_java.constants.Values.PAGE_MAP_PIC;
+import static com.akrivonos.app_standart_java.models.PostDownloadPicturePack.TYPE_DOWNLOAD_STANDART;
 
 public class SearchPictureFragment extends Fragment implements ControlBorderDownloaderListener {
     public static final String SEARCH_PICTURE_FRAGMENT = "search_picture_fragment";
@@ -56,7 +58,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     private String currentUser;
     private LinearLayoutManager linearLayoutManager;
     private PictureAdapter pictureAdapter;
-    private final android.arch.lifecycle.Observer<PostDownloadPicturePack> downloadPicturesObserverDuo = new android.arch.lifecycle.Observer<PostDownloadPicturePack>() {
+    private final androidx.lifecycle.Observer<PostDownloadPicturePack> downloadPicturesObserverDuo = new androidx.lifecycle.Observer<PostDownloadPicturePack>() {
         @Override
         public void onChanged(@Nullable PostDownloadPicturePack postDownloadPicturePack) {
             if (postDownloadPicturePack != null) {
@@ -128,7 +130,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
                 .map(CharSequence::toString)
                 .subscribe(searchText -> {
                     this.searchText = searchText;
-                    RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
+                    RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1, TYPE_DOWNLOAD_STANDART);
                 });
 
         buttonSearchDis = RxView.clicks(searchButton)
@@ -136,7 +138,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
                 .filter(searchText -> !TextUtils.isEmpty(searchText) && InternetUtils.isInternetConnectionEnable(getContext()))
                 .subscribe(searchText -> {
                     this.searchText = searchText;
-                            RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1);
+                    RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, 1, TYPE_DOWNLOAD_STANDART);
                             pictureAdapter.throwOffData();
                             progressBar.setVisibility(View.VISIBLE);
                             searchButton.setClickable(false);
@@ -169,10 +171,10 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     public void loadNextPage(int pageToLoad, int typePage) {
         switch (typePage) {
             case PAGE_DEF_PIC:
-                RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, pageToLoad);
+                RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, pageToLoad, TYPE_DOWNLOAD_STANDART);
                 break;
             case PAGE_MAP_PIC:
-                RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, pageToLoad);
+                RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, pageToLoad, TYPE_DOWNLOAD_STANDART);
                 break;
         }
         progressBar.setVisibility(View.VISIBLE);
@@ -210,10 +212,10 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
         super.onPrepareOptionsMenu(menu);
     }
 
-    public void startCoordinatesSearch(LatLng latLng) {
+    private void startCoordinatesSearch(LatLng latLng) {
         coordinatesToFindPics = latLng;
         pictureAdapter.throwOffData();
-        RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, 1);
+        RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, 1, TYPE_DOWNLOAD_STANDART);
         progressBar.setVisibility(View.VISIBLE);
         searchButton.setClickable(false);
     }
