@@ -11,12 +11,12 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.jakewharton.rxbinding3.view.RxView;
 
 import io.reactivex.disposables.Disposable;
 
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
-import static com.akrivonos.app_standart_java.constants.Values.CURRENT_USER_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 
 public class AuthActivity extends AppCompatActivity {
@@ -37,16 +37,12 @@ public class AuthActivity extends AppCompatActivity {
                 .map(unit -> userNameField.getText().toString().toLowerCase())
                 .filter(userName -> !TextUtils.isEmpty(userName))
                 .subscribe(userName -> {
-                    saveCurrentUser(userName);
+                    PreferenceUtils.saveCurrentUser(this, userName);
                     startActivity(new Intent(AuthActivity.this, MainActivity.class));
                     finish();
                 });
     }
 
-    private void saveCurrentUser(String currentUserName) { //сохранение состояния поля для ввода
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        sharedPreferences.edit().putString(CURRENT_USER_NAME, currentUserName).apply();
-    }
 
     private void restoreDefaultNightMode() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

@@ -15,8 +15,12 @@ public class Values {
     public static final String TAG_SCHEDULED_WORK = "tag_scheduled_work";
     public static final String STATE_MEET_VALUE = "state_meet_value";
     public static final String REQUEST_TEXT_SCHEDULED = "request_Text_scheduled";
+    public static final String TAG_FRAGMENT_ACTIVITY_START_MODE = "activity_start_mode";
+
+    public static final String SCHEDULED_TASK_ID = "scheduled_task_id";
     public static final int ARGUMENT_SINGLE_FRAG = 1;
     public static final int ARGUMENT_EXPANABLE_FRAG = 2;
+    public static final String TAG_DEBUG = "test";
     public static final String TYPE_FRAG = "type_fragment";
     public static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final int PAGE_DEF_PIC = 1;

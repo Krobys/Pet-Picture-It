@@ -5,12 +5,10 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,6 +38,7 @@ import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.akrivonos.app_standart_java.MainActivity;
@@ -47,6 +46,8 @@ import com.akrivonos.app_standart_java.R;
 import com.akrivonos.app_standart_java.utils.PreferenceUtils;
 import com.akrivonos.app_standart_java.workers.DownloadPicturesWorker;
 
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import io.ghyeok.stickyswitch.widget.StickySwitch;
@@ -55,12 +56,14 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
-import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_TEXT_SCHEDULED;
+import static com.akrivonos.app_standart_java.constants.Values.TAG_DEBUG;
 import static com.akrivonos.app_standart_java.constants.Values.TAG_SCHEDULED_WORK;
 
 public class SettingsFragment extends Fragment {
     public static final String SETTINGS_FRAGMENT = "settings_fragment";
+    public static final String TEXT_REQUEST_SCHEDULED_SETTINGS = "text_request_scheduled";
+    public static final String ID_RADIOBUTTON_SELECTED_SCHEDULED_SETTINGS = "id_radiobutton_scheduled";
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener = (buttonView, isChecked) -> changeAppThemeStyle(isChecked);
     private Switch aSwitch;
     private CheckBox checkBoxBackgroundTask;
@@ -140,7 +143,6 @@ public class SettingsFragment extends Fragment {
     private View.OnClickListener updateBackgroundServiceSettings = buttonView -> {
         if (checkBoxBackgroundTask.isChecked()) {
             startPopUpSettingsBackgroundTask(checkBoxBackgroundTask, false);
-            //TODO popup с возможностью редактирования установленных настроек
         }
     };
 
@@ -149,7 +151,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void startPopUpSettingsBackgroundTask(View view, boolean isFirstSetUp) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (30 >= android.os.Build.VERSION_CODES.O) {
             Activity activity = getActivity();
             if (activity == null) return;
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -159,19 +161,29 @@ public class SettingsFragment extends Fragment {
             popupWindow.setOutsideTouchable(false);
             popupWindow.setFocusable(true);
             popupWindow.setContentView(popupView);
-            popupWindow.showAsDropDown(view, 0, 0, Gravity.CENTER_HORIZONTAL);
-
+            popupWindow.setOnDismissListener((isFirstSetUp) ? () -> checkBoxBackgroundTask.setChecked(false) : null);
+            popupWindow.showAsDropDown(view, 15, 15, Gravity.CENTER_HORIZONTAL);
             Button applySettings = popupView.findViewById(R.id.button_apply_background_task);
             Button cancelButton = popupView.findViewById(R.id.cancel_schedule_button);
             EditText editTextScheduled = popupView.findViewById(R.id.editTextScheduledRequest);
             RadioGroup radioGroupBackgroundVariants = popupView.findViewById(R.id.radioGroupBackgroundUpdate);
 
+            if (!isFirstSetUp) {
+                Context context = getContext();
+                if (context != null) {
+                    String textRequestWorkerSchedule = PreferenceUtils.getScheduleTaskRequestText(context);
+                    int checkedVarianRadioId = PreferenceUtils.getScheduleTaskIdRadiobuttonSelected(context);
+
+                    editTextScheduled.setText(textRequestWorkerSchedule);
+                    radioGroupBackgroundVariants.check(checkedVarianRadioId);
+                }
+            }
+
             final int[] requestFrequency = new int[1];
-            //TODO при закрытии попапа не кнопкой подтверждения - возвращать чекбокс в состояние выключен
             radioGroupBackgroundVariants.setOnCheckedChangeListener((group, checkedId) -> {
                 switch (checkedId) {
                     case R.id.radioButton1:
-                        requestFrequency[0] = 1;
+                        requestFrequency[0] = 15;
                         break;
                     case R.id.radioButton2:
                         requestFrequency[0] = 30;
@@ -213,17 +225,17 @@ public class SettingsFragment extends Fragment {
                     if (context != null) {
                         if (!isFirstSetUp) {
                             WorkManager.getInstance(context).cancelAllWorkByTag(TAG_SCHEDULED_WORK);
-                            WorkManager.getInstance(context).enqueue(periodicWorkRequestDownload);
                         }
+                        WorkManager.getInstance(context).enqueue(periodicWorkRequestDownload);
+                        PreferenceUtils.setScheduleTaskSettings(context, scheduledRequestText, radioGroupBackgroundVariants.getCheckedRadioButtonId());
                     }
+                    popupWindow.setOnDismissListener(null);
                     popupWindow.dismiss();
                 }
             });
 
             cancelButton.setOnClickListener(view1 -> {
-                if (!isFirstSetUp) {
-                    checkBoxBackgroundTask.setChecked(false);
-                }
+                Log.d(TAG_DEBUG, "startPopUpSettingsBackgroundTask: isFirstSetUp: " + isFirstSetUp);
                 popupWindow.dismiss();
             });
         } else {
@@ -231,6 +243,23 @@ public class SettingsFragment extends Fragment {
             Log.d("test", "android.os.Build.VERSION.SDK_INT: " + android.os.Build.VERSION.SDK_INT + " android.os.Build.VERSION_CODES.O: " + android.os.Build.VERSION_CODES.O);
             checkBoxBackgroundTask.setChecked(false);
         }
+    }
+
+    private boolean isScheduleWorkerActive() {
+        Context context = getContext();
+        if (context != null)
+            try {
+                String idWorker = PreferenceUtils.getScheduledTaskId(getContext());
+                Log.d("test", "isScheduleWorkerActive: id: " + idWorker);
+                if (!idWorker.equals("0")) {
+                    return WorkManager.getInstance(context).getWorkInfoById(UUID.fromString(idWorker)).get().getState() == WorkInfo.State.ENQUEUED;
+                }
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        return false;
     }
 
     @Override
@@ -242,10 +271,10 @@ public class SettingsFragment extends Fragment {
         setSwitchDependsStyle();
         aSwitch.setOnCheckedChangeListener(onCheckedChangeListener);
         checkBoxBackgroundTask = view.findViewById(R.id.check_box_allow_backgrounds_updates);
+        checkBoxBackgroundTask.setChecked(isScheduleWorkerActive());
         checkBoxBackgroundTask.setOnCheckedChangeListener(checkedUpdateOnBackground);
         ImageButton backgroundTaskReconfigureButton = view.findViewById(R.id.edit_background_updates_button);
         backgroundTaskReconfigureButton.setOnClickListener(updateBackgroundServiceSettings);
-
         Button popupStartButton = view.findViewById(R.id.show_popup_button);
         popupStartButton.setOnClickListener(popupStartClickListener);
         return view;
@@ -260,9 +289,10 @@ public class SettingsFragment extends Fragment {
         int style_mode = (isChecked)
                 ? MODE_NIGHT_YES
                 : MODE_NIGHT_NO;
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) activity.isRecreated = true;
         AppCompatDelegate.setDefaultNightMode(style_mode);
         saveDefaultNightMode(style_mode);
-        recreateActivity();
     }
 
     @Override
@@ -276,23 +306,5 @@ public class SettingsFragment extends Fragment {
     private void setSwitchDependsStyle() {
         int styleMode = getDefaultNightMode();
         aSwitch.setChecked((styleMode == MODE_NIGHT_YES));
-    }
-
-    private void recreateActivity(){
-        new Handler().post(() -> {
-            Activity activity = getActivity();
-            if (activity == null) return;
-            Intent intent = activity.getIntent();
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    | Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            getActivity().overridePendingTransition(0, 0);
-            getActivity().finish();
-
-            getActivity().overridePendingTransition(0, 0);
-            intent.putExtra(SETTINGS_FRAGMENT, "settings");
-            intent.putExtra(EXPANDABLE_VALUE, ((MainActivity) activity).getExpandable());
-            startActivity(intent);
-        });
     }
 }

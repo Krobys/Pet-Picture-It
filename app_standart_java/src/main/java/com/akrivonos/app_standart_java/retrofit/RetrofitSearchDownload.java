@@ -14,7 +14,8 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,7 +40,7 @@ public class RetrofitSearchDownload {
     private static RetrofitSearchDownload retrofitSearchDownload;
     private MutableLiveData<PostDownloadPicturePack> transData;
     private final ApiRetrofitInterface apiService;
-    private io.reactivex.Observable<ArrayList<PhotoInfo>> observableSheduledPhotos;
+    private PublishSubject<ArrayList<PhotoInfo>> observableScheduledPhotos;
     private RetrofitSearchDownload() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -63,8 +64,11 @@ public class RetrofitSearchDownload {
         return transData;
     }
 
-    public void setObserverSheduled(io.reactivex.Observer<ArrayList<PhotoInfo>> observer) {
-        observableSheduledPhotos.subscribe(observer);
+    public void setObserverScheduled(io.reactivex.Observer<ArrayList<PhotoInfo>> observer) {
+        observableScheduledPhotos = PublishSubject.create();
+        observableScheduledPhotos
+                .observeOn(Schedulers.io())
+                .subscribe(observer);
     }
 
     public void startDownloadPictures(String searchText, String userName, int pageToLoad, int typeDownload) {
@@ -87,7 +91,7 @@ public class RetrofitSearchDownload {
                                 transData.setValue(postDownloadPicturePack);
                                 break;
                             case TYPE_DOWNLOAD_CHEDULE:
-                                observableSheduledPhotos = Observable.create(o -> o.onNext(convertPhotoToPhotoInfo(rsp.getPhotos().getPhoto())));
+                                observableScheduledPhotos.onNext(convertPhotoToPhotoInfo(rsp.getPhotos().getPhoto()));
                                 break;
                         }
                     }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -47,6 +48,8 @@ import static com.akrivonos.app_standart_java.constants.Values.DATABASE_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
+import static com.akrivonos.app_standart_java.constants.Values.TAG_DEBUG;
+import static com.akrivonos.app_standart_java.constants.Values.TAG_FRAGMENT_ACTIVITY_START_MODE;
 import static com.akrivonos.app_standart_java.constants.Values.TYPE_FRAG;
 import static com.akrivonos.app_standart_java.fragments.FavoritesFragment.FAVORITES_FRAGMENT;
 import static com.akrivonos.app_standart_java.fragments.GalleryFragment.GALLERY_FRAGMENT;
@@ -70,9 +73,11 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
 
+    public boolean isRecreated = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        Log.d(TAG_DEBUG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -88,10 +93,10 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
         NavigationView navigationView = findViewById(R.id.nvView);
         setupDrawerContent(navigationView);
         View header = navigationView.getHeaderView(0);
-
+        setUpToggleDrawer();
         ((TextView)header.findViewById(R.id.name_user)).setText(PreferenceUtils.getCurrentUserName(this));
-        setUpDefaultPage();
-
+        if (savedInstanceState != null)
+            isRecreated = savedInstanceState.getBoolean("test", false);
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         batteryChangeReceiver = new BatteryChangeReceiver();
         registerReceiver(batteryChangeReceiver, batteryLevelFilter);
@@ -100,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     @Override
     protected void onResume() {
         isViewExpandable();
+        setUpDefaultPage();
         super.onResume();
     }
 
@@ -116,11 +122,10 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
                 drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
     }
     private void selectDrawerItem(MenuItem menuItem) {
-        Fragment fragment = null;
+        Fragment fragment = new SearchPictureFragment();
         String TAG_FRAGMENT = SEARCH_PICTURE_FRAGMENT;
         switch (menuItem.getItemId()) {
             case R.id.search_pictures:
-                setUpToggleDrawer();
                 fragment = new SearchPictureFragment();
                 TAG_FRAGMENT = SEARCH_PICTURE_FRAGMENT;
                 break;
@@ -149,14 +154,11 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
                 fragment = new ScheduledPictureFragment();
                 TAG_FRAGMENT = SCHEDULE_FRAGMENT;
                 break;
-            default:
-                fragment = new SearchPictureFragment();
         }
-        if(fragment != null){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment, TAG_FRAGMENT).addToBackStack(null).commit();
             menuItem.setChecked(true);
-        }
+
         drawer.closeDrawers();
     }
 
@@ -170,11 +172,19 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     private void setUpDefaultPage() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Intent intent = getIntent();
-        if(intent.hasExtra(SETTINGS_FRAGMENT)){
-            fragmentManager.beginTransaction().add(R.id.flContent, new SettingsFragment(), SETTINGS_FRAGMENT).commit();
-            intent.removeExtra(SETTINGS_FRAGMENT);
+        if (intent.hasExtra(TAG_FRAGMENT_ACTIVITY_START_MODE)) {
+            if (intent.getStringExtra(TAG_FRAGMENT_ACTIVITY_START_MODE).equals(SCHEDULE_FRAGMENT)) {
+                fragmentManager.beginTransaction().replace(R.id.flContent, new ScheduledPictureFragment(), SETTINGS_FRAGMENT).commit();
+            }
         }else{
-            fragmentManager.beginTransaction().add(R.id.flContent, new SearchPictureFragment(), SEARCH_PICTURE_FRAGMENT).commit();
+            if (isRecreated) {
+                Log.d("test", "setUpDefaultPage: settings");
+                fragmentManager.beginTransaction().replace(R.id.flContent, new SettingsFragment(), SETTINGS_FRAGMENT).commit();
+                isRecreated = false;
+            } else {
+                Log.d("test", "setUpDefaultPage: search");
+                fragmentManager.beginTransaction().replace(R.id.flContent, new SearchPictureFragment(), SEARCH_PICTURE_FRAGMENT).commit();
+            }
         }
     }
 
@@ -184,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     private void isViewExpandable(){
         Intent intent = getIntent();
+        boolean exp = intent.getBooleanExtra(EXPANDABLE_VALUE, true);
+        Log.d("test", "isViewExpandable: exp: " + exp);
         if (intent.hasExtra(EXPANDABLE_VALUE)) {
             isExpandable = intent.getBooleanExtra(EXPANDABLE_VALUE, false);
             intent.removeExtra(EXPANDABLE_VALUE);
@@ -261,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
             e.printStackTrace();
         }
 
-
     }
 
     @Override
@@ -297,5 +308,21 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     protected void onDestroy() {
         unregisterReceiver(batteryChangeReceiver);
         super.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG_DEBUG, "onSaveInstanceState: ");
+        outState.putBoolean("recreate", isRecreated);
+        outState.putBoolean("expandableV", isExpandable);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.d("test", "onRestoreInstanceState: ");
+        isRecreated = savedInstanceState.getBoolean("recreate", false);
+        isExpandable = savedInstanceState.getBoolean("expandableV", false);
+        super.onRestoreInstanceState(savedInstanceState);
     }
 }
