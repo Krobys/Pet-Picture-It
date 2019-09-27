@@ -174,7 +174,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
                 RetrofitSearchDownload.getInstance().startDownloadPictures(searchText, currentUser, pageToLoad, TYPE_DOWNLOAD_STANDART);
                 break;
             case PAGE_MAP_PIC:
-                RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, pageToLoad, TYPE_DOWNLOAD_STANDART);
+                RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, pageToLoad);
                 break;
         }
         progressBar.setVisibility(View.VISIBLE);
@@ -215,7 +215,7 @@ public class SearchPictureFragment extends Fragment implements ControlBorderDown
     private void startCoordinatesSearch(LatLng latLng) {
         coordinatesToFindPics = latLng;
         pictureAdapter.throwOffData();
-        RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, 1, TYPE_DOWNLOAD_STANDART);
+        RetrofitSearchDownload.getInstance().startDownloadPictures(coordinatesToFindPics, currentUser, 1);
         progressBar.setVisibility(View.VISIBLE);
         searchButton.setClickable(false);
     }

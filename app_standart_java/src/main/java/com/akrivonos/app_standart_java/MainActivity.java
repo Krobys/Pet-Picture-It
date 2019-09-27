@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -48,7 +47,6 @@ import static com.akrivonos.app_standart_java.constants.Values.DATABASE_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.EXPANDABLE_VALUE;
 import static com.akrivonos.app_standart_java.constants.Values.LATTITUDE_LONGITUDE;
 import static com.akrivonos.app_standart_java.constants.Values.MY_MAP_PERMISSION_CODE;
-import static com.akrivonos.app_standart_java.constants.Values.TAG_DEBUG;
 import static com.akrivonos.app_standart_java.constants.Values.TAG_FRAGMENT_ACTIVITY_START_MODE;
 import static com.akrivonos.app_standart_java.constants.Values.TYPE_FRAG;
 import static com.akrivonos.app_standart_java.fragments.FavoritesFragment.FAVORITES_FRAGMENT;
@@ -77,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG_DEBUG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -178,24 +175,17 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
             }
         }else{
             if (isRecreated) {
-                Log.d("test", "setUpDefaultPage: settings");
                 fragmentManager.beginTransaction().replace(R.id.flContent, new SettingsFragment(), SETTINGS_FRAGMENT).commit();
                 isRecreated = false;
             } else {
-                Log.d("test", "setUpDefaultPage: search");
                 fragmentManager.beginTransaction().replace(R.id.flContent, new SearchPictureFragment(), SEARCH_PICTURE_FRAGMENT).commit();
             }
         }
     }
 
-    public boolean getExpandable(){
-        return isExpandable;
-    }
-
     private void isViewExpandable(){
         Intent intent = getIntent();
         boolean exp = intent.getBooleanExtra(EXPANDABLE_VALUE, true);
-        Log.d("test", "isViewExpandable: exp: " + exp);
         if (intent.hasExtra(EXPANDABLE_VALUE)) {
             isExpandable = intent.getBooleanExtra(EXPANDABLE_VALUE, false);
             intent.removeExtra(EXPANDABLE_VALUE);
@@ -220,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             drawer.openDrawer(GravityCompat.START);
             return true;
@@ -312,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(TAG_DEBUG, "onSaveInstanceState: ");
         outState.putBoolean("recreate", isRecreated);
         outState.putBoolean("expandableV", isExpandable);
         super.onSaveInstanceState(outState);
@@ -320,7 +309,6 @@ public class MainActivity extends AppCompatActivity implements OpenListItemLinkL
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        Log.d("test", "onRestoreInstanceState: ");
         isRecreated = savedInstanceState.getBoolean("recreate", false);
         isExpandable = savedInstanceState.getBoolean("expandableV", false);
         super.onRestoreInstanceState(savedInstanceState);

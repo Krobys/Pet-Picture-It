@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -32,24 +31,20 @@ import io.reactivex.disposables.Disposable;
 
 import static com.akrivonos.app_standart_java.constants.Values.DATABASE_NAME;
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_TEXT_SCHEDULED;
-import static com.akrivonos.app_standart_java.constants.Values.TAG_DEBUG;
 import static com.akrivonos.app_standart_java.constants.Values.TAG_FRAGMENT_ACTIVITY_START_MODE;
 import static com.akrivonos.app_standart_java.fragments.ScheduledPictureFragment.SCHEDULE_FRAGMENT;
 import static com.akrivonos.app_standart_java.models.PostDownloadPicturePack.TYPE_DOWNLOAD_CHEDULE;
 
 public class DownloadPicturesWorker extends androidx.work.Worker {
 
-    public static final String TEXT_REQUEST_SCHEDULE = "text_request_schedule";
-    public static final String CHECKED_RADIOBUTTON_ID = "checked_radiobutton_id";
-    private RoomAppDatabase roomAppDatabase;
+    private final RoomAppDatabase roomAppDatabase;
     private Disposable disposableShedule;
-    private WeakReference<Context> contextWeakReference;
+    private final WeakReference<Context> contextWeakReference;
     private String requestText;
     private String userName;
 
     public DownloadPicturesWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        Log.d("test", "DownloadPicturesWorker: initiated");
         contextWeakReference = new WeakReference<>(context);
         roomAppDatabase = Room.databaseBuilder(context, RoomAppDatabase.class, DATABASE_NAME)
                 .allowMainThreadQueries()
@@ -66,7 +61,6 @@ public class DownloadPicturesWorker extends androidx.work.Worker {
             public void onNext(ArrayList<PhotoInfo> photoInfos) {
                 if (photoInfos != null) {
                     roomAppDatabase.scheduledPicturesDao().clearTable();
-                    Log.d("test", "Next schedule work");
                     for (PhotoInfo photoInfo : photoInfos) {
                         roomAppDatabase.scheduledPicturesDao().addToSheduledTable(new ScheduledPictures(photoInfo));
                     }
@@ -87,7 +81,7 @@ public class DownloadPicturesWorker extends androidx.work.Worker {
                             Intent intent = new Intent(context, MainActivity.class).putExtra(TAG_FRAGMENT_ACTIVITY_START_MODE, SCHEDULE_FRAGMENT);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-                            NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channel29")
                                     .setSmallIcon(R.drawable.ic_turned_in_black)
                                     .setLargeIcon(bitmap)
                                     .setContentTitle("Downloading Finished")
@@ -104,7 +98,6 @@ public class DownloadPicturesWorker extends androidx.work.Worker {
 
             @Override
             public void onError(Throwable e) {
-                Log.d(TAG_DEBUG, "onError: " + e.getMessage());
             }
 
             @Override
@@ -114,14 +107,12 @@ public class DownloadPicturesWorker extends androidx.work.Worker {
         };
 
         RetrofitSearchDownload.getInstance().setObserverScheduled(photosScheduledObserver);
-        Log.d(TAG_DEBUG, "DownloadPicturesWorker: id: " + getId());
         PreferenceUtils.setScheduledTaskId(context, getId().toString());
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        Log.d(TAG_DEBUG, "doWork: ");
         requestText = getInputData().getString(REQUEST_TEXT_SCHEDULED);
         userName = PreferenceUtils.getCurrentUserName(getApplicationContext());
         RetrofitSearchDownload.getInstance().startDownloadPictures(requestText, userName, 1, TYPE_DOWNLOAD_CHEDULE);

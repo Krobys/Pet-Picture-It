@@ -57,7 +57,6 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode;
 import static com.akrivonos.app_standart_java.constants.Values.DEFAULT_MODE_NIGHT;
 import static com.akrivonos.app_standart_java.constants.Values.REQUEST_TEXT_SCHEDULED;
-import static com.akrivonos.app_standart_java.constants.Values.TAG_DEBUG;
 import static com.akrivonos.app_standart_java.constants.Values.TAG_SCHEDULED_WORK;
 
 public class SettingsFragment extends Fragment {
@@ -130,7 +129,7 @@ public class SettingsFragment extends Fragment {
         });
     };
 
-    private CompoundButton.OnCheckedChangeListener checkedUpdateOnBackground = (buttonView, isChecked) -> {
+    private final CompoundButton.OnCheckedChangeListener checkedUpdateOnBackground = (buttonView, isChecked) -> {
         if (isChecked) {
             startPopUpSettingsBackgroundTask(buttonView, true);
         } else {
@@ -140,7 +139,7 @@ public class SettingsFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener updateBackgroundServiceSettings = buttonView -> {
+    private final View.OnClickListener updateBackgroundServiceSettings = buttonView -> {
         if (checkBoxBackgroundTask.isChecked()) {
             startPopUpSettingsBackgroundTask(checkBoxBackgroundTask, false);
         }
@@ -172,10 +171,10 @@ public class SettingsFragment extends Fragment {
                 Context context = getContext();
                 if (context != null) {
                     String textRequestWorkerSchedule = PreferenceUtils.getScheduleTaskRequestText(context);
-                    int checkedVarianRadioId = PreferenceUtils.getScheduleTaskIdRadiobuttonSelected(context);
+                    int checkedVariantRadioId = PreferenceUtils.getScheduleTaskIdRadiobuttonSelected(context);
 
                     editTextScheduled.setText(textRequestWorkerSchedule);
-                    radioGroupBackgroundVariants.check(checkedVarianRadioId);
+                    radioGroupBackgroundVariants.check(checkedVariantRadioId);
                 }
             }
 
@@ -235,7 +234,6 @@ public class SettingsFragment extends Fragment {
             });
 
             cancelButton.setOnClickListener(view1 -> {
-                Log.d(TAG_DEBUG, "startPopUpSettingsBackgroundTask: isFirstSetUp: " + isFirstSetUp);
                 popupWindow.dismiss();
             });
         } else {
@@ -250,7 +248,6 @@ public class SettingsFragment extends Fragment {
         if (context != null)
             try {
                 String idWorker = PreferenceUtils.getScheduledTaskId(getContext());
-                Log.d("test", "isScheduleWorkerActive: id: " + idWorker);
                 if (!idWorker.equals("0")) {
                     return WorkManager.getInstance(context).getWorkInfoById(UUID.fromString(idWorker)).get().getState() == WorkInfo.State.ENQUEUED;
                 }

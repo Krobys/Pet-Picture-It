@@ -82,6 +82,7 @@ public class MapSearch extends Fragment implements OnMapReadyCallback {
         Activity activity = getActivity();
         if(activity == null) return;
         LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager == null) return;
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (enabled) {

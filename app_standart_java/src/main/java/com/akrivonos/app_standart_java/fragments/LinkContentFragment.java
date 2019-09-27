@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,7 +91,6 @@ public class LinkContentFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("test", "Photoinfo id: "+photoInfo.getId());
         switch (item.getItemId()) {
             case R.id.favorire_pick:
                 if (checkIsFavorite()) {
@@ -127,9 +125,7 @@ public class LinkContentFragment extends Fragment {
     private boolean checkIsFavorite() {
         List<PhotoInfo> photoInfos = appDatabase.favoritePhotoDao()
                 .checkIsFavorite(photoInfo.getUrlText(), PreferenceUtils.getCurrentUserName(getContext()));
-        boolean isFavorite = photoInfos.size() != 0;
-        Log.d("test", "checkIsFavorite: "+isFavorite);
-        return isFavorite;
+        return photoInfos.size() != 0;
     }
 
     private void getArgumentsFragment(){

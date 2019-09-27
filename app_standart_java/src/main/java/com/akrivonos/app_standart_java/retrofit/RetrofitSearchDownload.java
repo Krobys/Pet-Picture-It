@@ -1,7 +1,5 @@
 package com.akrivonos.app_standart_java.retrofit;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
@@ -103,13 +101,12 @@ public class RetrofitSearchDownload {
 
             @Override
             public void onFailure(@NonNull Call<Rsp> call,@NonNull Throwable t) {
-                Log.d("test", "onFailure: "+t.getMessage());
                 transData.setValue(null);
             }
         });
     }
 
-    public void startDownloadPictures(LatLng latLng, String userName, int pageToLoad, int typeDownload) {
+    public void startDownloadPictures(LatLng latLng, String userName, int pageToLoad) {
         typeLoadPageTask = PAGE_MAP_PIC;
         this.userName = userName;
         final Call<Rsp> RspCall = apiService.searchPhotosByGeo(METHOD_SEARCH_BY_GEO, API_KEY_FLICKR, latLng.latitude, latLng.longitude, pageToLoad);
@@ -134,7 +131,6 @@ public class RetrofitSearchDownload {
 
             @Override
             public void onFailure(@NonNull Call<Rsp> call, @NonNull Throwable t) {
-                Log.d("test", "onFailure: "+t.getMessage());
                 transData.setValue(null);
             }
         });
