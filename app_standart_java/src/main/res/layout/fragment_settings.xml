@@ -37,14 +37,6 @@
                 android:background="@android:drawable/ic_menu_edit" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/show_popup_button"
-            style="@style/ButtonMaterialCustom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:text="show popup" />
-
     </LinearLayout>
 
 </FrameLayout>
